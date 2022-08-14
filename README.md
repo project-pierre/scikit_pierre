@@ -4,7 +4,7 @@
 
 [Docs](https://readthedocs.io/) | [Paper](https://doi.org/xx.xxx/xxxxx.xxxxxx)
 
-[![logo](Pierre.svg)](https://scikit-pierre.com)
+[![logo](Pierre.svg)](https://project-pierre.github.io/project-pierre)
 
 ## Overview
 
