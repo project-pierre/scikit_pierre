@@ -1,4 +1,4 @@
-from scikit_pierre.pierre.distributions.compute_tilde_q import compute_tilde_q
+from scikit_pierre.distributions.compute_tilde_q import compute_tilde_q
 
 
 def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_func, fairness_func):
