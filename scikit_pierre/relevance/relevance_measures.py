@@ -1,3 +1,5 @@
+from math import log
+
 import numpy as np
 
 
@@ -24,7 +26,7 @@ def ndcg_relevance_score(scores: list) -> float:
 
     The reference for this implementation are from:
 
-    - Silva and Durão. (2022). https://arxiv.org/abs/2204.03706
+    - Silva and Durão. (2022).
 
     :param scores: A list of float in which represents the relevance score for each item in its position.
 
@@ -42,3 +44,24 @@ def ndcg_relevance_score(scores: list) -> float:
     if scores is None or len(scores) < 1:
         return 0.0
     return ndcg_at_k(rel=scores)
+
+
+def utility_relevance_scores(scores: list) -> float:
+    """
+    The ... computes the list relevance.
+
+    The reference for this implementation are from:
+
+    - Sacharidis, Mouratidis, Kleftogiannis (2019) - https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=7946&context=sis_research
+
+    :param scores: A list of float in which represents the relevance score for each item in its position.
+
+    :return: A float which represents the list relevance.
+    """
+    def utility(values):
+        return sum(ix * (1 / log(ix + 1)) for ix, value in enumerate(values, start=1))
+
+    summation = utility(scores)
+    ideal = utility(sorted(scores, reverse=True))
+
+    return summation / ideal

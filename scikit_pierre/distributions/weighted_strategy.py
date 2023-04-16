@@ -1,3 +1,5 @@
+from math import log
+
 from pandas import DataFrame
 
 
@@ -70,4 +72,28 @@ def weighted_probability_strategy(item_classes_set: DataFrame, user_pref_set: Da
     total = sum([value for g, value in distribution_dict.items()])
     user_id = user_pref_set.iloc[0]['USER_ID']
     distribution = DataFrame.from_records({g: value / total for g, value in distribution_dict.items()}, index=[user_id])
+    return distribution.fillna(0.0)
+
+
+def class_ranked_strategy(item_classes_set: DataFrame, user_pref_set: DataFrame) -> DataFrame:
+    """
+    The Class Ranked Strategy - (CRS). The reference for this implementation are from:
+
+    - Sacharidis, Mouratidis, Kleftogiannis (2019) - https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=7946&context=sis_research
+
+    :param item_classes_set: A Dataframe were the lines are the items, the columns are the genres and the cells are probability values.
+    :param user_pref_set: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, TRANSACTION_VALUE]
+
+    :return: A Dataframe with one line. The columns are the genres and the index is the user id. The cells are probability values.
+    """
+    # TODO: REvisar formulação
+    filtered = item_classes_set.filter(items = user_pref_set['ITEM_ID'].tolist(), axis=0)
+
+    def constant(column_values):
+        return sum(value * (1 / log(ix + 1)) for ix, value in enumerate(column_values, start=1))
+
+    const_value = sum([constant(filtered[column_name].tolist()) for column_name in filtered.columns])
+
+    user_id = user_pref_set.iloc[0]['USER_ID']
+    distribution = DataFrame.from_records({column_name: const_value * constant(filtered[column_name].tolist()) for column_name in filtered.columns}, index=[user_id])
     return distribution.fillna(0.0)
