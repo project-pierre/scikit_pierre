@@ -1,6 +1,8 @@
+import logging
 from copy import deepcopy
 from math import log
 
+import numpy as np
 from numpy import sign
 from pandas import DataFrame, concat, merge
 
@@ -13,6 +15,7 @@ from ..tradeoff_weight.accessible import tradeoff_weights_funcs
 
 
 class CalibrationBase(BaseTradeOff):
+    logger = logging.getLogger(__name__)
 
     @staticmethod
     def _tradeoff_sim(lmbda: float, relevance_value: float, fairness_value: float, **kwargs) -> float:
@@ -154,8 +157,12 @@ class LinearCalibration(CalibrationBase):
         recommendation_list = self._select_item_component(
             target_distribution=target_dist,
             candidate_items=self._item_in_memory.select_user_items(data=user_candidate_items),
-            lmbda=lmbda
+            lmbda=lmbda, uid=uid
         )
+
+        if len(recommendation_list) < 10:
+            print(uid)
+            print(recommendation_list)
 
         rec_list = merge(self._item_in_memory.transform_to_pandas(items=recommendation_list), user_candidate_items,
                          how="left", on=["ITEM_ID"])
@@ -176,14 +183,12 @@ class LinearCalibration(CalibrationBase):
         fairness_value = self._fairness_component(p=list(target_distribution.values()),
                                                   q=list(realized_dist.values()),
                                                   d=self.environment["d"])
-
         relevance_value = self._relevance_component([item.score for _, item in temp_rec_items.items()])
-
         utility_value = self._tradeoff_balance_component(lmbda=lmbda, relevance_value=relevance_value,
                                                          fairness_value=fairness_value)
         return utility_value
 
-    def _surrogate(self, target_distribution: dict, candidate_items: dict, lmbda: float) -> dict:
+    def _surrogate(self, uid, target_distribution: dict, candidate_items: dict, lmbda: float) -> dict:
         """
         Start with an empty recommendation list,
         loop over the candidate items, during each iteration
@@ -198,26 +203,42 @@ class LinearCalibration(CalibrationBase):
         recommendation_list = dict()
 
         # loop for each position in recommendation list
-        for order in range(self.environment['list_size']):
+        # print("**********************************************************")
+        # print('user id')
+        # print(uid)
+        range_list = range(int(self.environment['list_size']))
+        # print(range_list)
+        for order in range_list:
+            # print('order')
+            # print(order)
             # start loop variables
-            max_utility = -999999999
+            max_utility = -np.inf
             best_item = None
             best_id = None
             # loop for test each item in each position
             for i_id, item in candidate_items.items():
+                # print(i_id)
+                # print(item)
                 if (i_id not in recommendation_list.keys()) and (i_id is not None):
                     temp_rec_items = deepcopy(recommendation_list)
                     temp_rec_items[i_id] = item
 
                     utility = self._compute_utility(target_distribution=target_distribution,
                                                     temp_rec_items=temp_rec_items, lmbda=lmbda)
-                    if utility > max_utility:
-                        max_utility = deepcopy(utility)
+
+                    # print('utility')
+                    # print(utility)
+                    if float(utility) > float(max_utility):
+                        max_utility = float(deepcopy(utility))
                         best_item = deepcopy(item)
                         best_id = deepcopy(i_id)
+
+                        # print('max_utility')
+                        # print(max_utility)
             if best_id is not None:
                 best_item.position = order + 1
                 recommendation_list[best_id] = best_item
+                # print(recommendation_list)
         return recommendation_list
 
     def _select_item_funcs(self, algorithm_name: str = "SURROGATE"):
@@ -404,10 +425,13 @@ class LogarithmBias(CalibrationBase):
         :return: A Dict of Item Class instances, which represents the user recommendation list.
         """
         recommendation_dict = dict()
+        # print("**********************************************************")
+        # print('user id')
+        range_list = range(int(self.environment['list_size']))
         # loop for each position in recommendation list
-        for order in range(self.environment['list_size']):
+        for order in range_list:
             # start loop variables
-            max_utility = -999999999
+            max_utility = -np.inf
             best_item = None
             best_id = None
             best_bias_list = list()

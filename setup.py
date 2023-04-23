@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
+# python setup.py sdist bdist_wheel
 # The directory containing this file
 HERE = path.abspath(path.dirname(__file__))
 
@@ -15,7 +16,7 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 # This call to setup() does all the work
 setup(
     name="scikit_pierre",
-    version="0.0.1-build3",
+    version="0.0.2-build6",
     description="Scikit-Pierre is a Scientific ToolKit for Post-processing Recommendations.",
     long_description=long_description,
     long_description_content_type="text/markdown",

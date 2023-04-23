@@ -26,7 +26,7 @@ def weighted_strategy_base(item_classes_set: DataFrame, user_pref_set: DataFrame
                 denominator[column_name] = denominator.get(column_name, 0.0) + row.TRANSACTION_VALUE
 
     def genre(g):
-        if g in denominator.keys() and denominator[g] > 0.0:
+        if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
         else:
             return 0.0
