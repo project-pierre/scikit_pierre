@@ -32,11 +32,11 @@ def weighted_strategy_base(item_classes_set: DataFrame, user_pref_set: DataFrame
             return 0.0
 
     compute()
-    distribution = {g: genre(g) for g in item_classes_set.columns}
+    distribution = dict({g: genre(g) for g in item_classes_set.columns})
     return distribution
 
 
-def weighted_strategy(user_pref_set: DataFrame, item_classes_set: DataFrame) -> DataFrame:
+def weighted_strategy(user_id, user_pref_set: DataFrame, item_classes_set: DataFrame) -> DataFrame:
     """
     The Weighted Strategy - (WS). The reference for this implementation are from:
 
@@ -51,13 +51,19 @@ def weighted_strategy(user_pref_set: DataFrame, item_classes_set: DataFrame) -> 
 
     :return: A Dataframe with one line. The columns are the genres and the index is the user id. The cells are probability values.
     """
-    distribution_dict = weighted_strategy_base(item_classes_set, user_pref_set)
-    user_id = user_pref_set.iloc[0]['USER_ID']
-    distribution = DataFrame.from_records(distribution_dict, index=[user_id])
-    return distribution.fillna(0.0)
+    print(user_pref_set.head(5))
+    print(item_classes_set.head(5))
+    distribution_dict = weighted_strategy_base(item_classes_set=item_classes_set, user_pref_set=user_pref_set)
+    try:
+        distribution = DataFrame.from_records(distribution_dict, index=[str(user_id)])
+        return distribution.fillna(0.0)
+    except TypeError:
+        print(user_pref_set)
+        print(distribution_dict)
+        exit(0)
 
 
-def weighted_probability_strategy(item_classes_set: DataFrame, user_pref_set: DataFrame) -> DataFrame:
+def weighted_probability_strategy(user_id, item_classes_set: DataFrame, user_pref_set: DataFrame) -> DataFrame:
     """
     The Weighted Probability Strategy - (WPS). The reference for this implementation are from:
 
@@ -70,12 +76,11 @@ def weighted_probability_strategy(item_classes_set: DataFrame, user_pref_set: Da
     """
     distribution_dict = weighted_strategy_base(item_classes_set, user_pref_set)
     total = sum([value for g, value in distribution_dict.items()])
-    user_id = user_pref_set.iloc[0]['USER_ID']
-    distribution = DataFrame.from_records({g: value / total for g, value in distribution_dict.items()}, index=[user_id])
+    distribution = DataFrame.from_records({g: value / total for g, value in distribution_dict.items()}, index=[str(user_id)])
     return distribution.fillna(0.0)
 
 
-def class_ranked_strategy(item_classes_set: DataFrame, user_pref_set: DataFrame) -> DataFrame:
+def class_ranked_strategy(user_id, item_classes_set: DataFrame, user_pref_set: DataFrame) -> DataFrame:
     """
     The Class Ranked Strategy - (CRS). The reference for this implementation are from:
 
@@ -94,6 +99,5 @@ def class_ranked_strategy(item_classes_set: DataFrame, user_pref_set: DataFrame)
 
     const_value = sum([constant(filtered[column_name].tolist()) for column_name in filtered.columns])
 
-    user_id = user_pref_set.iloc[0]['USER_ID']
-    distribution = DataFrame.from_records({column_name: const_value * constant(filtered[column_name].tolist()) for column_name in filtered.columns}, index=[user_id])
+    distribution = DataFrame.from_records({column_name: const_value * constant(filtered[column_name].tolist()) for column_name in filtered.columns}, index=[str(user_id)])
     return distribution.fillna(0.0)
