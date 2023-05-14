@@ -51,15 +51,19 @@ def weighted_strategy(user_id, user_pref_set: DataFrame, item_classes_set: DataF
 
     :return: A Dataframe with one line. The columns are the genres and the index is the user id. The cells are probability values.
     """
-    print(user_pref_set.head(5))
-    print(item_classes_set.head(5))
     distribution_dict = weighted_strategy_base(item_classes_set=item_classes_set, user_pref_set=user_pref_set)
     try:
         distribution = DataFrame.from_records(distribution_dict, index=[str(user_id)])
         return distribution.fillna(0.0)
-    except TypeError:
+    except TypeError as e:
         print(user_pref_set)
         print(distribution_dict)
+        distribution = DataFrame([list(distribution_dict.values())], columns=list(distribution_dict.keys()), index=[str(user_id)])
+        print(distribution)
+        print(e)
+        return distribution.fillna(0.0)
+    except Exception as e:
+        print(e)
         exit(0)
 
 
