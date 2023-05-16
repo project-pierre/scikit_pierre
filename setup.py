@@ -16,7 +16,7 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 # This call to setup() does all the work
 setup(
     name="scikit_pierre",
-    version="0.0.2-build14",
+    version="0.0.2-build15",
     description="Scikit-Pierre is a Scientific ToolKit for Post-processing Recommendations.",
     long_description=long_description,
     long_description_content_type="text/markdown",

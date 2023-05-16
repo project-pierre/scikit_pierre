@@ -30,12 +30,13 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
                 numerator = 0.00001
         return abs(numerator / denominator)
 
-    def __rank_miscalibration(user_target_distribution, user_rec_list):
+    def __rank_miscalibration(user_id, user_target_distribution, user_rec_list):
         user_rec_list.sort_values(by=['ORDER'])
         result = [
             __miscalibration(
                 target_dist=user_target_distribution,
                 realized_dist=dist_func(
+                    user_id=user_id,
                     user_pref_set=user_rec_list.head(k),
                     item_classes_set=items_classes_set
                 )
@@ -50,7 +51,9 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
         raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     results = list(map(
-        lambda utarget_dist, urec_list: __rank_miscalibration(utarget_dist[1], urec_list[1]),
+        lambda utarget_dist, urec_list: __rank_miscalibration(
+            user_target_distribution=utarget_dist[1], user_rec_list=urec_list[1], user_id=urec_list[0]
+        ),
         users_target_dist.iterrows(),
         users_recommendation_lists.groupby(by=['USER_ID'])
     ))
