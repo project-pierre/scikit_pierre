@@ -47,7 +47,7 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
     users_recommendation_lists.sort_values(by=['USER_ID'], inplace=True)
     users_target_dist.sort_index(inplace=True)
 
-    if set(users_recommendation_lists['USER_ID'].unique().tolist()) != set(users_target_dist.index):
+    if set([str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()]) != set([str(ix) for ix in users_target_dist.index]):
         raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     results = list(map(
