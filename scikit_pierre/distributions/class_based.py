@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def class_weighted_strategy(items: dict) -> dict:
     """
     The Class Weighted Strategy - (CWS). The reference for this implementation are from:
@@ -46,10 +49,12 @@ def weighted_probability_strategy(items: dict) -> dict:
     return final_distribution
 
 
-# Time distribution
-def time_weighted_genre(items: dict) -> dict:
+# ############################################################################################### #
+# ######################################### Time Based ########################################## #
+# ############################################################################################### #
+def time_weighted_based(items: dict) -> dict:
     """
-    The Time Weighted Genre Distribution - (TWGD). The reference for this implementation are from:
+    The Time Weight Based - (TWB). The reference for this implementation are from:
 
     - <In process>
 
@@ -61,12 +66,18 @@ def time_weighted_genre(items: dict) -> dict:
 
     def compute():
         for index, item in items.items():
-            for genre, genre_value in item.genres.items():
-                numerator[genre] = numerator.get(genre, 0.) + item.time * item.score * genre_value
-                denominator[genre] = denominator.get(genre, 0.) + item.time * item.score
+            for genre, genre_value in item.classes.items():
+                numerator[genre] = numerator.get(genre, 0) + item.time * item.score * genre_value
+                denominator[genre] = denominator.get(genre, 0) + item.score
+
+    def genre(g):
+        if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
+            return numerator[g] / denominator[g]
+        else:
+            return 0.00001
 
     compute()
-    distribution = {g: numerator[g] / denominator[g] for g in numerator}
+    distribution = {g: genre(g) for g in numerator}
     return distribution
 
 
@@ -79,7 +90,7 @@ def time_weighted_probability_genre(items: dict) -> dict:
     :param items: A Dict of Item Class instances.
     :return: A Dict of genre and value.
     """
-    dist = time_weighted_genre(items)
+    dist = time_weighted_based(items)
     norm = sum(dist.values())
     distribution = {g: dist[g] / norm for g in dist}
     return distribution

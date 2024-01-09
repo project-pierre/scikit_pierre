@@ -69,7 +69,7 @@ class LinearCalibration(CalibrationBase):
 
     def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame, item_set: DataFrame):
         """
-        :param users_preferences: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, TRANSACTION_VALUE].
+        :param users_preferences: A Pandas DataFrame with four columns [USER_ID, ITEM_ID, TRANSACTION_VALUE, TIMESTAMP].
         :param candidate_items: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, PREDICTED_VALUE].
         :param item_set: A Pandas DataFrame of items.
         """
@@ -203,42 +203,34 @@ class LinearCalibration(CalibrationBase):
         recommendation_list = dict()
 
         # loop for each position in recommendation list
-        # print("**********************************************************")
-        # print('user id')
-        # print(uid)
-        range_list = range(int(self.environment['list_size']))
-        # print(range_list)
+        range_list = list(range(1, int(self.environment['list_size']) + 1))
+
         for order in range_list:
-            # print('order')
-            # print(order)
             # start loop variables
             max_utility = -np.inf
             best_item = None
             best_id = None
+
             # loop for test each item in each position
             for i_id, item in candidate_items.items():
-                # print(i_id)
-                # print(item)
                 if (i_id not in recommendation_list.keys()) and (i_id is not None):
                     temp_rec_items = deepcopy(recommendation_list)
-                    temp_rec_items[i_id] = item
+                    temp_item = deepcopy(item)
+                    temp_item.time = float(1/int(order))
+                    temp_rec_items[i_id] = temp_item
 
                     utility = self._compute_utility(target_distribution=target_distribution,
                                                     temp_rec_items=temp_rec_items, lmbda=lmbda)
 
-                    # print('utility')
-                    # print(utility)
                     if float(utility) > float(max_utility):
                         max_utility = float(deepcopy(utility))
-                        best_item = deepcopy(item)
+                        best_item = deepcopy(temp_item)
                         best_id = deepcopy(i_id)
 
-                        # print('max_utility')
-                        # print(max_utility)
             if best_id is not None:
-                best_item.position = order + 1
+                best_item.position = order
                 recommendation_list[best_id] = best_item
-                # print(recommendation_list)
+
         return recommendation_list
 
     def _select_item_funcs(self, algorithm_name: str = "SURROGATE"):
@@ -425,9 +417,9 @@ class LogarithmBias(CalibrationBase):
         :return: A Dict of Item Class instances, which represents the user recommendation list.
         """
         recommendation_dict = dict()
-        # print("**********************************************************")
-        # print('user id')
-        range_list = range(int(self.environment['list_size']))
+
+        range_list = range(1, int(self.environment['list_size']) + 1)
+
         # loop for each position in recommendation list
         for order in range_list:
             # start loop variables
@@ -439,8 +431,9 @@ class LogarithmBias(CalibrationBase):
             for i_id, item in candidate_items.items():
                 if i_id not in recommendation_dict.keys() and i_id is not None:
                     temp_rec_items = deepcopy(recommendation_dict)
-                    temp_rec_items[i_id] = item
-                    bias_list = deepcopy(best_bias_list)
+                    temp_item = deepcopy(item)
+                    temp_item.time = float(1/int(order))
+                    temp_rec_items[i_id] = temp_item
 
                     utility, bias_list = self._compute_utility(
                         lmbda=lmbda, temp_rec_items=temp_rec_items,
@@ -449,7 +442,7 @@ class LogarithmBias(CalibrationBase):
                     )
                     if utility > max_utility:
                         max_utility = deepcopy(utility)
-                        best_item = deepcopy(item)
+                        best_item = deepcopy(temp_item)
                         best_id = deepcopy(i_id)
             if best_id is not None:
                 best_item.position = order + 1

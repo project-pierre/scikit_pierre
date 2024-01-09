@@ -13,6 +13,8 @@ def distributions_funcs(distribution: str):
         return class_based.class_weighted_strategy
     elif distribution == "WPS":
         return class_based.weighted_probability_strategy
+    elif distribution == "TWB":
+        return class_based.time_weighted_based
     else:
         raise Exception("Distribution not found!")
 

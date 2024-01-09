@@ -62,18 +62,25 @@ class ItemsInMemory:
     def select_user_items(self, data: DataFrame) -> dict:
         """
         Function to select items used in the DataFrame.
-        :param data: A Pandas DataFrame with three columns: [USER_ID, ITEM_ID, TRANSACTION_VALUE] or [USER_ID, ITEM_ID, PREDICTED_VALUE].
+        :param data: A Pandas DataFrame with three or four columns: [USER_ID, ITEM_ID, TRANSACTION_VALUE, TIMESTAMP] or [USER_ID, ITEM_ID, PREDICTED_VALUE].
 
         :return: A subset of variable items.
         """
         user_items = {}
         feedback_column = "PREDICTED_VALUE"
+        maximum = 0
+        minimum = 0
         if "TRANSACTION_VALUE" in data.columns.tolist():
             feedback_column = "TRANSACTION_VALUE"
+        if 'TIMESTAMP' in data.columns.tolist():
+            maximum = data['TIMESTAMP'].max()
+            minimum = data['TIMESTAMP'].min()
         for row in data.itertuples():
             item_id = getattr(row, "ITEM_ID")
             user_items[item_id] = deepcopy(self.items[item_id])
             user_items[item_id].score = getattr(row, feedback_column)
+            if 'TIMESTAMP' in data.columns.tolist():
+                user_items[item_id].time = (getattr(row, 'TIMESTAMP') - minimum) / (maximum - minimum)
         return user_items
 
     @staticmethod
