@@ -105,3 +105,61 @@ def class_ranked_strategy(user_id, item_classes_set: DataFrame, user_pref_set: D
 
     distribution = DataFrame.from_records({column_name: const_value * constant(filtered[column_name].tolist()) for column_name in filtered.columns}, index=[str(user_id)])
     return distribution.fillna(0.0)
+
+
+def time_weighted_based_computation(item_classes_set: DataFrame, user_pref_set: DataFrame) -> dict:
+    """
+    The Time Weight Based - (TWB). The reference for this implementation are from:
+
+    - <In process>
+
+    :param item_classes_set: A Dataframe were the lines are the items, the columns are the genres and the cells are probability values.
+    :param user_pref_set: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, TRANSACTION_VALUE]
+
+    :return: A Dict of genre and value.
+    """
+    numerator = {}
+    denominator = {}
+
+    def compute():
+        for row in user_pref_set.itertuples():
+            for column_name in item_classes_set.columns:
+                line = item_classes_set.loc[row.ITEM_ID]
+                genre_value = line[column_name]
+                if genre_value == 0.0:
+                    continue
+                numerator[column_name] = numerator.get(column_name, 0.0) + row.TIMESTAMP * row.TRANSACTION_VALUE * genre_value
+                denominator[column_name] = denominator.get(column_name, 0.0) + row.TRANSACTION_VALUE
+
+    def genre(g):
+        if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
+            return numerator[g] / denominator[g]
+        else:
+            return 0.00001
+
+    compute()
+    distribution = dict({g: genre(g) for g in item_classes_set.columns})
+    return distribution
+
+
+def time_weighted_based(user_id, user_pref_set: DataFrame, item_classes_set: DataFrame) -> DataFrame:
+    """
+    The Time Weight Based - (TWB). The reference for this implementation are from:
+
+    - <In process>
+
+    :param item_classes_set: A Dataframe were the lines are the items, the columns are the genres and the cells are probability values.
+    :param user_pref_set: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, TRANSACTION_VALUE]
+
+    :return: A Dataframe with one line. The columns are the genres and the index is the user id. The cells are probability values.
+    """
+    distribution_dict = time_weighted_based_computation(item_classes_set=item_classes_set, user_pref_set=user_pref_set)
+    try:
+        distribution = DataFrame.from_records(distribution_dict, index=[str(user_id)])
+        return distribution.fillna(0.0)
+    except TypeError as e:
+        distribution = DataFrame([list(distribution_dict.values())], columns=list(distribution_dict.keys()), index=[str(user_id)])
+        return distribution.fillna(0.0)
+    except Exception as e:
+        print(e)
+        exit(0)

@@ -30,5 +30,7 @@ def distributions_funcs_pandas(distribution: str):
         return weighted_strategy.weighted_strategy
     elif distribution == "WPS":
         return weighted_strategy.weighted_probability_strategy
+    elif distribution == "TWB":
+        return weighted_strategy.time_weighted_based
     else:
         raise Exception("Distribution not found!")
