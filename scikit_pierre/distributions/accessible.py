@@ -1,4 +1,4 @@
-from . import class_based
+from . import class_based, entropy_based, time_based, mixed_based
 from . import weighted_strategy
 
 
@@ -14,7 +14,13 @@ def distributions_funcs(distribution: str):
     elif distribution == "WPS":
         return class_based.weighted_probability_strategy
     elif distribution == "TWB":
-        return class_based.time_weighted_based
+        return time_based.time_weighted_based
+    elif distribution == "TSW":
+        return time_based.temporal_slide_window
+    elif distribution == "GLEB":
+        return entropy_based.global_local_entropy_based
+    elif distribution == "GLEB_TWB":
+        return mixed_based.mixed_gleb_twb
     else:
         raise Exception("Distribution not found!")
 

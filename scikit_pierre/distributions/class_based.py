@@ -1,6 +1,6 @@
-import numpy as np
-
-
+# ############################################################################################### #
+# ######################################### Class Based ######################################### #
+# ############################################################################################### #
 def class_weighted_strategy(items: dict) -> dict:
     """
     The Class Weighted Strategy - (CWS). The reference for this implementation are from:
@@ -50,91 +50,8 @@ def weighted_probability_strategy(items: dict) -> dict:
 
 
 # ############################################################################################### #
-# ######################################### Time Based ########################################## #
+# ######################################### Unrevised ########################################## #
 # ############################################################################################### #
-def time_weighted_based(items: dict) -> dict:
-    """
-    The Time Weight Based - (TWB). The reference for this implementation are from:
-
-    - <In process>
-
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
-    """
-    numerator = {}
-    denominator = {}
-
-    def compute():
-        for index, item in items.items():
-            for genre, genre_value in item.classes.items():
-                numerator[genre] = numerator.get(genre, 0) + item.time * item.score * genre_value
-                denominator[genre] = denominator.get(genre, 0) + item.score
-
-    def genre(g):
-        if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
-            return numerator[g] / denominator[g]
-        else:
-            return 0.00001
-
-    compute()
-    distribution = {g: genre(g) for g in numerator}
-    return distribution
-
-
-def time_weighted_probability_genre(items: dict) -> dict:
-    """
-    The Time Weighted Probability Genre Distribution - (TWPGD). The reference for this implementation are from:
-
-    - <In process>
-
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
-    """
-    dist = time_weighted_based(items)
-    norm = sum(dist.values())
-    distribution = {g: dist[g] / norm for g in dist}
-    return distribution
-
-
-def time_genre(items: dict) -> dict:
-    """
-    The Time Genre Distribution - (TGD). The reference for this implementation are from:
-
-    - <In process>
-
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
-    """
-    numerator = {}
-    denominator = {}
-
-    def compute():
-        for index, item in items.items():
-            for genre, genre_value in item.genres.items():
-                numerator[genre] = numerator.get(genre, 0.) + item.time * genre_value
-                denominator[genre] = denominator.get(genre, 0.) + item.time
-
-    compute()
-    distribution = {g: numerator[g] / denominator[g] for g in numerator}
-    return distribution
-
-
-def time_probability_genre(items: dict) -> dict:
-    """
-    The Time Probability Genre Distribution - (TPGD). The reference for this implementation are from:
-
-    - <In process>
-
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
-    """
-    dist = time_genre(items)
-    norm = sum(dist.values())
-    distribution = {g: dist[g] / norm for g in dist}
-    return distribution
-
-
-# Pure values
 def pure_genre(items: dict) -> dict:
     """
     The Genre Distribution - (GD). The reference for this implementation are from:
