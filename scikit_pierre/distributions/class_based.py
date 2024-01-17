@@ -5,7 +5,7 @@ def class_weighted_strategy(items: dict) -> dict:
     """
     The Class Weighted Strategy - (CWS). The reference for this implementation are from:
 
-    - Silva et. al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
+    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
 
     - Kaya and Bridge (2019). https://doi.org/10.1145/3298689.3347045
 
@@ -19,9 +19,9 @@ def class_weighted_strategy(items: dict) -> dict:
 
     def compute():
         for index, item in items.items():
-            for genre, genre_value in item.classes.items():
-                numerator[genre] = numerator.get(genre, 0) + item.score * genre_value
-                denominator[genre] = denominator.get(genre, 0) + item.score
+            for category, genre_value in item.classes.items():
+                numerator[category] = numerator.get(category, 0) + item.score * genre_value
+                denominator[category] = denominator.get(category, 0) + item.score
 
     def genre(g):
         if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
@@ -49,12 +49,9 @@ def weighted_probability_strategy(items: dict) -> dict:
     return final_distribution
 
 
-# ############################################################################################### #
-# ######################################### Unrevised ########################################## #
-# ############################################################################################### #
 def pure_genre(items: dict) -> dict:
     """
-    The Genre Distribution - (GD). The reference for this implementation are from:
+    The Pure Genre Distribution - (PGD). The reference for this implementation are from:
 
     - <In process>
 
@@ -63,14 +60,14 @@ def pure_genre(items: dict) -> dict:
     """
     distribution = {}
     for index, item in items.items():
-        for genre, genre_value in item.genres.items():
-            distribution[genre] = distribution.get(genre, 0.) + genre_value
+        for category, genre_value in item.classes.items():
+            distribution[category] = distribution.get(category, 0.) + genre_value
     return distribution
 
 
-def probability_genre(items: dict) -> dict:
+def pure_genre_with_probability_property(items: dict) -> dict:
     """
-    The Probability Genre Distribution - (PGD). The reference for this implementation are from:
+    The Pure Genre Distribution with Probability Property - (PGD_P). The reference for this implementation are from:
 
     - <In process>
 
@@ -79,5 +76,10 @@ def probability_genre(items: dict) -> dict:
     """
     dist = pure_genre(items)
     norm = sum(dist.values())
-    distribution = {g: dist[g] / norm for g in dist}
+    distribution = {g: value / norm for g, value in dist.items()}
     return distribution
+
+
+# ############################################################################################### #
+# ######################################### Unrevised ########################################## #
+# ############################################################################################### #

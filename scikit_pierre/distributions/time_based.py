@@ -1,10 +1,6 @@
 # ############################################################################################### #
 # ######################################### Time Based ########################################## #
 # ############################################################################################### #
-import math
-from collections import defaultdict
-
-from numpy import mean
 
 
 def time_weighted_based(items: dict) -> dict:
@@ -21,9 +17,9 @@ def time_weighted_based(items: dict) -> dict:
 
     def compute():
         for index, item in items.items():
-            for genre, genre_value in item.classes.items():
-                numerator[genre] = numerator.get(genre, 0) + item.time * item.score * genre_value
-                denominator[genre] = denominator.get(genre, 0) + item.score
+            for category, genre_value in item.classes.items():
+                numerator[category] = numerator.get(category, 0) + item.time * item.score * genre_value
+                denominator[category] = denominator.get(category, 0) + item.score
 
     def genre(g):
         if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
@@ -36,65 +32,19 @@ def time_weighted_based(items: dict) -> dict:
     return distribution
 
 
-def temporal_slide_window(items: dict, major: int = 10) -> dict:
+def time_weighted_based_with_probability_property(items: dict) -> dict:
     """
-    The Temporal Slide Window - (TSW). The reference for this implementation are from:
-
-    - <In process>
-
-    :param items: A Dict of Item Class instances.
-    :param major: TODO
-
-    :return: A Dict of genre and value.
-    """
-    minor = major * 2
-    total = len(items)
-    batch_size = math.floor(total / minor)
-    floor = 0
-    top = 0
-    distribution_list = []
-    enum_items = list(enumerate(list(items.items())))
-    for i in range(2, minor + 1):
-        top = i * batch_size
-        if i == minor:
-            to_use_items = dict({item for index, item in enum_items[floor:]})
-        else:
-            to_use_items = dict(item for index, item in enum_items[floor:top])
-        distribution_list.append(time_weighted_based(to_use_items))
-        floor = (i - 1) * batch_size
-
-    distribution_list.append(time_weighted_based({
-        **dict(item for index, item in enum_items[:batch_size]), **dict(item for index, item in enum_items[floor:])
-    }))
-
-    dd = defaultdict(list)
-    for d in distribution_list:  # you can list as many input dicts as you want here
-        for key, value in d.items():
-            dd[key].append(value)
-
-    distribution = {}
-    for key, value in dd.items():
-        distribution[key] = mean(value)
-
-    return distribution
-
-
-# ############################################################################################### #
-# ######################################### Unrevised ########################################## #
-# ############################################################################################### #
-def time_weighted_probability_genre(items: dict) -> dict:
-    """
-    The Time Weighted Probability Genre Distribution - (TWPGD). The reference for this implementation are from:
+    The Time Weight Based with Probability Property - (TWB_P). The reference for this implementation are from:
 
     - <In process>
 
     :param items: A Dict of Item Class instances.
     :return: A Dict of genre and value.
     """
-    dist = time_weighted_based(items)
-    norm = sum(dist.values())
-    distribution = {g: dist[g] / norm for g in dist}
-    return distribution
+    distribution = time_weighted_based(items)
+    total = sum([value for g, value in distribution.items()])
+    final_distribution = {g: value / total for g, value in distribution.items()}
+    return final_distribution
 
 
 def time_genre(items: dict) -> dict:
@@ -111,18 +61,18 @@ def time_genre(items: dict) -> dict:
 
     def compute():
         for index, item in items.items():
-            for genre, genre_value in item.genres.items():
-                numerator[genre] = numerator.get(genre, 0.) + item.time * genre_value
-                denominator[genre] = denominator.get(genre, 0.) + item.time
+            for category, genre_value in item.classes.items():
+                numerator[category] = numerator.get(category, 0.) + item.time * genre_value
+                denominator[category] = denominator.get(category, 0.) + item.time
 
     compute()
     distribution = {g: numerator[g] / denominator[g] for g in numerator}
     return distribution
 
 
-def time_probability_genre(items: dict) -> dict:
+def time_genre_with_probability_property(items: dict) -> dict:
     """
-    The Time Probability Genre Distribution - (TPGD). The reference for this implementation are from:
+    The Time Genre Distribution with Probability Property - (TGD_P). The reference for this implementation are from:
 
     - <In process>
 
@@ -131,5 +81,10 @@ def time_probability_genre(items: dict) -> dict:
     """
     dist = time_genre(items)
     norm = sum(dist.values())
-    distribution = {g: dist[g] / norm for g in dist}
+    distribution = {g: value / norm for g, value in dist.items()}
     return distribution
+
+
+# ############################################################################################### #
+# ######################################### Unrevised ########################################### #
+# ############################################################################################### #
