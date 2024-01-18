@@ -7,7 +7,7 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
 
     Implementation based on:
 
-    - Silva et. al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
+    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
 
     :param users_target_dist: A DataFrame were the lines are the users, the columns are the classes and the cells are the distribution value.
     :param users_recommendation_lists: A Pandas DataFrame, which represents the users recommendation lists.

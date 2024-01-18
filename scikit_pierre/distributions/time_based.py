@@ -65,8 +65,14 @@ def time_genre(items: dict) -> dict:
                 numerator[category] = numerator.get(category, 0.) + item.time * genre_value
                 denominator[category] = denominator.get(category, 0.) + item.time
 
+    def genre(g):
+        if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
+            return numerator[g] / denominator[g]
+        else:
+            return 0.00001
+
     compute()
-    distribution = {g: numerator[g] / denominator[g] for g in numerator}
+    distribution = {g: genre(g) for g in numerator}
     return distribution
 
 

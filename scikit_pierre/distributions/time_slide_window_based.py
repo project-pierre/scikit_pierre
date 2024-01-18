@@ -21,9 +21,7 @@ def temporal_slide_window_base_function(items: dict, major: int = 10, using: str
     :return: A Dict of genre and value.
     """
     base_distribution = None
-    if using == "CWS":
-        pass
-    elif using == "GLEB":
+    if using == "GLEB":
         base_distribution = global_local_entropy_based
     elif using == "TWB":
         base_distribution = time_weighted_based

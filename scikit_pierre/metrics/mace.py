@@ -16,12 +16,12 @@ def mace(users_target_dist: DataFrame, users_recommendation_lists: DataFrame, it
 
     :return: A float that's represents the mace value.
     """
-    def __calibration_error(target_dist, realized_dist):
+    def __calibration_error(target_dist: DataFrame, realized_dist: DataFrame):
         diff_result = [abs(float(target_dist[column] - float(realized_dist[column])))
                        for column in realized_dist]
         return sum(diff_result) / len(diff_result)
 
-    def __ace(user_id, user_target_distribution, user_rec_list):
+    def __ace(user_id: str|int, user_target_distribution: DataFrame, user_rec_list: DataFrame):
         user_rec_list.sort_values(by=['ORDER'], inplace=True)
         result_ace = [
             __calibration_error(
