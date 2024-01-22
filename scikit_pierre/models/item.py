@@ -84,7 +84,7 @@ class ItemsInMemory:
         return user_items
 
     @staticmethod
-    def transform_to_pandas(items: dict):
+    def transform_to_pandas(items: dict) -> DataFrame:
         user_results = []
         for _, item in items.items():
             user_results += [DataFrame(data=[[item.id, item.position]],

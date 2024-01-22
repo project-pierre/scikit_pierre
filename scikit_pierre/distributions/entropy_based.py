@@ -14,7 +14,7 @@ def global_local_entropy_based(items: dict) -> dict:
     numerator = {}
     denominator = {}
 
-    def global_entropy():
+    def global_entropy() -> dict:
         genre_list = [
             category
             for index, item in items.items()
@@ -32,7 +32,7 @@ def global_local_entropy_based(items: dict) -> dict:
                 numerator[category] = numerator.get(category, 0) + item.score * ent
                 denominator[category] = denominator.get(category, 0) + item.score
 
-    def genre(g):
+    def genre(g: str) -> float:
         if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
         else:

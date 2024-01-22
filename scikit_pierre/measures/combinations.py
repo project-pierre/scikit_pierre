@@ -14,7 +14,7 @@ def taneja(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return ((p_a + q_b) / 2) * log((p_a + q_b) / (2 * sqrt(p_a * q_b)))
@@ -35,7 +35,7 @@ def kumar_johnson(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return ((p_a ** 2 - q_b ** 2) ** 2) / (2 * (p_a * q_b) ** (3 / 2))
@@ -56,7 +56,7 @@ def avg(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i, diff):
+    def compute(p_i: float, q_i: float, diff: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return abs(p_a - q_b) + diff
@@ -71,14 +71,14 @@ def weighted_total_variation(p: list, q: list, **kwargs) -> float:
 
     The reference for this implementation are from:
 
-    - Seymen et. al. (2021). https://doi.org/10.1145/3460231.3478857
+    - Seymen et al. (2021). https://doi.org/10.1145/3460231.3478857
 
     :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
     :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return (p_a + 1) * abs(p_a - q_b)

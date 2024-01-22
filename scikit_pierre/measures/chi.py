@@ -22,7 +22,7 @@ def person_chi_square(p: list, q: list, **kwargs) -> float:
 
     The reference for this implementation are from:
 
-    - Silva et. al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
+    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
@@ -31,7 +31,7 @@ def person_chi_square(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         try:
             return ((p_i - q_i) ** 2) / q_i
         except ZeroDivisionError:
@@ -55,7 +55,7 @@ def neyman_square(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         try:
             return (p_i - q_i) ** 2 / p_i
         except ZeroDivisionError:
@@ -81,7 +81,7 @@ def squared_chi_square(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         try:
             return (p_i - q_i) ** 2 / (p_i + q_i)
         except ZeroDivisionError:
@@ -107,7 +107,7 @@ def probabilistic_symmetric_chi_square(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         try:
             return (p_i - q_i) ** 2 / (p_i + q_i)
         except ZeroDivisionError:
@@ -133,7 +133,7 @@ def divergence(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         try:
             return (p_i - q_i) ** 2 / (p_i + q_i) ** 2
         except ZeroDivisionError:
@@ -159,7 +159,7 @@ def clark(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         try:
             return (abs(p_i - q_i) / (p_i + q_i)) ** 2
         except ZeroDivisionError:
@@ -185,7 +185,7 @@ def additive_symmetric_chi_squared(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         try:
             return (((p_i - q_i) ** 2) * (p_i + q_i)) / (p_i * q_i)
         except ZeroDivisionError:

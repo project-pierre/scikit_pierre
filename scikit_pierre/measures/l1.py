@@ -89,7 +89,7 @@ def canberra(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         numerator = abs(p_i - q_i)
         denominator = (p_i + q_i)
         try:
@@ -113,7 +113,7 @@ def lorentzian(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         smooth = 1 + abs(p_i - q_i)
         return math.log(smooth)
 

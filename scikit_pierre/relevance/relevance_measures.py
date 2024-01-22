@@ -35,7 +35,7 @@ def ndcg_relevance_score(scores: list) -> float:
     def __dcg_at_k(rel: list) -> float:
         return sum([((2 ** score) - 1)/(np.log2(ix + 2)) for ix, score in enumerate(rel)])
 
-    def ndcg_at_k(rel):
+    def ndcg_at_k(rel: list) -> float:
         idcg = __dcg_at_k(sorted(rel, reverse=True))
         if not idcg:
             return 0.0
@@ -58,10 +58,10 @@ def utility_relevance_scores(scores: list) -> float:
 
     :return: A float which represents the list relevance.
     """
-    def utility(values):
+    def utility(values: list) -> float:
         return sum(ix * (1 / log(ix + 1)) for ix, value in enumerate(values, start=1))
 
-    summation = utility(scores)
+    summation = utility(values=scores)
     ideal = utility(sorted(scores, reverse=True))
 
     return summation / ideal

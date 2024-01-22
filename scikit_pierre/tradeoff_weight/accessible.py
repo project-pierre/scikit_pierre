@@ -22,7 +22,7 @@ def lambda_choice(dist: list, env_lambda: str) -> float:
     elif env_lambda == "EFF":
         return weight.efficiency(dist_vec=dist)
     else:
-        raise Exception("Tradeoff weight not found!")
+        raise Exception(f"Tradeoff weight not found! {env_lambda}")
 
 
 def tradeoff_weights_funcs(env_lambda: str):
@@ -47,5 +47,4 @@ def tradeoff_weights_funcs(env_lambda: str):
     elif env_lambda == "EFF":
         return weight.efficiency
     else:
-        raise Exception("Tradeoff weight not found!")
-
+        raise Exception(f"Tradeoff weight not found! {env_lambda}")

@@ -30,7 +30,7 @@ def bhattacharyya(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute():
+    def compute() -> float:
         value = sum([math.sqrt(p_i * q_i) for p_i, q_i in zip(p, q)])
         if value == 0:
             return 0.00001
@@ -67,7 +67,7 @@ def matusita(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         return (math.sqrt(p_i) - math.sqrt(q_i)) ** 2
 
     return math.sqrt(sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)]))

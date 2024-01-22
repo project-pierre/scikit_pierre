@@ -40,7 +40,7 @@ def wave_hedges(p: list, q: list, **kwargs) -> float:
     :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         numerator = abs(p_i - q_i)
         denominator = max([p_i, q_i])
         try:

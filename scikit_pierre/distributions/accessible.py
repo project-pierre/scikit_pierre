@@ -50,7 +50,7 @@ def distributions_funcs(distribution: str):
     elif distribution == "TSW_TWB_GLEB_P":
         return time_slide_window_based.mixed_tsw_twb_gleb_with_probability_property
     else:
-        raise Exception("Distribution not found!")
+        raise Exception(f"Distribution not found! {distribution}")
 
 
 def distributions_funcs_pandas(distribution: str):

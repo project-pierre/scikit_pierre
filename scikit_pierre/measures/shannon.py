@@ -7,7 +7,7 @@ def kullback_leibler(p: list, q: list, **kwargs) -> float:
 
     The reference for this implementation are from:
 
-    - Silva et. al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
+    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
 
     - Steck (2018). https://doi.org/10.1145/3240323.3240372
 
@@ -18,7 +18,7 @@ def kullback_leibler(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return p_a * log(p_a / q_b)
@@ -39,7 +39,7 @@ def jeffreys(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return (p_a - q_b) * log(p_a / q_b)
@@ -60,7 +60,7 @@ def k_divergence(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return p_a * log((2 * p_a) / (p_a + q_b))
@@ -81,7 +81,7 @@ def topsoe(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return (p_a * log((2 * p_a) / (p_a + q_b))) + (q_b * log((2 * q_b) / (p_a + q_b)))
@@ -102,12 +102,12 @@ def jensen_shannon(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute_left(p_i, q_i):
+    def compute_left(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return p_a * log((2 * p_a) / (p_a + q_b))
 
-    def compute_right(p_i, q_i):
+    def compute_right(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return q_b * log((2 * q_b) / (p_a + q_b))
@@ -129,7 +129,7 @@ def jensen_difference(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         return (((p_a * log(p_a)) + (q_b * log(q_b))) / 2) - (((p_a + q_b) / 2) * log((p_a + q_b) / 2))

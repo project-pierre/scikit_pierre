@@ -15,13 +15,13 @@ def time_weighted_based(items: dict) -> dict:
     numerator = {}
     denominator = {}
 
-    def compute():
+    def compute() -> None:
         for index, item in items.items():
             for category, genre_value in item.classes.items():
                 numerator[category] = numerator.get(category, 0) + item.time * item.score * genre_value
                 denominator[category] = denominator.get(category, 0) + item.score
 
-    def genre(g):
+    def genre(g: str) -> float:
         if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
         else:
@@ -59,13 +59,13 @@ def time_genre(items: dict) -> dict:
     numerator = {}
     denominator = {}
 
-    def compute():
+    def compute() -> None:
         for index, item in items.items():
             for category, genre_value in item.classes.items():
                 numerator[category] = numerator.get(category, 0.) + item.time * genre_value
                 denominator[category] = denominator.get(category, 0.) + item.time
 
-    def genre(g):
+    def genre(g: str) -> float:
         if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
         else:

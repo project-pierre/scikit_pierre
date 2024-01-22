@@ -1,5 +1,4 @@
 import math
-from math import log2
 
 
 def xquad(item: object, recommendations: dict, p: dict, q: dict):

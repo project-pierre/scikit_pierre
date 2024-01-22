@@ -60,7 +60,7 @@ class LinearCalibration(CalibrationBase):
 
     Implementation based on:
 
-    - Silva et. al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
+    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
 
     - Kaya and Bridge (2019). https://doi.org/10.1145/3298689.3347045
 
@@ -122,7 +122,7 @@ class LinearCalibration(CalibrationBase):
         self._select_item_component = self._select_item_funcs(algorithm_name=select_item_component)
         self._class_approach = class_funcs(class_approach=class_approach)
 
-    def fit(self, uuids: list = None):
+    def fit(self, uuids: list = None) -> list:
         """
         Method to create a recommendation list for all users passed by param uuids.
 
@@ -132,16 +132,15 @@ class LinearCalibration(CalibrationBase):
 
         super().fit()
 
-        if self.environment['class_approach'] == "GENRE_PROBABILITY":
-            self._item_in_memory.item_by_genre()
+        self._item_in_memory.item_by_genre()
 
         if not uuids:
-            uuids = self.users_preferences['USER_ID'].unique()
+            uuids = self.users_preferences['USER_ID'].unique().tolist()
 
         recommendation_lists = list(map(self._user_recommendation, uuids))
         return recommendation_lists
 
-    def _user_recommendation(self, uid):
+    def _user_recommendation(self, uid) -> DataFrame:
         user_pref = self.users_preferences[self.users_preferences['USER_ID'] == uid]
         user_candidate_items = self.candidate_items[self.candidate_items['USER_ID'] == uid]
 
@@ -180,9 +179,9 @@ class LinearCalibration(CalibrationBase):
         :return: A float between [0;1],
         """
         realized_dist = self._distribution_component(items=temp_rec_items)
-        fairness_value = self._fairness_component(p=list(target_distribution.values()),
-                                                  q=list(realized_dist.values()),
-                                                  d=self.environment["d"])
+        fairness_value = self._fairness_component(
+            p=list(target_distribution.values()), q=list(realized_dist.values()), d=self.environment["d"]
+        )
         relevance_value = self._relevance_component([item.score for _, item in temp_rec_items.items()])
         utility_value = self._tradeoff_balance_component(lmbda=lmbda, relevance_value=relevance_value,
                                                          fairness_value=fairness_value)
@@ -252,7 +251,7 @@ class LogarithmBias(CalibrationBase):
 
     Implementation based on:
 
-    - Silva et. al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
+    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
     """
     BIAS_ALPHA = 0.001
     BIAS_SIGMA = 0.001

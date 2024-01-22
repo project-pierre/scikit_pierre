@@ -11,7 +11,7 @@ def vicis_wave_hedges(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         numerator = abs(p_a - q_b)
@@ -34,7 +34,7 @@ def vicis_symmetric_chi_square(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         numerator = (p_a - q_b) ** 2
@@ -57,7 +57,7 @@ def vicis_symmetric_chi_square_emanon3(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         numerator = (p_a - q_b) ** 2
@@ -80,7 +80,7 @@ def vicis_symmetric_chi_square_emanon4(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute(p_i, q_i):
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         numerator = (p_a - q_b) ** 2
@@ -103,14 +103,14 @@ def max_symmetric_chi_square_emanon5(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute_left(p_i, q_i):
+    def compute_left(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         numerator = (p_a - q_b) ** 2
         denominator = p_a
         return numerator / denominator
 
-    def compute_right(p_i, q_i):
+    def compute_right(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         numerator = (p_a - q_b) ** 2
@@ -134,14 +134,14 @@ def min_symmetric_chi_square_emanon6(p: list, q: list, **kwargs) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute_left(p_i, q_i):
+    def compute_left(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         numerator = (p_a - q_b) ** 2
         denominator = p_a
         return numerator / denominator
 
-    def compute_right(p_i, q_i):
+    def compute_right(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
         numerator = (p_a - q_b) ** 2

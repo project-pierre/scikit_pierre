@@ -1,18 +1,20 @@
 from pandas import DataFrame
 
+from scikit_pierre.distributions.accessible import distributions_funcs_pandas
 
-def mace(users_target_dist: DataFrame, users_recommendation_lists: DataFrame, items_classes_set: DataFrame, dist_func) -> float:
+
+def mace(users_target_dist: DataFrame, users_recommendation_lists: DataFrame, items_classes_set: DataFrame, distribution: str) -> float:
     """
     Mean Average Calibration Error. Metric to calibrated recommendations systems.
 
     Implementation based on:
 
-    - Silva et. al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
+    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
 
     :param users_target_dist: A DataFrame were the lines are the users, the columns are the classes and the cells are the distribution value.
     :param users_recommendation_lists: A Pandas DataFrame, which represents the users recommendation lists.
     :param items_classes_set: A Dataframe were the lines are the items, the columns are the classes and the cells are probability values.
-    :param dist_func: A fairness function.
+    :param distribution: A calibration function name.
 
     :return: A float that's represents the mace value.
     """
@@ -21,7 +23,7 @@ def mace(users_target_dist: DataFrame, users_recommendation_lists: DataFrame, it
                        for column in realized_dist]
         return sum(diff_result) / len(diff_result)
 
-    def __ace(user_id: str|int, user_target_distribution: DataFrame, user_rec_list: DataFrame):
+    def __ace(user_id: str, user_target_distribution: DataFrame, user_rec_list: DataFrame):
         user_rec_list.sort_values(by=['ORDER'], inplace=True)
         result_ace = [
             __calibration_error(
@@ -34,6 +36,7 @@ def mace(users_target_dist: DataFrame, users_recommendation_lists: DataFrame, it
         ]
         return sum(result_ace) / len(result_ace)
 
+    dist_func = distributions_funcs_pandas(distribution)
     users_recommendation_lists.sort_values(by=['USER_ID'], inplace=True)
     users_target_dist.sort_index(inplace=True)
 
