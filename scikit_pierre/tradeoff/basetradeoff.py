@@ -9,7 +9,7 @@ class BaseTradeOff:
     """
     Tradeoff superclass. To be used for all Tradeoff classes.
     """
-    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame, item_set: DataFrame):
+    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame, item_set: DataFrame, users_distribution: DataFrame = None):
         """
         :param users_preferences: A Pandas Dataframe with three columns [USER_ID, ITEM_ID, TRANSACTION_VALUE]
         :param candidate_items: A Pandas Dataframe with three columns [USER_ID, ITEM_ID, PREDICTED_VALUE]
@@ -30,6 +30,7 @@ class BaseTradeOff:
             raise Exception("Some wrong information in the ITEM ID.")
 
         self._item_in_memory = ItemsInMemory(data=self.item_set)
+        self.users_distribution = users_distribution
 
         self.environment = {}
 

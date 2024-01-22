@@ -1,6 +1,7 @@
 from .tradeoff import calibration
 from .metrics import evaluation
+from .distributions import compute_distribution
 
 __version__ = "0.0.1"
 
-__all__ = ["calibration", "evaluation", "__version__"]
+__all__ = ["calibration", "evaluation", "compute_distribution", "__version__"]

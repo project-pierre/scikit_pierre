@@ -67,14 +67,14 @@ class LinearCalibration(CalibrationBase):
     - Steck (2018). https://doi.org/10.1145/3240323.3240372
     """
 
-    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame, item_set: DataFrame):
+    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame, item_set: DataFrame, users_distribution: DataFrame = None):
         """
         :param users_preferences: A Pandas DataFrame with four columns [USER_ID, ITEM_ID, TRANSACTION_VALUE, TIMESTAMP].
         :param candidate_items: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, PREDICTED_VALUE].
         :param item_set: A Pandas DataFrame of items.
         """
         # Constructing the instance with the basic
-        super().__init__(users_preferences, candidate_items, item_set)
+        super().__init__(users_preferences, candidate_items, item_set, users_distribution)
         self._items_distribution = None
         # Creating variables to lead with the equation components as functions
         self._distribution_component = None
@@ -146,6 +146,11 @@ class LinearCalibration(CalibrationBase):
 
         # Target Distribution (p)
         target_dist = self._distribution_component(items=self._item_in_memory.select_user_items(data=user_pref))
+        # if self.users_distribution is None:
+        #     target_dist = self._distribution_component(items=self._item_in_memory.select_user_items(data=user_pref))
+        # else:
+        #     pre_computed_distribution = self.users_distribution.loc[uid]
+        #     target_dist = {col: value for col, value in zip(pre_computed_distribution.columns.tolist(), pre_computed_distribution.values.tolist())}
         # Tradeoff weight (lambda)
         if self.environment['weight'][:2] == "C@":
             lmbda = self._tradeoff_weight_component
@@ -256,7 +261,7 @@ class LogarithmBias(CalibrationBase):
     BIAS_ALPHA = 0.001
     BIAS_SIGMA = 0.001
 
-    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame, item_set: DataFrame):
+    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame, item_set: DataFrame, users_distribution: DataFrame = None):
         """
         :param users_preferences: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, TRANSACTION_VALUE].
         :param candidate_items: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, PREDICTED_VALUE].

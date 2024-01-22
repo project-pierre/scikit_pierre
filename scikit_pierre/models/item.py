@@ -77,7 +77,8 @@ class ItemsInMemory:
             minimum = data['TIMESTAMP'].min()
         for row in data.itertuples():
             item_id = getattr(row, "ITEM_ID")
-            user_items[item_id] = deepcopy(self.items[item_id])
+            item = self.items[item_id]
+            user_items[item_id] = deepcopy(item)
             user_items[item_id].score = getattr(row, feedback_column)
             if 'TIMESTAMP' in data.columns.tolist():
                 user_items[item_id].time = (getattr(row, 'TIMESTAMP') - minimum) / (maximum - minimum)

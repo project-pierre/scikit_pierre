@@ -47,6 +47,11 @@ extensions = [
         include_dirs=[np.get_include()]
     ),
     Extension(
+        name="scikit_pierre.distributions.compute_distribution",
+        sources=["scikit_pierre/distributions/compute_distribution" + ext],
+        include_dirs=[np.get_include()]
+    ),
+    Extension(
         name="scikit_pierre.metrics.evaluation",
         sources=["scikit_pierre/metrics/evaluation" + ext],
         include_dirs=[np.get_include()]
