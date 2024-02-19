@@ -81,7 +81,17 @@ class ItemsInMemory:
             user_items[item_id] = deepcopy(item)
             user_items[item_id].score = getattr(row, feedback_column)
             if 'TIMESTAMP' in data.columns.tolist():
-                user_items[item_id].time = (getattr(row, 'TIMESTAMP') - minimum) / (maximum - minimum)
+                upper = (getattr(row, 'TIMESTAMP') - minimum)
+                divisor = maximum - minimum
+                try:
+                    user_items[item_id].time = upper / divisor
+                except ZeroDivisionError:
+                    if divisor == 0 and upper == 0:
+                        user_items[item_id].time = 1
+                    elif divisor == 0:
+                        user_items[item_id].time = upper / 1
+                    else:
+                        user_items[item_id].time = 1 / divisor
         return user_items
 
     @staticmethod
