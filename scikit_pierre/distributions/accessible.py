@@ -29,9 +29,9 @@ def distributions_funcs(distribution: str):
         return entropy_based.global_local_entropy_based
     elif distribution == "GLEB_P":
         return entropy_based.global_local_entropy_based_with_probability_property
-    elif distribution == "GLEB_TWB":
+    elif distribution == "TWB_GLEB":
         return mixed_based.mixed_gleb_twb
-    elif distribution == "GLEB_TWB_P":
+    elif distribution == "TWB_GLEB_P":
         return mixed_based.mixed_gleb_twb_with_probability_property
     elif distribution == "TSW":
         return time_slide_window_based.temporal_slide_window

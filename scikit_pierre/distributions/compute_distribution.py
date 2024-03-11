@@ -22,7 +22,7 @@ def computer_users_distribution(users_preference_set: DataFrame, items_df: DataF
             items=_item_in_memory.select_user_items(data=user_pref_set),
         )
         users_pref_dist_list.append(
-            DataFrame([list(user_dist_dict.values())], columns=list(user_dist_dict.keys()), index=user_id)
+            DataFrame([list(user_dist_dict.values())], columns=list(user_dist_dict.keys()), index=[str(user_id)])
         )
 
     return concat(users_pref_dist_list)
