@@ -62,9 +62,9 @@ def cosine(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([p_i * q_i for p_i, q_i in zip(p, q)])
-    p_denominator = math.sqrt(sum([p_i ** 2 for p_i in p]))
-    q_denominator = math.sqrt(sum([q_i ** 2 for p_i, q_i in zip(p, q)]))
+    numerator = sum(p_i * q_i for p_i, q_i in zip(p, q))
+    p_denominator = math.sqrt(sum(p_i ** 2 for p_i in p))
+    q_denominator = math.sqrt(sum(q_i ** 2 for p_i, q_i in zip(p, q)))
     denominator = p_denominator * q_denominator
     try:
         return numerator / denominator
@@ -86,9 +86,9 @@ def kumar_hassebrook(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([p_i * q_i for p_i, q_i in zip(p, q)])
-    p_denominator = sum([p_i ** 2 for p_i in p])
-    q_denominator = sum([q_i ** 2 for p_i, q_i in zip(p, q)])
+    numerator = sum(p_i * q_i for p_i, q_i in zip(p, q))
+    p_denominator = sum(p_i ** 2 for p_i in p)
+    q_denominator = sum(q_i ** 2 for p_i, q_i in zip(p, q))
     denominator = p_denominator + q_denominator - numerator
     try:
         return numerator / denominator
@@ -110,10 +110,10 @@ def jaccard(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([(p_i - q_i) ** 2 for p_i, q_i in zip(p, q)])
-    p_denominator = sum([p_i ** 2 for p_i in p])
-    q_denominator = sum([q_i ** 2 for p_i, q_i in zip(p, q)])
-    prod_denominator = sum([p_i * q_i for p_i, q_i in zip(p, q)])
+    numerator = sum((p_i - q_i) ** 2 for p_i, q_i in zip(p, q))
+    p_denominator = sum(p_i ** 2 for p_i in p)
+    q_denominator = sum(q_i ** 2 for p_i, q_i in zip(p, q))
+    prod_denominator = sum(p_i * q_i for p_i, q_i in zip(p, q))
     denominator = p_denominator + q_denominator - prod_denominator
     try:
         return numerator / denominator

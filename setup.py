@@ -1,14 +1,13 @@
+"""
+Setup of Scikit-Pierre
+"""
 # Always prefer setuptools over distutils
 import os
 
-from setuptools import setup, find_packages, Extension
-
 # To use a consistent encoding
 from codecs import open
-from os import path
-from setuptools import dist  # Install numpy right now
 
-# dist.Distribution().fetch_build_eggs(["numpy"])
+from setuptools import setup, find_packages, Extension
 
 try:
     import numpy as np
@@ -25,14 +24,14 @@ else:
 
 __version__ = "0.0.1"
 
-here = path.abspath(path.dirname(__file__))
+here = os.path.abspath(os.path.dirname(__file__))
 
 # Get the long description from README.md
-with open(path.join(here, "README.md"), encoding="utf-8") as f:
+with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 # get the dependencies and installs
-with open(path.join(here, "requirements.txt"), encoding="utf-8") as f:
+with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as f:
     install_requires = [line.strip() for line in f.read().split("\n")]
 
 cmdclass = {}
@@ -68,7 +67,7 @@ def get_ext_paths(root_dir, exclude_files):
     """get filepaths for compilation"""
     paths = []
 
-    for root, dirs, files in os.walk(root_dir):
+    for root, _, files in os.walk(root_dir):
         for filename in files:
             if os.path.splitext(filename)[1] != '.py':
                 continue
@@ -82,7 +81,6 @@ def get_ext_paths(root_dir, exclude_files):
 
 
 if USE_CYTHON:
-    # See https://cython.readthedocs.io/en/latest/src/userguide/source_files_and_compilation.html#distributing-cython-modules
     extensions = cythonize(
         extensions,
         # get_ext_paths('scikit_pierre', EXCLUDE_FILES),

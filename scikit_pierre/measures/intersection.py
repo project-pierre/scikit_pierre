@@ -77,8 +77,8 @@ def czekanowski_similarity(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = 2 * sum([min([p_i, q_i]) for p_i, q_i in zip(p, q)])
-    denominator = sum([p_i + q_i for p_i, q_i in zip(p, q)])
+    numerator = 2 * sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
+    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:
@@ -99,8 +99,8 @@ def czekanowski_divergence(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
-    denominator = sum([p_i + q_i for p_i, q_i in zip(p, q)])
+    numerator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
+    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:
@@ -121,8 +121,8 @@ def motyka_similarity(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([min([p_i, q_i]) for p_i, q_i in zip(p, q)])
-    denominator = sum([p_i + q_i for p_i, q_i in zip(p, q)])
+    numerator = sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
+    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:

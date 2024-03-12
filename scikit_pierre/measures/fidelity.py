@@ -39,7 +39,7 @@ def bhattacharyya(p: list, q: list) -> float:
     """
 
     def compute() -> float:
-        value = sum([math.sqrt(p_i * q_i) for p_i, q_i in zip(p, q)])
+        value = sum(math.sqrt(p_i * q_i) for p_i, q_i in zip(p, q))
         if value == 0:
             return 0.00001
         return value

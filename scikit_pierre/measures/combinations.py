@@ -70,7 +70,7 @@ def avg(p: list, q: list) -> float:
         q_b = 0.00001 if q_i == 0 else q_i
         return abs(p_a - q_b) + diff
 
-    difference = max([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
+    difference = max(abs(p_i - q_i) for p_i, q_i in zip(p, q))
     return sum(compute(p_i, q_i, difference) for p_i, q_i in zip(p, q)) / 2
 
 
