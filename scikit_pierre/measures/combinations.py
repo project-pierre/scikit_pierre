@@ -24,7 +24,7 @@ def taneja(p: list, q: list) -> float:
         q_b = 0.00001 if q_i == 0 else q_i
         return ((p_a + q_b) / 2) * log((p_a + q_b) / (2 * sqrt(p_a * q_b)))
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def kumar_johnson(p: list, q: list) -> float:
@@ -47,7 +47,7 @@ def kumar_johnson(p: list, q: list) -> float:
         q_b = 0.00001 if q_i == 0 else q_i
         return ((p_a ** 2 - q_b ** 2) ** 2) / (2 * (p_a * q_b) ** (3 / 2))
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def avg(p: list, q: list) -> float:
@@ -71,7 +71,7 @@ def avg(p: list, q: list) -> float:
         return abs(p_a - q_b) + diff
 
     difference = max([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
-    return sum([compute(p_i, q_i, difference) for p_i, q_i in zip(p, q)]) / 2
+    return sum(compute(p_i, q_i, difference) for p_i, q_i in zip(p, q)) / 2
 
 
 def weighted_total_variation(p: list, q: list) -> float:
@@ -94,4 +94,4 @@ def weighted_total_variation(p: list, q: list) -> float:
         q_b = 0.00001 if q_i == 0 else q_i
         return (p_a + 1) * abs(p_a - q_b)
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)]) / 2
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q)) / 2

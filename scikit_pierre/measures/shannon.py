@@ -29,7 +29,7 @@ def kullback_leibler(p: list, q: list) -> float:
         q_b = 0.00001 if q_i == 0 else q_i
         return p_a * log(p_a / q_b)
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def jeffreys(p: list, q: list) -> float:
@@ -52,7 +52,7 @@ def jeffreys(p: list, q: list) -> float:
         q_b = 0.00001 if q_i == 0 else q_i
         return (p_a - q_b) * log(p_a / q_b)
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def k_divergence(p: list, q: list) -> float:
@@ -75,7 +75,7 @@ def k_divergence(p: list, q: list) -> float:
         q_b = 0.00001 if q_i == 0 else q_i
         return p_a * log((2 * p_a) / (p_a + q_b))
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def topsoe(p: list, q: list) -> float:
@@ -98,7 +98,7 @@ def topsoe(p: list, q: list) -> float:
         q_b = 0.00001 if q_i == 0 else q_i
         return (p_a * log((2 * p_a) / (p_a + q_b))) + (q_b * log((2 * q_b) / (p_a + q_b)))
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def jensen_shannon(p: list, q: list) -> float:
@@ -126,8 +126,8 @@ def jensen_shannon(p: list, q: list) -> float:
         q_b = 0.00001 if q_i == 0 else q_i
         return q_b * log((2 * q_b) / (p_a + q_b))
 
-    return (1 / 2) * (sum([compute_left(p_i, q_i) for p_i, q_i in zip(p, q)]) +
-                      sum([compute_right(p_i, q_i) for p_i, q_i in zip(p, q)]))
+    return (1 / 2) * (sum(compute_left(p_i, q_i) for p_i, q_i in zip(p, q)) +
+                      sum(compute_right(p_i, q_i) for p_i, q_i in zip(p, q)))
 
 
 def jensen_difference(p: list, q: list) -> float:
@@ -151,4 +151,4 @@ def jensen_difference(p: list, q: list) -> float:
         return (((p_a * log(p_a)) + (q_b * log(q_b))) / 2) - (
                     ((p_a + q_b) / 2) * log((p_a + q_b) / 2))
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))

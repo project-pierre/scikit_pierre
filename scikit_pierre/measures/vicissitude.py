@@ -25,7 +25,7 @@ def vicis_wave_hedges(p: list, q: list) -> float:
         denominator = min(p_a, q_b)
         return numerator / denominator
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def vicis_symmetric_chi_square(p: list, q: list) -> float:
@@ -50,7 +50,7 @@ def vicis_symmetric_chi_square(p: list, q: list) -> float:
         denominator = min(p_a, q_b) ** 2
         return numerator / denominator
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def vicis_symmetric_chi_square_emanon3(p: list, q: list) -> float:
@@ -76,7 +76,7 @@ def vicis_symmetric_chi_square_emanon3(p: list, q: list) -> float:
         denominator = min(p_a, q_b)
         return numerator / denominator
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def vicis_symmetric_chi_square_emanon4(p: list, q: list) -> float:
@@ -102,7 +102,7 @@ def vicis_symmetric_chi_square_emanon4(p: list, q: list) -> float:
         denominator = max(p_a, q_b)
         return numerator / denominator
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def max_symmetric_chi_square_emanon5(p: list, q: list) -> float:
@@ -135,8 +135,8 @@ def max_symmetric_chi_square_emanon5(p: list, q: list) -> float:
         denominator = q_b
         return numerator / denominator
 
-    return max([sum([compute_left(p_i, q_i) for p_i, q_i in zip(p, q)]),
-                sum([compute_right(p_i, q_i) for p_i, q_i in zip(p, q)])])
+    return max([sum(compute_left(p_i, q_i) for p_i, q_i in zip(p, q)),
+                sum(compute_right(p_i, q_i) for p_i, q_i in zip(p, q))])
 
 
 def min_symmetric_chi_square_emanon6(p: list, q: list) -> float:
@@ -169,5 +169,5 @@ def min_symmetric_chi_square_emanon6(p: list, q: list) -> float:
         denominator = q_b
         return numerator / denominator
 
-    return min([sum([compute_left(p_i, q_i) for p_i, q_i in zip(p, q)]),
-                sum([compute_right(p_i, q_i) for p_i, q_i in zip(p, q)])])
+    return min([sum(compute_left(p_i, q_i) for p_i, q_i in zip(p, q)),
+                sum(compute_right(p_i, q_i) for p_i, q_i in zip(p, q))])

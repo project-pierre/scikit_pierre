@@ -46,7 +46,7 @@ def person_chi_square(p: list, q: list) -> float:
         except ArithmeticError:
             return 0.0
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def neyman_square(p: list, q: list) -> float:
@@ -74,7 +74,7 @@ def neyman_square(p: list, q: list) -> float:
         except ArithmeticError:
             return 0.0
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def squared_chi_square(p: list, q: list) -> float:
@@ -102,7 +102,7 @@ def squared_chi_square(p: list, q: list) -> float:
         except ArithmeticError:
             return 0.0
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def probabilistic_symmetric_chi_square(p: list, q: list) -> float:
@@ -131,7 +131,7 @@ def probabilistic_symmetric_chi_square(p: list, q: list) -> float:
         except ArithmeticError:
             return 0.0
 
-    return 2 * sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return 2 * sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def divergence(p: list, q: list) -> float:
@@ -159,7 +159,7 @@ def divergence(p: list, q: list) -> float:
         except ArithmeticError:
             return 0.0
 
-    return 2 * sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return 2 * sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def clark(p: list, q: list) -> float:
@@ -187,7 +187,7 @@ def clark(p: list, q: list) -> float:
         except ArithmeticError:
             return 0.0
 
-    return math.sqrt(sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)]))
+    return math.sqrt(sum(compute(p_i, q_i) for p_i, q_i in zip(p, q)))
 
 
 def additive_symmetric_chi_squared(p: list, q: list) -> float:
@@ -213,4 +213,4 @@ def additive_symmetric_chi_squared(p: list, q: list) -> float:
         except ArithmeticError:
             return 0.0
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))

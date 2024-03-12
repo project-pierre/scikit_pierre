@@ -20,7 +20,7 @@ def fidelity(p: list, q: list) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    return sum([math.sqrt(p_i * q_i) for p_i, q_i in zip(p, q)])
+    return sum(math.sqrt(p_i * q_i) for p_i, q_i in zip(p, q))
 
 
 def bhattacharyya(p: list, q: list) -> float:
@@ -61,7 +61,7 @@ def hellinger(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    return math.sqrt(2 * sum([(math.sqrt(p_i) - math.sqrt(q_i)) ** 2 for p_i, q_i in zip(p, q)]))
+    return math.sqrt(2 * sum((math.sqrt(p_i) - math.sqrt(q_i)) ** 2 for p_i, q_i in zip(p, q)))
 
 
 def matusita(p: list, q: list) -> float:
@@ -82,7 +82,7 @@ def matusita(p: list, q: list) -> float:
     def compute(p_i: float, q_i: float) -> float:
         return (math.sqrt(p_i) - math.sqrt(q_i)) ** 2
 
-    return math.sqrt(sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)]))
+    return math.sqrt(sum(compute(p_i, q_i) for p_i, q_i in zip(p, q)))
 
 
 def squared_chord_similarity(p: list, q: list) -> float:
@@ -99,7 +99,7 @@ def squared_chord_similarity(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    return 2 * sum([math.sqrt(p_i * q_i) for p_i, q_i in zip(p, q)]) - 1
+    return 2 * sum(math.sqrt(p_i * q_i) for p_i, q_i in zip(p, q)) - 1
 
 
 def squared_chord_divergence(p: list, q: list) -> float:
@@ -116,4 +116,4 @@ def squared_chord_divergence(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    return sum([(math.sqrt(p_i) - math.sqrt(q_i)) ** 2 for p_i, q_i in zip(p, q)])
+    return sum((math.sqrt(p_i) - math.sqrt(q_i)) ** 2 for p_i, q_i in zip(p, q))

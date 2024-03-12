@@ -19,7 +19,7 @@ def inner_product(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    return sum([p_i * q_i for p_i, q_i in zip(p, q)])
+    return sum(p_i * q_i for p_i, q_i in zip(p, q))
 
 
 def harmonic_mean(p: list, q: list) -> float:
@@ -45,7 +45,7 @@ def harmonic_mean(p: list, q: list) -> float:
         except ZeroDivisionError:
             return numerator / 0.00001
 
-    return 2 * sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return 2 * sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def cosine(p: list, q: list) -> float:
@@ -135,8 +135,8 @@ def dice_similarity(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = 2 * sum([p_i * q_i for p_i, q_i in zip(p, q)])
-    denominator = sum([p_i ** 2 for p_i in p]) + sum([q_i ** 2 for q_i in q])
+    numerator = 2 * sum(p_i * q_i for p_i, q_i in zip(p, q))
+    denominator = sum(p_i ** 2 for p_i in p) + sum(q_i ** 2 for q_i in q)
     try:
         return numerator / denominator
     except ZeroDivisionError:
@@ -157,8 +157,8 @@ def dice_divergence(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([(p_i - q_i) ** 2 for p_i, q_i in zip(p, q)])
-    denominator = sum([p_i ** 2 for p_i in p]) + sum([q_i ** 2 for q_i in q])
+    numerator = sum((p_i - q_i) ** 2 for p_i, q_i in zip(p, q))
+    denominator = sum(p_i ** 2 for p_i in p) + sum(q_i ** 2 for q_i in q)
     try:
         return numerator / denominator
     except ZeroDivisionError:

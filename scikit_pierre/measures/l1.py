@@ -18,8 +18,8 @@ def sorensen(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
-    denominator = sum([p_i + q_i for p_i, q_i in zip(p, q)])
+    numerator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
+    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:
@@ -40,7 +40,7 @@ def gower(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    return (1 / len(p)) * sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
+    return (1 / len(p)) * sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
 
 
 def soergel(p: list, q: list) -> float:
@@ -57,8 +57,8 @@ def soergel(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
-    denominator = sum([max([p_i, q_i]) for p_i, q_i in zip(p, q)])
+    numerator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
+    denominator = sum(max([p_i, q_i]) for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:
@@ -79,8 +79,8 @@ def kulczynski_d(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
-    denominator = sum([min([p_i, q_i]) for p_i, q_i in zip(p, q)])
+    numerator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
+    denominator = sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:
@@ -110,7 +110,7 @@ def canberra(p: list, q: list) -> float:
         except ZeroDivisionError:
             return numerator / 0.00001
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def lorentzian(p: list, q: list) -> float:
@@ -132,4 +132,4 @@ def lorentzian(p: list, q: list) -> float:
         smooth = 1 + abs(p_i - q_i)
         return math.log(smooth)
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))

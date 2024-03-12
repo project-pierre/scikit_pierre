@@ -17,7 +17,7 @@ def intersection_similarity(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    return sum([min([p_i, q_i]) for p_i, q_i in zip(p, q)])
+    return sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
 
 
 def intersection_divergence(p: list, q: list) -> float:
@@ -34,7 +34,7 @@ def intersection_divergence(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    return (1 / 2) * sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
+    return (1 / 2) * sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
 
 
 def wave_hedges(p: list, q: list) -> float:
@@ -60,7 +60,7 @@ def wave_hedges(p: list, q: list) -> float:
         except ZeroDivisionError:
             return numerator / 0.00001
 
-    return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
+    return sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def czekanowski_similarity(p: list, q: list) -> float:
@@ -143,8 +143,8 @@ def motyka_divergence(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([max([p_i, q_i]) for p_i, q_i in zip(p, q)])
-    denominator = sum([p_i + q_i for p_i, q_i in zip(p, q)])
+    numerator = sum(max([p_i, q_i]) for p_i, q_i in zip(p, q))
+    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:
@@ -165,8 +165,8 @@ def kulczynski_s(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([min([p_i, q_i]) for p_i, q_i in zip(p, q)])
-    denominator = sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
+    numerator = sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
+    denominator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:
@@ -187,8 +187,8 @@ def ruzicka(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([min([p_i, q_i]) for p_i, q_i in zip(p, q)])
-    denominator = sum([max([p_i, q_i]) for p_i, q_i in zip(p, q)])
+    numerator = sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
+    denominator = sum(max([p_i, q_i]) for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:
@@ -209,8 +209,8 @@ def tanimoto(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum([max([p_i, q_i]) - min([p_i, q_i]) for p_i, q_i in zip(p, q)])
-    denominator = sum([max([p_i, q_i]) for p_i, q_i in zip(p, q)])
+    numerator = sum(max([p_i, q_i]) - min([p_i, q_i]) for p_i, q_i in zip(p, q))
+    denominator = sum(max([p_i, q_i]) for p_i, q_i in zip(p, q))
     try:
         return numerator / denominator
     except ZeroDivisionError:
