@@ -1,7 +1,6 @@
+import numpy as np
 import unittest
 from copy import deepcopy
-
-import numpy as np
 
 from ...scikit_pierre.relevance.relevance_measures import sum_relevance_score, ndcg_relevance_score
 

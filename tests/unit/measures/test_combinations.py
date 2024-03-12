@@ -47,9 +47,11 @@ class TestCombinations(unittest.TestCase):
                          answer / 2)
 
     def test_weighted_total_variation(self):
-        answer = sum([(0.389 + 1) * abs(0.389 - 0.35), (0.5 + 1) * abs(0.5 - 0.563), (0.25 + 1) * abs(0.25 - 0.4),
+        answer = sum([(0.389 + 1) * abs(0.389 - 0.35), (0.5 + 1) * abs(0.5 - 0.563),
+                      (0.25 + 1) * abs(0.25 - 0.4),
                       (0.625 + 1) * abs(0.625 - 0.5), (0.00001 + 1) * abs(0.00001 - 0.00001),
                       (0.00001 + 1) * abs(0.00001 - 0.00001), (0.25 + 1) * abs(0.25 - 0.00001)])
-        self.assertEqual(combinations.weighted_total_variation(p=[0.389, 0.5, 0.25, 0.625, 0.0, 0.0, 0.25],
-                                                               q=[0.35, 0.563, 0.4, 0.5, 0.0, 0.0, 0.0]),
-                         answer / 2)
+        self.assertEqual(
+            combinations.weighted_total_variation(p=[0.389, 0.5, 0.25, 0.625, 0.0, 0.0, 0.25],
+                                                  q=[0.35, 0.563, 0.4, 0.5, 0.0, 0.0, 0.0]),
+            answer / 2)
