@@ -1,7 +1,7 @@
 import unittest
 from math import sqrt
 
-from pierre.measures import inner_product
+from ....scikit_pierre.measures import inner_product
 
 
 class TestInnerProduct(unittest.TestCase):

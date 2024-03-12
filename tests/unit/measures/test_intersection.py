@@ -1,6 +1,6 @@
 import unittest
 
-from pierre.measures import intersection
+from ....scikit_pierre.measures import intersection
 
 
 class TestIntersection(unittest.TestCase):

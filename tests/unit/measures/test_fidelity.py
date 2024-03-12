@@ -1,7 +1,7 @@
 import unittest
 from math import sqrt, log
 
-from pierre.measures import fidelity
+from ....scikit_pierre.measures import fidelity
 
 
 class TestFidelity(unittest.TestCase):

@@ -1,7 +1,7 @@
 import unittest
 from math import sqrt
 
-from pierre.measures import chi
+from ....scikit_pierre.measures import chi
 
 
 class TestChi(unittest.TestCase):

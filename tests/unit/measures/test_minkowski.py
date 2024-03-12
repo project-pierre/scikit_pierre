@@ -1,7 +1,7 @@
 import unittest
 from math import sqrt
 
-from pierre.measures import minkowski
+from ....scikit_pierre.measures import minkowski
 
 
 class TestMinkowski(unittest.TestCase):

@@ -1,6 +1,6 @@
 import unittest
 
-from pierre.measures import vicissitude
+from ....scikit_pierre.measures import vicissitude
 
 
 class TestVicissitude(unittest.TestCase):

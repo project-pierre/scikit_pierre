@@ -1,7 +1,7 @@
 import unittest
 from math import log
 
-from pierre.measures import shannon
+from ....scikit_pierre.measures import shannon
 
 
 class TestShanon(unittest.TestCase):

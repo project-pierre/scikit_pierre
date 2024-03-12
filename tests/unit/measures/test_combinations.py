@@ -1,7 +1,7 @@
 import unittest
 from math import log, sqrt
 
-from pierre.measures import combinations
+from ....scikit_pierre.measures import combinations
 
 
 class TestCombinations(unittest.TestCase):

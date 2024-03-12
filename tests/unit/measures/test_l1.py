@@ -1,7 +1,7 @@
 import unittest
 from math import log
 
-from pierre.measures import l1
+from ....scikit_pierre.measures import l1
 
 
 class TestL1(unittest.TestCase):
