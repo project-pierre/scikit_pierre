@@ -25,4 +25,4 @@ def computer_users_distribution(users_preference_set: DataFrame, items_df: DataF
             DataFrame([list(user_dist_dict.values())], columns=list(user_dist_dict.keys()), index=[str(user_id)])
         )
 
-    return concat(users_pref_dist_list)
+    return concat(users_pref_dist_list, ignore_index=False)

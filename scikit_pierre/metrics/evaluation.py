@@ -155,10 +155,12 @@ def mace(
     )
     users_target_dist.sort_index(inplace=True)
     users_target_dist.fillna(0, inplace=True)
+
+    users_preference_set.sort_values(by=['USER_ID'], inplace=True)
     users_recommendation_lists.sort_values(by=['USER_ID'], inplace=True)
 
     set_1 = set([str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()])
-    set_2 = set([str(ix) for ix in users_target_dist.index])
+    set_2 = set([str(ix) for ix in users_preference_set['USER_ID'].unique().tolist()])
 
     if set_1 != set_2:
         raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
