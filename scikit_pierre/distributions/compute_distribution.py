@@ -3,8 +3,8 @@ File to transform Dataframe in Item class and Item class in Dataframe.
 """
 from pandas import DataFrame, concat
 
-from scikit_pierre.distributions.accessible import distributions_funcs
-from scikit_pierre.models.item import ItemsInMemory
+from .accessible import distributions_funcs
+from ..models.item import ItemsInMemory
 
 
 def computer_users_distribution(

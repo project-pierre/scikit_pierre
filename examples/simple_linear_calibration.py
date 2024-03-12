@@ -4,7 +4,7 @@ The files in the path dataset show an example of how you need to model the entra
 """
 import pandas as pd
 
-from scikit_pierre.tradeoff.calibration import LinearCalibration
+from ..scikit_pierre.tradeoff.calibration import LinearCalibration
 
 # Load the users' preference set as a Pandas DataFrame instance.
 # It is expected 3 columns: [USER_ID, ITEM_ID, TRANSACTION_VALUE].

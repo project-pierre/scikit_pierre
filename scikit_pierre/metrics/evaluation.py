@@ -4,10 +4,10 @@ This file contains all evaluation metrics.
 
 from pandas import DataFrame
 
-from scikit_pierre.distributions.accessible import distributions_funcs
-from scikit_pierre.distributions.compute_distribution import computer_users_distribution
-from scikit_pierre.distributions.compute_tilde_q import compute_tilde_q
-from scikit_pierre.models.item import ItemsInMemory
+from ..distributions.accessible import distributions_funcs
+from ..distributions.compute_distribution import computer_users_distribution
+from ..distributions.compute_tilde_q import compute_tilde_q
+from ..models.item import ItemsInMemory
 
 
 #########################################################################################

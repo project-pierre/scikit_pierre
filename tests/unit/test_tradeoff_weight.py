@@ -1,5 +1,5 @@
 import unittest
-from pierre.tradeoff_weight.weight import genre_count, norm_var
+from ...scikit_pierre.tradeoff_weight.weight import genre_count, norm_var
 
 
 class TestBaseWeights(unittest.TestCase):
@@ -41,32 +41,32 @@ class TestWeightGenreCount(TestBaseWeights):
 class TestWeightVar(TestBaseWeights):
     def test_1(self):
         answermean = sum(self.test1)/len(self.test1)
-        answer1 = 1 - sum([abs(j - answermean) ** 2 for j in self.test1])/len(self.test1)
+        answer1 = 1 - sum(abs(j - answermean) ** 2 for j in self.test1)/len(self.test1)
         self.assertEqual(norm_var(self.test1), answer1)
 
     def test_2(self):
         answermean = sum(self.test2)/len(self.test2)
-        answer2 = 1 - sum([abs(j - answermean) ** 2 for j in self.test2])/len(self.test2)
+        answer2 = 1 - sum(abs(j - answermean) ** 2 for j in self.test2)/len(self.test2)
         self.assertEqual(norm_var(self.test2), answer2)
 
     def test_3(self):
         answermean = sum(self.test3)/len(self.test3)
-        answer3 = 1 - (sum([abs(j - answermean) ** 2 for j in self.test3])/len(self.test3))
+        answer3 = 1 - (sum(abs(j - answermean) ** 2 for j in self.test3)/len(self.test3))
         self.assertEqual(norm_var(self.test3), answer3)
 
     def test_4(self):
         answermean = sum(self.test4)/len(self.test4)
-        answer4 = 1 - sum([abs(j - answermean) ** 2 for j in self.test4])/len(self.test4)
+        answer4 = 1 - sum(abs(j - answermean) ** 2 for j in self.test4)/len(self.test4)
         self.assertEqual(norm_var(self.test4), answer4)
 
     def test_5(self):
         answermean = sum(self.test5)/len(self.test5)
-        answer5 = 1 - sum([abs(j - answermean) ** 2 for j in self.test5])/len(self.test5)
+        answer5 = 1 - sum(abs(j - answermean) ** 2 for j in self.test5)/len(self.test5)
         self.assertEqual(norm_var(self.test5), answer5)
 
     def test_6(self):
         answermean = sum(self.test6)/len(self.test6)
-        answer6 = 1 - sum([abs(j - answermean) ** 2 for j in self.test6])/len(self.test6)
+        answer6 = 1 - sum(abs(j - answermean) ** 2 for j in self.test6)/len(self.test6)
         self.assertEqual(norm_var(self.test6), answer6)
 
 

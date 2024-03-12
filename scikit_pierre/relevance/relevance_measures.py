@@ -39,7 +39,7 @@ def ndcg_relevance_score(scores: list) -> float:
     """
 
     def __dcg_at_k(rel: list) -> float:
-        return sum([((2 ** score) - 1) / (np.log2(ix + 2)) for ix, score in enumerate(rel)])
+        return sum(((2 ** score) - 1) / (np.log2(ix + 2)) for ix, score in enumerate(rel))
 
     def ndcg_at_k(rel: list) -> float:
         idcg = __dcg_at_k(sorted(rel, reverse=True))

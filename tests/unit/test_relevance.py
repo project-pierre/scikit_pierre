@@ -3,7 +3,7 @@ from copy import deepcopy
 
 import numpy as np
 
-from pierre.relevance.relevance_measures import sum_relevance_score, ndcg_relevance_score
+from ...scikit_pierre.relevance.relevance_measures import sum_relevance_score, ndcg_relevance_score
 
 
 class TestBaseRelevance(unittest.TestCase):
@@ -45,30 +45,30 @@ class TestSumRelevance(TestBaseRelevance):
 class TestNDCGRelevance(TestBaseRelevance):
     def test_1(self):
         l = deepcopy(self.test1)
-        dcg = sum([((2 ** w) - 1) / (np.log2(i + 2)) for i, w in enumerate(l)])
+        dcg = sum(((2 ** w) - 1) / (np.log2(i + 2)) for i, w in enumerate(l))
 
         l.sort(reverse=True)
-        idcg = sum([((2 ** w) - 1) / (np.log2(i + 2)) for i, w in enumerate(l)])
+        idcg = sum(((2 ** w) - 1) / (np.log2(i + 2)) for i, w in enumerate(l))
 
         answer1 = dcg / idcg
         self.assertEqual(ndcg_relevance_score(self.test1), answer1)
 
     def test_2(self):
         l = deepcopy(self.test2)
-        dcg = sum([((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l)])
+        dcg = sum(((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l))
 
         l.sort(reverse=True)
-        idcg = sum([((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l)])
+        idcg = sum(((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l))
 
         answer2 = dcg / idcg
         self.assertEqual(ndcg_relevance_score(self.test2), answer2)
 
     def test_3(self):
         l = deepcopy(self.test3)
-        dcg = sum([((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l)])
+        dcg = sum(((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l))
 
         l.sort(reverse=True)
-        idcg = sum([((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l)])
+        idcg = sum(((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l))
 
         answer3 = dcg / idcg
         self.assertEqual(ndcg_relevance_score(self.test3), answer3)
@@ -78,20 +78,20 @@ class TestNDCGRelevance(TestBaseRelevance):
 
     def test_5(self):
         l = deepcopy(self.test5)
-        dcg = sum([((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l)])
+        dcg = sum(((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l))
 
         l.sort(reverse=True)
-        idcg = sum([((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l)])
+        idcg = sum(((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l))
 
         answer5 = dcg / idcg
         self.assertEqual(ndcg_relevance_score(self.test5), answer5)
 
     def test_6(self):
         l = deepcopy(self.test6)
-        dcg = sum([((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l)])
+        dcg = sum(((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l))
 
         l.sort(reverse=True)
-        idcg = sum([((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l)])
+        idcg = sum(((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l))
 
         answer6 = dcg / idcg
         self.assertEqual(ndcg_relevance_score(self.test6), answer6)
