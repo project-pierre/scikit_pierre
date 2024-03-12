@@ -88,7 +88,7 @@ class ItemsInMemory:
             user_items[item_id] = deepcopy(item)
             user_items[item_id].score = getattr(row, feedback_column)
             if 'TIMESTAMP' in data.columns.tolist():
-                upper = (getattr(row, 'TIMESTAMP') - minimum)
+                upper = getattr(row, 'TIMESTAMP') - minimum
                 divisor = maximum - minimum
                 try:
                     user_items[item_id].time = upper / divisor

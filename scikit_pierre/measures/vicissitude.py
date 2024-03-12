@@ -3,7 +3,7 @@ This file contains all vicissitude family equations.
 """
 
 
-def vicis_wave_hedges(p: list, q: list, **kwargs) -> float:
+def vicis_wave_hedges(p: list, q: list) -> float:
     """
     Vicis-Wave Hedges (p, q) divergence. Low values means close, high values means far.
 
@@ -28,7 +28,7 @@ def vicis_wave_hedges(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def vicis_symmetric_chi_square(p: list, q: list, **kwargs) -> float:
+def vicis_symmetric_chi_square(p: list, q: list) -> float:
     """
     Vicis-Symmetric Chi Square (p, q) divergence. Low values means close, high values means far.
 
@@ -53,7 +53,7 @@ def vicis_symmetric_chi_square(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def vicis_symmetric_chi_square_emanon3(p: list, q: list, **kwargs) -> float:
+def vicis_symmetric_chi_square_emanon3(p: list, q: list) -> float:
     """
     Vicis-Symmetric Chi Square Emanon 3(p, q) divergence.
     Low values means close, high values means far.
@@ -79,7 +79,7 @@ def vicis_symmetric_chi_square_emanon3(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def vicis_symmetric_chi_square_emanon4(p: list, q: list, **kwargs) -> float:
+def vicis_symmetric_chi_square_emanon4(p: list, q: list) -> float:
     """
     Vicis-Symmetric Chi Square Emanon 4 (p, q) divergence.
     Low values means close, high values means far.
@@ -105,7 +105,7 @@ def vicis_symmetric_chi_square_emanon4(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def max_symmetric_chi_square_emanon5(p: list, q: list, **kwargs) -> float:
+def max_symmetric_chi_square_emanon5(p: list, q: list) -> float:
     """
     Vicis-Symmetric Chi Square Emanon 5 (p, q) divergence.
     Low values means close, high values means far.
@@ -139,7 +139,7 @@ def max_symmetric_chi_square_emanon5(p: list, q: list, **kwargs) -> float:
                 sum([compute_right(p_i, q_i) for p_i, q_i in zip(p, q)])])
 
 
-def min_symmetric_chi_square_emanon6(p: list, q: list, **kwargs) -> float:
+def min_symmetric_chi_square_emanon6(p: list, q: list) -> float:
     """
     Vicis-Symmetric Chi Square Emanon 6 (p, q) divergence.
     Low values means close, high values means far.

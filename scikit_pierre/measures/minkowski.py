@@ -4,7 +4,7 @@ This file contains all minkowski family equations.
 from math import sqrt
 
 
-def minkowski(p: list, q: list, d: int = 3, **kwargs) -> float:
+def minkowski(p: list, q: list, d: int = 3) -> float:
     """
     Minkowski (p, q) divergence. Low values means close, high values means far.
 
@@ -22,7 +22,7 @@ def minkowski(p: list, q: list, d: int = 3, **kwargs) -> float:
     return sum([abs(p_i - q_j) ** d for p_i, q_j in zip(p, q)]) ** (1 / d)
 
 
-def euclidean(p: list, q: list, **kwargs) -> float:
+def euclidean(p: list, q: list) -> float:
     """
     Euclidean (p, q) divergence. Low values means close, high values means far.
 
@@ -39,7 +39,7 @@ def euclidean(p: list, q: list, **kwargs) -> float:
     return sqrt(sum([abs(p_i - q_j) ** 2 for p_i, q_j in zip(p, q)]))
 
 
-def city_block(p: list, q: list, **kwargs) -> float:
+def city_block(p: list, q: list) -> float:
     """
     City Block (p, q) divergence. Low values means close, high values means far.
 
@@ -56,7 +56,7 @@ def city_block(p: list, q: list, **kwargs) -> float:
     return sum([abs(p_i - q_j) for p_i, q_j in zip(p, q)])
 
 
-def chebyshev(p: list, q: list, **kwargs) -> float:
+def chebyshev(p: list, q: list) -> float:
     """
     Chebyshev (p, q) divergence. Low values means close, high values means far.
 

@@ -5,7 +5,7 @@ This file contains all shanon family equations.
 from math import log
 
 
-def kullback_leibler(p: list, q: list, **kwargs) -> float:
+def kullback_leibler(p: list, q: list) -> float:
     """
     Kullback-Leibler (p, q) divergence. Low values means close, high values means far.
 
@@ -32,7 +32,7 @@ def kullback_leibler(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def jeffreys(p: list, q: list, **kwargs) -> float:
+def jeffreys(p: list, q: list) -> float:
     """
     Jeffreys (p, q) divergence. Low values means close, high values means far.
 
@@ -55,7 +55,7 @@ def jeffreys(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def k_divergence(p: list, q: list, **kwargs) -> float:
+def k_divergence(p: list, q: list) -> float:
     """
     K Divergence (p, q) divergence. Low values means close, high values means far.
 
@@ -78,7 +78,7 @@ def k_divergence(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def topsoe(p: list, q: list, **kwargs) -> float:
+def topsoe(p: list, q: list) -> float:
     """
     Topsoe (p, q) divergence. Low values means close, high values means far.
 
@@ -101,7 +101,7 @@ def topsoe(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def jensen_shannon(p: list, q: list, **kwargs) -> float:
+def jensen_shannon(p: list, q: list) -> float:
     """
     Jensen Shannon (p, q) divergence. Low values means close, high values means far.
 
@@ -130,7 +130,7 @@ def jensen_shannon(p: list, q: list, **kwargs) -> float:
                       sum([compute_right(p_i, q_i) for p_i, q_i in zip(p, q)]))
 
 
-def jensen_difference(p: list, q: list, **kwargs) -> float:
+def jensen_difference(p: list, q: list) -> float:
     """
     Jensen Difference (p, q) divergence. Low values means close, high values means far.
 

@@ -3,9 +3,9 @@ This file contains implementations of Calibrated Recommendation Trade-off functi
 """
 
 import logging
-import numpy as np
 from copy import deepcopy
 from math import log
+import numpy as np
 from numpy import sign
 from pandas import DataFrame, concat, merge
 
@@ -54,8 +54,7 @@ class CalibrationBase(BaseTradeOff):
         """
         if measure.upper() in SIMILARITY_LIST:
             return self._tradeoff_sim
-        else:
-            return self._tradeoff_div
+        return self._tradeoff_div
 
 
 class LinearCalibration(CalibrationBase):
@@ -222,7 +221,7 @@ class LinearCalibration(CalibrationBase):
         :return: A Dict of Item Class instances, which represents the user recommendation list.
         """
 
-        recommendation_list = dict()
+        recommendation_list = {}
 
         # loop for each position in recommendation list
         range_list = list(range(1, int(self.environment['list_size']) + 1))
@@ -264,8 +263,7 @@ class LinearCalibration(CalibrationBase):
         """
         if algorithm_name.upper() == "SURROGATE":
             return self._surrogate
-        else:
-            raise NameError("Select item algorithm not found!")
+        raise NameError("Select item algorithm not found!")
 
 
 class LogarithmBias(CalibrationBase):
@@ -451,7 +449,7 @@ class LogarithmBias(CalibrationBase):
         :param lmbda: A float between [0;1], which represent the tradeoff weight.
         :return: A Dict of Item Class instances, which represents the user recommendation list.
         """
-        recommendation_dict = dict()
+        recommendation_dict = {}
 
         range_list = range(1, int(self.environment['list_size']) + 1)
 
@@ -461,7 +459,7 @@ class LogarithmBias(CalibrationBase):
             max_utility = -np.inf
             best_item = None
             best_id = None
-            best_bias_list = list()
+            best_bias_list = []
             # loop for test each item in each position
             for i_id, item in candidate_items.items():
                 if i_id not in recommendation_dict.keys() and i_id is not None:
@@ -493,5 +491,4 @@ class LogarithmBias(CalibrationBase):
         """
         if algorithm_name.upper() == "SURROGATE":
             return self._surrogate
-        else:
-            raise NameError("Select item algorithm not found!")
+        raise NameError("Select item algorithm not found!")

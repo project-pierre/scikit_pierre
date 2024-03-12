@@ -4,7 +4,7 @@ This file contains all combinations family equations.
 from math import log, sqrt
 
 
-def taneja(p: list, q: list, **kwargs) -> float:
+def taneja(p: list, q: list) -> float:
     """
     Taneja (p, q) divergence. Low values means close, high values means far.
 
@@ -27,7 +27,7 @@ def taneja(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def kumar_johnson(p: list, q: list, **kwargs) -> float:
+def kumar_johnson(p: list, q: list) -> float:
     """
     Kumar Johnson (p, q) divergence. Low values means close, high values means far.
 
@@ -50,7 +50,7 @@ def kumar_johnson(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def avg(p: list, q: list, **kwargs) -> float:
+def avg(p: list, q: list) -> float:
     """
     AVG (p, q) divergence. Low values means close, high values means far.
 
@@ -74,7 +74,7 @@ def avg(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i, difference) for p_i, q_i in zip(p, q)]) / 2
 
 
-def weighted_total_variation(p: list, q: list, **kwargs) -> float:
+def weighted_total_variation(p: list, q: list) -> float:
     """
     Weighted Total Variation(P, Q) (p, q) divergence. Low values means close, high values means far.
 

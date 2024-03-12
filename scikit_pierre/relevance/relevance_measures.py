@@ -2,8 +2,8 @@
 This file contains all relevance measure equations.
 """
 
-import numpy as np
 from math import log
+import numpy as np
 
 
 def sum_relevance_score(scores: list) -> float:

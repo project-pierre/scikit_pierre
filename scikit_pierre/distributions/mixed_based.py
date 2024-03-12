@@ -31,7 +31,7 @@ def mixed_gleb_twb(items: dict) -> dict:
         return {t: total[t] / n for t in dict(total)}
 
     def compute() -> None:
-        for index, item in items.items():
+        for _, item in items.items():
             for category, genre_value in item.classes.items():
                 ent = -(genre_global[category] * genre_value) * log2(
                     genre_global[category] * genre_value)
@@ -42,8 +42,7 @@ def mixed_gleb_twb(items: dict) -> dict:
         if (g in denominator.keys() and denominator[g] > 0.0) and (
                 g in numerator.keys() and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
-        else:
-            return 0.00001
+        return 0.00001
 
     genre_global = global_entropy()
     compute()

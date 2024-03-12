@@ -3,7 +3,7 @@ This file contains all intersection family equations.
 """
 
 
-def intersection_similarity(p: list, q: list, **kwargs) -> float:
+def intersection_similarity(p: list, q: list) -> float:
     """
     Intersection (p, q) similarity. Low values means different, high values means similar.
 
@@ -20,7 +20,7 @@ def intersection_similarity(p: list, q: list, **kwargs) -> float:
     return sum([min([p_i, q_i]) for p_i, q_i in zip(p, q)])
 
 
-def intersection_divergence(p: list, q: list, **kwargs) -> float:
+def intersection_divergence(p: list, q: list) -> float:
     """
     Intersection (p, q) divergence. Low values means close, high values means far.
 
@@ -37,7 +37,7 @@ def intersection_divergence(p: list, q: list, **kwargs) -> float:
     return (1 / 2) * sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
 
 
-def wave_hedges(p: list, q: list, **kwargs) -> float:
+def wave_hedges(p: list, q: list) -> float:
     """
     Wave Hedges (p, q) divergence. Low values means close, high values means far.
 
@@ -63,7 +63,7 @@ def wave_hedges(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def czekanowski_similarity(p: list, q: list, **kwargs) -> float:
+def czekanowski_similarity(p: list, q: list) -> float:
     """
     Czekanowski (p, q) similarity. Low values means different, high values means similar.
 
@@ -85,7 +85,7 @@ def czekanowski_similarity(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def czekanowski_divergence(p: list, q: list, **kwargs) -> float:
+def czekanowski_divergence(p: list, q: list) -> float:
     """
     Czekanowski (p, q) divergence. Low values means close, high values means far.
 
@@ -107,7 +107,7 @@ def czekanowski_divergence(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def motyka_similarity(p: list, q: list, **kwargs) -> float:
+def motyka_similarity(p: list, q: list) -> float:
     """
     Motyka (p, q) similarity. Low values means different, high values means similar.
 
@@ -129,7 +129,7 @@ def motyka_similarity(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def motyka_divergence(p: list, q: list, **kwargs) -> float:
+def motyka_divergence(p: list, q: list) -> float:
     """
     Motyka (p, q) divergence. Low values means close, high values means far.
 
@@ -151,7 +151,7 @@ def motyka_divergence(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def kulczynski_s(p: list, q: list, **kwargs) -> float:
+def kulczynski_s(p: list, q: list) -> float:
     """
     Kulczynski s (p, q) similarity. Low values means different, high values means similar.
 
@@ -173,7 +173,7 @@ def kulczynski_s(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def ruzicka(p: list, q: list, **kwargs) -> float:
+def ruzicka(p: list, q: list) -> float:
     """
     Ruzicka (p, q) similarity. Low values means different, high values means similar.
 
@@ -195,7 +195,7 @@ def ruzicka(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def tanimoto(p: list, q: list, **kwargs) -> float:
+def tanimoto(p: list, q: list) -> float:
     """
     Tanimoto (p, q) divergence. Low values means close, high values means far.
 

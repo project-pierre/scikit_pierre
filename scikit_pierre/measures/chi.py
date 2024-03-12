@@ -4,7 +4,7 @@ This file contains all chi family equations.
 import math
 
 
-def squared_euclidean(p: list, q: list, **kwargs) -> float:
+def squared_euclidean(p: list, q: list) -> float:
     """
     Squared Euclidean (p, q) divergence. Low values means close, high values means far.
 
@@ -18,10 +18,10 @@ def squared_euclidean(p: list, q: list, **kwargs) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    return sum([(p_i - q_i) ** 2 for p_i, q_i in zip(p, q)])
+    return sum((p_i - q_i) ** 2 for p_i, q_i in zip(p, q))
 
 
-def person_chi_square(p: list, q: list, **kwargs) -> float:
+def person_chi_square(p: list, q: list) -> float:
     """
     Pearson Chi-Square (p, q) divergence. Low values means close, high values means far.
 
@@ -49,7 +49,7 @@ def person_chi_square(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def neyman_square(p: list, q: list, **kwargs) -> float:
+def neyman_square(p: list, q: list) -> float:
     """
     Neyman Square (p, q) divergence. Low values means close, high values means far.
 
@@ -77,7 +77,7 @@ def neyman_square(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def squared_chi_square(p: list, q: list, **kwargs) -> float:
+def squared_chi_square(p: list, q: list) -> float:
     """
     Squared Chi Square (p, q) divergence. Low values means close, high values means far.
 
@@ -105,7 +105,7 @@ def squared_chi_square(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def probabilistic_symmetric_chi_square(p: list, q: list, **kwargs) -> float:
+def probabilistic_symmetric_chi_square(p: list, q: list) -> float:
     """
     Probabilistic Symmetric Chi Square (p, q) divergence.
     Low values means close, high values means far.
@@ -134,7 +134,7 @@ def probabilistic_symmetric_chi_square(p: list, q: list, **kwargs) -> float:
     return 2 * sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def divergence(p: list, q: list, **kwargs) -> float:
+def divergence(p: list, q: list) -> float:
     """
     Divergence (p, q) divergence. Low values means close, high values means far.
 
@@ -162,7 +162,7 @@ def divergence(p: list, q: list, **kwargs) -> float:
     return 2 * sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def clark(p: list, q: list, **kwargs) -> float:
+def clark(p: list, q: list) -> float:
     """
     Clark (p, q) divergence. Low values means close, high values means far.
 
@@ -190,7 +190,7 @@ def clark(p: list, q: list, **kwargs) -> float:
     return math.sqrt(sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)]))
 
 
-def additive_symmetric_chi_squared(p: list, q: list, **kwargs) -> float:
+def additive_symmetric_chi_squared(p: list, q: list) -> float:
     """
     Additive Symmetric Chi Square (p, q) divergence. Low values means close, high values means far.
 

@@ -52,5 +52,4 @@ def distributions_funcs(distribution: str):
         return time_slide_window_based.mixed_tsw_twb_gleb
     elif distribution == "TSW_TWB_GLEB_P":
         return time_slide_window_based.mixed_tsw_twb_gleb_with_probability_property
-    else:
-        raise NameError(f"Distribution not found! {distribution}")
+    raise NameError(f"Distribution not found! {distribution}")

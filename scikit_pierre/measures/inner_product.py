@@ -5,7 +5,7 @@ This file contains all inner product family equations.
 import math
 
 
-def inner_product(p: list, q: list, **kwargs) -> float:
+def inner_product(p: list, q: list) -> float:
     """
     Inner Product (p, q) similarity. Low values means different, high values means similar.
 
@@ -22,7 +22,7 @@ def inner_product(p: list, q: list, **kwargs) -> float:
     return sum([p_i * q_i for p_i, q_i in zip(p, q)])
 
 
-def harmonic_mean(p: list, q: list, **kwargs) -> float:
+def harmonic_mean(p: list, q: list) -> float:
     """
     Harmonic mean (p, q) similarity. Low values means different, high values means similar.
 
@@ -48,7 +48,7 @@ def harmonic_mean(p: list, q: list, **kwargs) -> float:
     return 2 * sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def cosine(p: list, q: list, **kwargs) -> float:
+def cosine(p: list, q: list) -> float:
     """
     Cosine (p, q) similarity. Low values means different, high values means similar.
 
@@ -72,7 +72,7 @@ def cosine(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def kumar_hassebrook(p: list, q: list, **kwargs) -> float:
+def kumar_hassebrook(p: list, q: list) -> float:
     """
     Kumar-Hassebrook (p, q) similarity. Low values means different, high values means similar.
 
@@ -96,7 +96,7 @@ def kumar_hassebrook(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def jaccard(p: list, q: list, **kwargs) -> float:
+def jaccard(p: list, q: list) -> float:
     """
     Jaccard (p, q) divergence. Low values means close, high values means far.
 
@@ -121,7 +121,7 @@ def jaccard(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def dice_similarity(p: list, q: list, **kwargs) -> float:
+def dice_similarity(p: list, q: list) -> float:
     """
     Dice (p, q) similarity. Low values means different, high values means similar.
 
@@ -143,7 +143,7 @@ def dice_similarity(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def dice_divergence(p: list, q: list, **kwargs) -> float:
+def dice_divergence(p: list, q: list) -> float:
     """
     Dice (p, q) divergence. Low values means close, high values means far.
 

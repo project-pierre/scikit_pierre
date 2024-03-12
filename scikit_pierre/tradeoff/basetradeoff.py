@@ -27,23 +27,30 @@ class BaseTradeOff:
             self.users_preferences = deepcopy(users_preferences)
             self.candidate_items = deepcopy(candidate_items)
         else:
-            raise Exception("Some column is missing.")
+            raise KeyError("Some column is missing.")
 
         if set(users_preferences['ITEM_ID'].unique().tolist() +
                candidate_items['ITEM_ID'].unique().tolist()).issubset(
             set(item_set['ITEM_ID'].unique().tolist())):
             self.item_set = deepcopy(item_set)
         else:
-            raise Exception("Some wrong information in the ITEM ID.")
+            raise NameError("Some wrong information in the ITEM ID.")
 
         self._item_in_memory = ItemsInMemory(data=self.item_set)
         self.users_distribution = users_distribution
 
         self.environment = {}
 
-    def env(self, environment: dict):
+    def env(self, environment: dict) -> None:
+        """
+        This method is to config the experiment environment.
+        :param environment: TODO: Docstring
+        """
         self.environment = environment
 
-    def fit(self):
+    def fit(self) -> None:
+        """
+        This method is the main method to start the trade-off computation.
+        """
         if not self.environment:
             raise SystemError("The configuration need to be set!")

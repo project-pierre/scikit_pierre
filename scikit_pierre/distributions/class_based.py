@@ -32,8 +32,7 @@ def class_weighted_strategy(items: dict) -> dict:
         if ((g in denominator.keys() and denominator[g] > 0.0) and
                 (g in numerator.keys() and numerator[g] > 0.0)):
             return numerator[g] / denominator[g]
-        else:
-            return 0.00001
+        return 0.00001
 
     compute()
     distribution = {g: genre(g) for g in numerator}

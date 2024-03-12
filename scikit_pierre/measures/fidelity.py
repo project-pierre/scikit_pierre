@@ -5,7 +5,7 @@ This file contains all fidelity family equations.
 import math
 
 
-def fidelity(p: list, q: list, **kwargs) -> float:
+def fidelity(p: list, q: list) -> float:
     """
     Fidelity (p, q) similarity. Low values means different, high values means similar.
 
@@ -23,7 +23,7 @@ def fidelity(p: list, q: list, **kwargs) -> float:
     return sum([math.sqrt(p_i * q_i) for p_i, q_i in zip(p, q)])
 
 
-def bhattacharyya(p: list, q: list, **kwargs) -> float:
+def bhattacharyya(p: list, q: list) -> float:
     """
     Bhattacharyya (p, q) divergence. Low values means close, high values means far.
 
@@ -47,7 +47,7 @@ def bhattacharyya(p: list, q: list, **kwargs) -> float:
     return -math.log(compute())
 
 
-def hellinger(p: list, q: list, **kwargs) -> float:
+def hellinger(p: list, q: list) -> float:
     """
     Hellinger (p, q) divergence. Low values means close, high values means far.
 
@@ -64,7 +64,7 @@ def hellinger(p: list, q: list, **kwargs) -> float:
     return math.sqrt(2 * sum([(math.sqrt(p_i) - math.sqrt(q_i)) ** 2 for p_i, q_i in zip(p, q)]))
 
 
-def matusita(p: list, q: list, **kwargs) -> float:
+def matusita(p: list, q: list) -> float:
     """
     Matusita (p, q) divergence. Low values means close, high values means far.
 
@@ -85,7 +85,7 @@ def matusita(p: list, q: list, **kwargs) -> float:
     return math.sqrt(sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)]))
 
 
-def squared_chord_similarity(p: list, q: list, **kwargs) -> float:
+def squared_chord_similarity(p: list, q: list) -> float:
     """
     Squared-chord (p, q) similarity. Low values means different, high values means similar.
 
@@ -102,7 +102,7 @@ def squared_chord_similarity(p: list, q: list, **kwargs) -> float:
     return 2 * sum([math.sqrt(p_i * q_i) for p_i, q_i in zip(p, q)]) - 1
 
 
-def squared_chord_divergence(p: list, q: list, **kwargs) -> float:
+def squared_chord_divergence(p: list, q: list) -> float:
     """
     Squared-chord (p, q) divergence. Low values means close, high values means far.
 

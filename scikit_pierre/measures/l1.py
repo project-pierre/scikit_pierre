@@ -4,7 +4,7 @@ This file contains all l1 family equations.
 import math
 
 
-def sorensen(p: list, q: list, **kwargs) -> float:
+def sorensen(p: list, q: list) -> float:
     """
     Sorensen (p, q) divergence. Low values means close, high values means far.
 
@@ -26,7 +26,7 @@ def sorensen(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def gower(p: list, q: list, **kwargs) -> float:
+def gower(p: list, q: list) -> float:
     """
     Gower (p, q) divergence. Low values means close, high values means far.
 
@@ -43,7 +43,7 @@ def gower(p: list, q: list, **kwargs) -> float:
     return (1 / len(p)) * sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
 
 
-def soergel(p: list, q: list, **kwargs) -> float:
+def soergel(p: list, q: list) -> float:
     """
     Soergel (p, q) divergence. Low values means close, high values means far.
 
@@ -65,7 +65,7 @@ def soergel(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def kulczynski_d(p: list, q: list, **kwargs) -> float:
+def kulczynski_d(p: list, q: list) -> float:
     """
     Kulczynski d (p, q) divergence. Low values means close, high values means far.
 
@@ -87,7 +87,7 @@ def kulczynski_d(p: list, q: list, **kwargs) -> float:
         return numerator / 0.00001
 
 
-def canberra(p: list, q: list, **kwargs) -> float:
+def canberra(p: list, q: list) -> float:
     """
     Canberra (p, q) divergence. Low values means close, high values means far.
 
@@ -113,7 +113,7 @@ def canberra(p: list, q: list, **kwargs) -> float:
     return sum([compute(p_i, q_i) for p_i, q_i in zip(p, q)])
 
 
-def lorentzian(p: list, q: list, **kwargs) -> float:
+def lorentzian(p: list, q: list) -> float:
     """
     Lorentzian (p, q) divergence. Low values means close, high values means far.
 
