@@ -38,8 +38,8 @@ def global_local_entropy_based(items: dict) -> dict:
                 denominator[category] = denominator.get(category, 0) + item.score
 
     def genre(g: str) -> float:
-        if (g in denominator.keys() and denominator[g] > 0.0) and (
-                g in numerator.keys() and numerator[g] > 0.0):
+        if (g in denominator and denominator[g] > 0.0) and (
+                g in numerator and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
         return 0.00001
 

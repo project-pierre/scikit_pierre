@@ -28,8 +28,8 @@ def time_weighted_based(items: dict) -> dict:
                 denominator[category] = denominator.get(category, 0) + item.score
 
     def genre(g: str) -> float:
-        if (g in denominator.keys() and denominator[g] > 0.0) and (
-                g in numerator.keys() and numerator[g] > 0.0):
+        if (g in denominator and denominator[g] > 0.0) and (
+                g in numerator and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
         return 0.00001
 
@@ -49,7 +49,7 @@ def time_weighted_based_with_probability_property(items: dict) -> dict:
     :return: A Dict of genre and value.
     """
     distribution = time_weighted_based(items)
-    total = sum([value for g, value in distribution.items()])
+    total = sum(value for g, value in distribution.items())
     final_distribution = {g: value / total for g, value in distribution.items()}
     return final_distribution
 
@@ -73,8 +73,8 @@ def time_genre(items: dict) -> dict:
                 denominator[category] = denominator.get(category, 0.) + item.time
 
     def genre(g: str) -> float:
-        if (g in denominator.keys() and denominator[g] > 0.0) and (
-                g in numerator.keys() and numerator[g] > 0.0):
+        if (g in denominator and denominator[g] > 0.0) and (
+                g in numerator and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
         return 0.00001
 

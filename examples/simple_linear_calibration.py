@@ -36,6 +36,6 @@ tradeoff_instance.config(
 )
 
 # Execute the instance and get the recommendation list to all users.
-recommendation_lists = tradeoff_instance.fit()
+recommendation_lists = pd.concat(tradeoff_instance.fit())
 # print the 5 first in the dataframe
 print(recommendation_lists.head(5))
