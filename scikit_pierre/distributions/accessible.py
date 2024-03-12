@@ -1,12 +1,15 @@
+"""
+File to allow access all distribution functions.
+"""
 from . import class_based, entropy_based, time_based, mixed_based, time_slide_window_based
-from . import weighted_strategy
 
 
 def distributions_funcs(distribution: str):
     """
     Function to decide what distance measure will be used.
 
-    :param distribution: The acronyms (initials) assigned to a distribution finder, which will be used by.
+    :param distribution: The acronyms (initials) assigned to a distribution finder,
+                        which will be used by.
     :return: The choose function.
     """
     if distribution == "CWS":
@@ -50,21 +53,4 @@ def distributions_funcs(distribution: str):
     elif distribution == "TSW_TWB_GLEB_P":
         return time_slide_window_based.mixed_tsw_twb_gleb_with_probability_property
     else:
-        raise Exception(f"Distribution not found! {distribution}")
-
-
-def distributions_funcs_pandas(distribution: str):
-    """
-    Function to decide what distance measure will be used.
-
-    :param distribution: The acronyms (initials) assigned to a distribution finder, which will be used by.
-    :return: The choose function.
-    """
-    if distribution == "CWS":
-        return weighted_strategy.weighted_strategy
-    elif distribution == "WPS":
-        return weighted_strategy.weighted_probability_strategy
-    elif distribution == "TWB":
-        return weighted_strategy.time_weighted_based
-    else:
-        raise Exception("Distribution not found!")
+        raise NameError(f"Distribution not found! {distribution}")

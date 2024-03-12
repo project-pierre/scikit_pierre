@@ -1,3 +1,8 @@
+"""
+This file presents the distributions based on the class/genre.
+"""
+
+
 # ############################################################################################### #
 # ######################################### Class Based ######################################### #
 # ############################################################################################### #
@@ -18,13 +23,14 @@ def class_weighted_strategy(items: dict) -> dict:
     denominator = {}
 
     def compute() -> None:
-        for index, item in items.items():
+        for _, item in items.items():
             for category, genre_value in item.classes.items():
                 numerator[category] = numerator.get(category, 0) + item.score * genre_value
                 denominator[category] = denominator.get(category, 0) + item.score
 
     def genre(g: str) -> float:
-        if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
+        if ((g in denominator.keys() and denominator[g] > 0.0) and
+                (g in numerator.keys() and numerator[g] > 0.0)):
             return numerator[g] / denominator[g]
         else:
             return 0.00001
@@ -59,7 +65,7 @@ def pure_genre(items: dict) -> dict:
     :return: A Dict of genre and value.
     """
     distribution = {}
-    for index, item in items.items():
+    for _, item in items.items():
         for category, genre_value in item.classes.items():
             distribution[category] = distribution.get(category, 0.) + genre_value
     return distribution
@@ -67,7 +73,8 @@ def pure_genre(items: dict) -> dict:
 
 def pure_genre_with_probability_property(items: dict) -> dict:
     """
-    The Pure Genre Distribution with Probability Property - (PGD_P). The reference for this implementation are from:
+    The Pure Genre Distribution with Probability Property - (PGD_P).
+    The reference for this implementation are from:
 
     - <In process>
 
@@ -78,7 +85,6 @@ def pure_genre_with_probability_property(items: dict) -> dict:
     norm = sum(dist.values())
     distribution = {g: value / norm for g, value in dist.items()}
     return distribution
-
 
 # ############################################################################################### #
 # ######################################### Unrevised ########################################## #

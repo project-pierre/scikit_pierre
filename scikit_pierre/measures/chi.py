@@ -1,3 +1,6 @@
+"""
+This file contains all chi family equations.
+"""
 import math
 
 
@@ -9,8 +12,10 @@ def squared_euclidean(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     return sum([(p_i - q_i) ** 2 for p_i, q_i in zip(p, q)])
@@ -26,8 +31,10 @@ def person_chi_square(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -50,8 +57,10 @@ def neyman_square(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -76,8 +85,10 @@ def squared_chi_square(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -96,14 +107,17 @@ def squared_chi_square(p: list, q: list, **kwargs) -> float:
 
 def probabilistic_symmetric_chi_square(p: list, q: list, **kwargs) -> float:
     """
-    Probabilistic Symmetric Chi Square (p, q) divergence. Low values means close, high values means far.
+    Probabilistic Symmetric Chi Square (p, q) divergence.
+    Low values means close, high values means far.
 
     The reference for this implementation are from:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -128,8 +142,10 @@ def divergence(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -154,8 +170,10 @@ def clark(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -180,8 +198,10 @@ def additive_symmetric_chi_squared(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 

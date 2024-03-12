@@ -1,6 +1,9 @@
-from math import log
+"""
+This file contains all relevance measure equations.
+"""
 
 import numpy as np
+from math import log
 
 
 def sum_relevance_score(scores: list) -> float:
@@ -9,11 +12,12 @@ def sum_relevance_score(scores: list) -> float:
 
     The reference for this implementation are from:
 
-    - Silva et. al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
+    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
 
     - Steck (2018). https://doi.org/10.1145/3240323.3240372
 
-    :param scores: A list with float numbers, which represents the weight for each item in its position.
+    :param scores: A list with float numbers,
+        which represents the weight for each item in its position.
 
     :return: A float, which represent list weight.
     """
@@ -28,12 +32,14 @@ def ndcg_relevance_score(scores: list) -> float:
 
     - Silva and Durão. (2022).
 
-    :param scores: A list of float in which represents the relevance score for each item in its position.
+    :param scores: A list of float in which represents the relevance score
+        for each item in its position.
 
     :return: A float which represents the list relevance.
     """
+
     def __dcg_at_k(rel: list) -> float:
-        return sum([((2 ** score) - 1)/(np.log2(ix + 2)) for ix, score in enumerate(rel)])
+        return sum([((2 ** score) - 1) / (np.log2(ix + 2)) for ix, score in enumerate(rel)])
 
     def ndcg_at_k(rel: list) -> float:
         idcg = __dcg_at_k(sorted(rel, reverse=True))
@@ -52,12 +58,15 @@ def utility_relevance_scores(scores: list) -> float:
 
     The reference for this implementation are from:
 
-    - Sacharidis, Mouratidis, Kleftogiannis (2019) - https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=7946&context=sis_research
+    - Sacharidis, Mouratidis, Kleftogiannis (2019) -
+        https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=7946&context=sis_research
 
-    :param scores: A list of float in which represents the relevance score for each item in its position.
+    :param scores: A list of float in which represents the relevance score
+        for each item in its position.
 
     :return: A float which represents the list relevance.
     """
+
     def utility(values: list) -> float:
         return sum(ix * (1 / log(ix + 1)) for ix, value in enumerate(values, start=1))
 

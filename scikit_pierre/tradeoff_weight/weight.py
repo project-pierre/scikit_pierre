@@ -1,3 +1,7 @@
+"""
+This file contains the trade-off weight equations.
+"""
+
 from math import sqrt
 
 

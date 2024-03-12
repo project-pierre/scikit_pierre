@@ -1,3 +1,6 @@
+"""
+File to deal with the genre transformation in probability.
+"""
 from pandas import DataFrame, concat
 
 
@@ -7,7 +10,8 @@ def genre_probability_approach(item_set: DataFrame) -> DataFrame:
 
     :param item_set: A DataFrame with the set of items with the columns: ['ITEM_ID', 'CLASSES']
 
-    :return: A Dataframe were the lines are the items, the columns are the genres and the cells are probability values.
+    :return: A Dataframe were the lines are the items,
+            the columns are the genres and the cells are probability values.
     """
     item_classes = []
     for row in item_set.itertuples():

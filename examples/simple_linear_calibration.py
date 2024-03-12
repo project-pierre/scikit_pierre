@@ -1,5 +1,10 @@
-from scikit_pierre.tradeoff.calibration import LinearCalibration
+"""
+Running example.
+The files in the path dataset show an example of how you need to model the entrance.
+"""
 import pandas as pd
+
+from scikit_pierre.tradeoff.calibration import LinearCalibration
 
 # Load the users' preference set as a Pandas DataFrame instance.
 # It is expected 3 columns: [USER_ID, ITEM_ID, TRANSACTION_VALUE].
@@ -15,19 +20,19 @@ items_dataframe = pd.read_csv('dataset/items.csv')
 
 # Create an instance with the basic data.
 tradeoff_instance = LinearCalibration(
-  users_preferences=users_preference_dataframe,
-  candidate_items=candidate_items_dataframe,
-  item_set=items_dataframe
+    users_preferences=users_preference_dataframe,
+    candidate_items=candidate_items_dataframe,
+    item_set=items_dataframe
 )
 
 # Configure the instance
 tradeoff_instance.config(
-  distribution_component='CWS',
-  fairness_component='KL',
-  relevance_component='SUM',
-  tradeoff_weight_component='VAR',
-  select_item_component='SURROGATE',
-  list_size=10
+    distribution_component='CWS',
+    fairness_component='KL',
+    relevance_component='SUM',
+    tradeoff_weight_component='VAR',
+    select_item_component='SURROGATE',
+    list_size=10
 )
 
 # Execute the instance and get the recommendation list to all users.

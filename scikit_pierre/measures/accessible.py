@@ -1,4 +1,9 @@
-from . import minkowski, l1, intersection, inner_product, shannon, fidelity, chi, combinations, vicissitude
+"""
+This file contains the call to all similarity and divergence measure.
+"""
+
+from . import minkowski, l1, intersection, inner_product, shannon, fidelity, chi, combinations, \
+    vicissitude
 
 
 def calibration_measures_funcs(measure: str = "KL"):
@@ -131,6 +136,8 @@ def calibration_measures_funcs(measure: str = "KL"):
         return vicissitude.max_symmetric_chi_square_emanon5
     elif measure == "VICIS_EMANON6":
         return vicissitude.min_symmetric_chi_square_emanon6
+    else:
+        raise NameError(f"Measure not found! {measure}")
 
 
 SIMILARITY_LIST = [

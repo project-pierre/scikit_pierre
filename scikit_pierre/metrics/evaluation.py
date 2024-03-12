@@ -1,3 +1,7 @@
+"""
+This file contains all evaluation metrics.
+"""
+
 from pandas import DataFrame
 
 from scikit_pierre.distributions.accessible import distributions_funcs
@@ -7,11 +11,13 @@ from scikit_pierre.models.item import ItemsInMemory
 
 
 #########################################################################################
-def mean_average_precision(users_recommendation_list: DataFrame, users_test_items: DataFrame) -> float:
+def mean_average_precision(users_recommendation_list: DataFrame,
+                           users_test_items: DataFrame) -> float:
     """
     Mean Average Precision. A metric to get the precision along the recommendation list.
 
-    :param users_recommendation_list: A Pandas DataFrame, which represents the users recommendation lists.
+    :param users_recommendation_list: A Pandas DataFrame,
+                                        which represents the users recommendation lists.
     :param users_test_items: A Pandas DataFrame, which represents the test items for the experiment.
 
     :return: A float, which represents the map value.
@@ -42,8 +48,10 @@ def mean_average_precision(users_recommendation_list: DataFrame, users_test_item
     users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
     users_test_items.sort_values(by=['USER_ID'], inplace=True)
 
-    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(users_test_items['USER_ID'].unique().tolist()):
-        raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
+    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
+            users_test_items['USER_ID'].unique().tolist()):
+        raise Exception(
+            'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     test_set = users_test_items.groupby(by=['USER_ID'])
     rec_set = users_recommendation_list.groupby(by=['USER_ID'])
@@ -53,11 +61,12 @@ def mean_average_precision(users_recommendation_list: DataFrame, users_test_item
         rec_set,
         test_set
     ))
-    return sum(users_results)/len(users_results)
+    return sum(users_results) / len(users_results)
 
 
 ######################################################################
-def mean_reciprocal_rank(users_recommendation_list: DataFrame, users_test_items: DataFrame) -> float:
+def mean_reciprocal_rank(users_recommendation_list: DataFrame,
+                         users_test_items: DataFrame) -> float:
     def get_rr_from_list(relevance_array: list) -> float:
         relevance_list_size = len(relevance_array)
         if relevance_list_size == 0:
@@ -76,8 +85,10 @@ def mean_reciprocal_rank(users_recommendation_list: DataFrame, users_test_items:
     users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
     users_test_items.sort_values(by=['USER_ID'], inplace=True)
 
-    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(users_test_items['USER_ID'].unique().tolist()):
-        raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
+    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
+            users_test_items['USER_ID'].unique().tolist()):
+        raise Exception(
+            'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     test_set = users_test_items.groupby(by=['USER_ID'])
     rec_set = users_recommendation_list.groupby(by=['USER_ID'])
@@ -87,7 +98,7 @@ def mean_reciprocal_rank(users_recommendation_list: DataFrame, users_test_items:
         rec_set,
         test_set
     ))
-    return sum(users_results)/len(users_results)
+    return sum(users_results) / len(users_results)
 
 
 #####################################################################
@@ -104,12 +115,15 @@ def mace(
     - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
 
     :param users_preference_set: TODO: Docstring
-    :param users_recommendation_lists: A Pandas DataFrame, which represents the users recommendation lists.
-    :param items_set_df: A Dataframe were the lines are the items, the columns are the classes and the cells are probability values.
+    :param users_recommendation_lists: A Pandas DataFrame,
+                                        which represents the users recommendation lists.
+    :param items_set_df: A Dataframe were the lines are the items,
+                            the columns are the classes and the cells are probability values.
     :param distribution: A calibration function name.
 
     :return: A float that's represents the mace value.
     """
+
     def __intermediate__(user_rec_list_df) -> DataFrame:
         user_rec_list_dict = _item_in_memory.select_user_items(data=user_rec_list_df)
         user_dist_dict = _distribution_component(
@@ -163,7 +177,8 @@ def mace(
     set_2 = set([str(ix) for ix in users_preference_set['USER_ID'].unique().tolist()])
 
     if set_1 != set_2:
-        raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
+        raise Exception(
+            'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     results = list(map(
         lambda utarget_dist, urec_list: __ace(
@@ -177,7 +192,8 @@ def mace(
 
 #######################################################
 
-def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_func, fairness_func):
+def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_func,
+         fairness_func):
     """
     Mean Rank MisCalibration. Metric to calibrated recommendations systems.
 
@@ -185,14 +201,20 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
 
     - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
 
-    :param users_target_dist: A DataFrame were the lines are the users, the columns are the classes and the cells are the distribution value.
-    :param users_recommendation_lists: A Pandas DataFrame, which represents the users recommendation lists.
-    :param items_classes_set: A Dataframe were the lines are the items, the columns are the classes and the cells are probability values.
+    :param users_target_dist:
+        A DataFrame were the lines are the users,
+        the columns are the classes and the cells are the distribution value.
+    :param users_recommendation_lists:
+        A Pandas DataFrame, which represents the users recommendation lists.
+    :param items_classes_set:
+        A Dataframe were the lines are the items,
+        the columns are the classes and the cells are probability values.
     :param fairness_func: A fairness function.
     :param dist_func: ...
 
     :return: A float that's represents the mace value.
     """
+
     def __miscalibration(target_dist, realized_dist):
         p = list(target_dist)
         q = list(realized_dist.values[0])
@@ -223,12 +245,15 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
     users_recommendation_lists.sort_values(by=['USER_ID'], inplace=True)
     users_target_dist.sort_index(inplace=True)
 
-    if set([str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()]) != set([str(ix) for ix in users_target_dist.index]):
-        raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
+    if set([str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()]) != set(
+            [str(ix) for ix in users_target_dist.index]):
+        raise Exception(
+            'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     results = list(map(
         lambda utarget_dist, urec_list: __rank_miscalibration(
-            user_target_distribution=utarget_dist[1], user_rec_list=urec_list[1], user_id=urec_list[0]
+            user_target_distribution=utarget_dist[1], user_rec_list=urec_list[1],
+            user_id=urec_list[0]
         ),
         users_target_dist.iterrows(),
         users_recommendation_lists.groupby(by=['USER_ID'])
@@ -254,7 +279,8 @@ def gap(users_data: DataFrame) -> float:
 def popularity_lift(users_model: DataFrame, users_recommendations: DataFrame) -> float:
     """
     Positive values for PL indicate amplification of popularity bias by the algorithm.
-    A negative value for PL happens when, on average, the recommendations are less concentrated on popular items than the users’ profile.
+    A negative value for PL happens when, on average,
+    the recommendations are less concentrated on popular items than the users’ profile.
     Moreover, the PL value of 0 means there is no popularity bias amplification.
     :param users_model:
     :param users_recommendations:
@@ -266,12 +292,15 @@ def popularity_lift(users_model: DataFrame, users_recommendations: DataFrame) ->
 
 
 ################################################################
-def serendipity(users_recommendation_list: DataFrame, users_test_items: DataFrame, users_baseline_items: DataFrame) -> float:
+def serendipity(users_recommendation_list: DataFrame, users_test_items: DataFrame,
+                users_baseline_items: DataFrame) -> float:
     """
     Serendipity
 
-    :param users_recommendation_list: A Pandas DataFrame, which represents the users recommendation lists.
-    :param users_test_items: A Pandas DataFrame, which represents the test items for the experiment.
+    :param users_recommendation_list:
+        A Pandas DataFrame, which represents the users recommendation lists.
+    :param users_test_items:
+        A Pandas DataFrame, which represents the test items for the experiment.
     :param users_baseline_items:
 
     :return: A float, which represents the serendipity value.
@@ -297,8 +326,10 @@ def serendipity(users_recommendation_list: DataFrame, users_test_items: DataFram
     users_test_items.sort_values(by=['USER_ID'], inplace=True)
     users_baseline_items.sort_values(by=['USER_ID'], inplace=True)
 
-    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(users_test_items['USER_ID'].unique().tolist()):
-        raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
+    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
+            users_test_items['USER_ID'].unique().tolist()):
+        raise Exception(
+            'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     test_set = users_test_items.groupby(by=['USER_ID'])
     rec_set = users_recommendation_list.groupby(by=['USER_ID'])
@@ -310,7 +341,7 @@ def serendipity(users_recommendation_list: DataFrame, users_test_items: DataFram
         test_set,
         baseline_set
     ))
-    return sum(users_results)/len(users_results)
+    return sum(users_results) / len(users_results)
 
 
 ###########################################################
@@ -319,7 +350,8 @@ def surprise(users_recommendation_list: DataFrame, users_preference_items: DataF
     """
     Serendipity
 
-    :param users_recommendation_list: A Pandas DataFrame, which represents the users recommendation lists.
+    :param users_recommendation_list:
+        A Pandas DataFrame, which represents the users recommendation lists.
     :param users_preference_items:
 
     :return: A float, which represents the surprise value.
@@ -332,8 +364,10 @@ def surprise(users_recommendation_list: DataFrame, users_preference_items: DataF
     users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
     users_preference_items.sort_values(by=['USER_ID'], inplace=True)
 
-    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(users_preference_items['USER_ID'].unique().tolist()):
-        raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
+    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
+            users_preference_items['USER_ID'].unique().tolist()):
+        raise Exception(
+            'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     preference_set = users_preference_items.groupby(by=['USER_ID'])
     rec_set = users_recommendation_list.groupby(by=['USER_ID'])
@@ -342,7 +376,7 @@ def surprise(users_recommendation_list: DataFrame, users_preference_items: DataF
         surp,
         rec_set
     ))
-    return sum(users_results)/len(users_results)
+    return sum(users_results) / len(users_results)
 
 
 #######################################################
@@ -350,7 +384,8 @@ def unexpectedness(users_recommendation_list: DataFrame, users_test_items: DataF
     """
     Serendipity
 
-    :param users_recommendation_list: A Pandas DataFrame, which represents the users recommendation lists.
+    :param users_recommendation_list: A Pandas DataFrame,
+        which represents the users recommendation lists.
     :param users_test_items: A Pandas DataFrame, which represents the test items for the experiment.
 
     :return: A float, which represents the map value.
@@ -367,8 +402,10 @@ def unexpectedness(users_recommendation_list: DataFrame, users_test_items: DataF
     users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
     users_test_items.sort_values(by=['USER_ID'], inplace=True)
 
-    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(users_test_items['USER_ID'].unique().tolist()):
-        raise Exception('Unknown users in recommendation or test set. Please make sure the users are the same.')
+    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
+            users_test_items['USER_ID'].unique().tolist()):
+        raise Exception(
+            'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     test_set = users_test_items.groupby(by=['USER_ID'])
     rec_set = users_recommendation_list.groupby(by=['USER_ID'])
@@ -378,4 +415,4 @@ def unexpectedness(users_recommendation_list: DataFrame, users_test_items: DataF
         rec_set,
         test_set
     ))
-    return sum(users_results)/len(users_results)
+    return sum(users_results) / len(users_results)

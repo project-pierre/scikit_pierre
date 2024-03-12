@@ -1,14 +1,16 @@
+"""
+This file contains implementations of Calibrated Recommendation Trade-off functions.
+"""
+
 import logging
+import numpy as np
 from copy import deepcopy
 from math import log
-
-import numpy as np
 from numpy import sign
 from pandas import DataFrame, concat, merge
 
 from .basetradeoff import BaseTradeOff
-from ..classes.acessible import class_funcs
-from ..distributions.accessible import distributions_funcs_pandas, distributions_funcs
+from ..distributions.accessible import distributions_funcs
 from ..measures.accessible import calibration_measures_funcs, SIMILARITY_LIST
 from ..relevance.accessible import relevance_measures_funcs
 from ..tradeoff_weight.accessible import tradeoff_weights_funcs
@@ -18,7 +20,8 @@ class CalibrationBase(BaseTradeOff):
     logger = logging.getLogger(__name__)
 
     @staticmethod
-    def _tradeoff_sim(lmbda: float, relevance_value: float, fairness_value: float, **kwargs) -> float:
+    def _tradeoff_sim(lmbda: float, relevance_value: float, fairness_value: float,
+                      **kwargs) -> float:
         """
         Tradeoff Balance that considers the similarity measures.
 
@@ -30,7 +33,8 @@ class CalibrationBase(BaseTradeOff):
         return ((1 - lmbda) * relevance_value) + (lmbda * fairness_value)
 
     @staticmethod
-    def _tradeoff_div(lmbda: float, relevance_value: float, fairness_value: float, **kwargs) -> float:
+    def _tradeoff_div(lmbda: float, relevance_value: float, fairness_value: float,
+                      **kwargs) -> float:
         """
         Tradeoff Balance that considers the distance measures.
 
@@ -67,10 +71,13 @@ class LinearCalibration(CalibrationBase):
     - Steck (2018). https://doi.org/10.1145/3240323.3240372
     """
 
-    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame, item_set: DataFrame, users_distribution: DataFrame = None):
+    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame,
+                 item_set: DataFrame, users_distribution: DataFrame = None):
         """
-        :param users_preferences: A Pandas DataFrame with four columns [USER_ID, ITEM_ID, TRANSACTION_VALUE, TIMESTAMP].
-        :param candidate_items: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, PREDICTED_VALUE].
+        :param users_preferences: A Pandas DataFrame with four columns
+            [USER_ID, ITEM_ID, TRANSACTION_VALUE, TIMESTAMP].
+        :param candidate_items: A Pandas DataFrame with three columns
+            [USER_ID, ITEM_ID, PREDICTED_VALUE].
         :param item_set: A Pandas DataFrame of items.
         """
         # Constructing the instance with the basic
@@ -83,17 +90,16 @@ class LinearCalibration(CalibrationBase):
         self._tradeoff_weight_component = None
         self._select_item_component = None
         self._tradeoff_balance_component = None
-        self._class_approach = None
 
-    def config(self, distribution_component: str = "CWS", class_approach="GENRE_PROBABILITY",
+    def config(self, distribution_component: str = "CWS",
                fairness_component: str = "CHI", relevance_component: str = "SUM",
                tradeoff_weight_component: str = "STD",
-               select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01, d: int = 3):
+               select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01,
+               d: int = 3):
         """
         Method to config the environment. All variable has default values.
 
         :param distribution_component: The name of the distribution to be used.
-        :param class_approach: The name of the class approach to be used.
         :param fairness_component: The name of the fairness measure to be used.
         :param relevance_component: The name of the relevance measure to be used.
         :param tradeoff_weight_component: The name of the tradeoff weight to be used.
@@ -104,7 +110,6 @@ class LinearCalibration(CalibrationBase):
         """
         super().env(environment={
             "distribution": distribution_component,
-            "class_approach": class_approach,
             "fairness": fairness_component,
             "relevance": relevance_component,
             "weight": tradeoff_weight_component,
@@ -117,10 +122,10 @@ class LinearCalibration(CalibrationBase):
         self._distribution_component = distributions_funcs(distribution=distribution_component)
         self._fairness_component = calibration_measures_funcs(measure=fairness_component)
         self._relevance_component = relevance_measures_funcs(relevance=relevance_component)
-        self._tradeoff_weight_component = tradeoff_weights_funcs(env_lambda=tradeoff_weight_component)
+        self._tradeoff_weight_component = tradeoff_weights_funcs(
+            env_lambda=tradeoff_weight_component)
         self._tradeoff_balance_component = self._tradeoff_funcs(measure=fairness_component)
         self._select_item_component = self._select_item_funcs(algorithm_name=select_item_component)
-        self._class_approach = class_funcs(class_approach=class_approach)
 
     def fit(self, uuids: list = None) -> list:
         """
@@ -145,12 +150,16 @@ class LinearCalibration(CalibrationBase):
         user_candidate_items = self.candidate_items[self.candidate_items['USER_ID'] == uid]
 
         # Target Distribution (p)
-        target_dist = self._distribution_component(items=self._item_in_memory.select_user_items(data=user_pref))
+        target_dist = self._distribution_component(
+            items=self._item_in_memory.select_user_items(data=user_pref))
         # if self.users_distribution is None:
-        #     target_dist = self._distribution_component(items=self._item_in_memory.select_user_items(data=user_pref))
+        #     target_dist = self._distribution_component(
+        #         items=self._item_in_memory.select_user_items(data=user_pref))
         # else:
         #     pre_computed_distribution = self.users_distribution.loc[uid]
-        #     target_dist = {col: value for col, value in zip(pre_computed_distribution.columns.tolist(), pre_computed_distribution.values.tolist())}
+        #     target_dist = {
+        #         col: value for col, value in zip(pre_computed_distribution.columns.tolist(),
+        #                                          pre_computed_distribution.values.tolist())}
         # Tradeoff weight (lambda)
         if self.environment['weight'][:2] == "C@":
             lmbda = self._tradeoff_weight_component
@@ -168,38 +177,47 @@ class LinearCalibration(CalibrationBase):
             print(uid)
             print(recommendation_list)
 
-        rec_list = merge(self._item_in_memory.transform_to_pandas(items=recommendation_list), user_candidate_items,
+        rec_list = merge(self._item_in_memory.transform_to_pandas(items=recommendation_list),
+                         user_candidate_items,
                          how="left", on=["ITEM_ID"])
 
         rec_list["USER_ID"] = uid
         return rec_list
 
-    def _compute_utility(self, target_distribution: dict, temp_rec_items: dict, lmbda: float) -> float:
+    def _compute_utility(self, target_distribution: dict, temp_rec_items: dict,
+                         lmbda: float) -> float:
         """
         The kernel of the Linear Tradeoff Balance.
 
-        :param target_distribution: A Dict with float numbers, which represents the distribution values - p.
+        :param target_distribution: A Dict with float numbers,
+            which represents the distribution values - p.
         :param lmbda: A float between [0;1], which represent the tradeoff weight.
         :param temp_rec_items: A dict with a temporary recommendation list.
         :return: A float between [0;1],
         """
         realized_dist = self._distribution_component(items=temp_rec_items)
         fairness_value = self._fairness_component(
-            p=list(target_distribution.values()), q=list(realized_dist.values()), d=self.environment["d"]
+            p=list(target_distribution.values()), q=list(realized_dist.values()),
+            d=self.environment["d"]
         )
-        relevance_value = self._relevance_component([item.score for _, item in temp_rec_items.items()])
-        utility_value = self._tradeoff_balance_component(lmbda=lmbda, relevance_value=relevance_value,
+        relevance_value = self._relevance_component(
+            [item.score for _, item in temp_rec_items.items()])
+        utility_value = self._tradeoff_balance_component(lmbda=lmbda,
+                                                         relevance_value=relevance_value,
                                                          fairness_value=fairness_value)
         return utility_value
 
-    def _surrogate(self, uid, target_distribution: dict, candidate_items: dict, lmbda: float) -> dict:
+    def _surrogate(self, uid, target_distribution: dict, candidate_items: dict,
+                   lmbda: float) -> dict:
         """
         Start with an empty recommendation list,
         loop over the candidate items, during each iteration
         update the list with the item that maximizes the utility function.
 
-        :param target_distribution: A Dict with float numbers, which represents the distribution values - p.
-        :param candidate_items: A Dict of Item Class instances, which represents the user candidate items.
+        :param target_distribution: A Dict with float numbers,
+            which represents the distribution values - p.
+        :param candidate_items: A Dict of Item Class instances,
+            which represents the user candidate items.
         :param lmbda: A float between [0;1], which represent the tradeoff weight.
         :return: A Dict of Item Class instances, which represents the user recommendation list.
         """
@@ -220,7 +238,7 @@ class LinearCalibration(CalibrationBase):
                 if (i_id not in recommendation_list.keys()) and (i_id is not None):
                     temp_rec_items = deepcopy(recommendation_list)
                     temp_item = deepcopy(item)
-                    temp_item.time = float(1/int(order))
+                    temp_item.time = float(1 / int(order))
                     temp_rec_items[i_id] = temp_item
 
                     utility = self._compute_utility(target_distribution=target_distribution,
@@ -247,7 +265,7 @@ class LinearCalibration(CalibrationBase):
         if algorithm_name.upper() == "SURROGATE":
             return self._surrogate
         else:
-            raise Exception("Select item algorithm not found!")
+            raise NameError("Select item algorithm not found!")
 
 
 class LogarithmBias(CalibrationBase):
@@ -261,10 +279,13 @@ class LogarithmBias(CalibrationBase):
     BIAS_ALPHA = 0.001
     BIAS_SIGMA = 0.001
 
-    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame, item_set: DataFrame, users_distribution: DataFrame = None):
+    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame,
+                 item_set: DataFrame, users_distribution: DataFrame = None):
         """
-        :param users_preferences: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, TRANSACTION_VALUE].
-        :param candidate_items: A Pandas DataFrame with three columns [USER_ID, ITEM_ID, PREDICTED_VALUE].
+        :param users_preferences: A Pandas DataFrame with three columns
+            [USER_ID, ITEM_ID, TRANSACTION_VALUE].
+        :param candidate_items: A Pandas DataFrame with three columns
+            [USER_ID, ITEM_ID, PREDICTED_VALUE].
         :param item_set: A Pandas DataFrame of items.
         """
         # Constructing the instance with the basic
@@ -279,12 +300,12 @@ class LogarithmBias(CalibrationBase):
         self._tradeoff_weight_component = None
         self._select_item_component = None
         self._tradeoff_balance_component = None
-        self._class_approach = None
 
     def config(self, distribution_component: str = "CWS", class_approach="GENRE_PROBABILITY",
                fairness_component: str = "CHI", relevance_component: str = "SUM",
                tradeoff_weight_component: str = "STD",
-               select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01, d: int = 3):
+               select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01,
+               d: int = 3):
         """
         Method to config the environment. All variable has default values.
 
@@ -313,10 +334,10 @@ class LogarithmBias(CalibrationBase):
         self._distribution_component = distributions_funcs(distribution=distribution_component)
         self._fairness_component = calibration_measures_funcs(measure=fairness_component)
         self._relevance_component = relevance_measures_funcs(relevance=relevance_component)
-        self._tradeoff_weight_component = tradeoff_weights_funcs(env_lambda=tradeoff_weight_component)
+        self._tradeoff_weight_component = tradeoff_weights_funcs(
+            env_lambda=tradeoff_weight_component)
         self._tradeoff_balance_component = self._tradeoff_funcs(measure=fairness_component)
         self._select_item_component = self._select_item_funcs(algorithm_name=select_item_component)
-        self._class_approach = class_funcs(class_approach=class_approach)
 
     def fit(self, uuids: list = None):
         """
@@ -345,7 +366,8 @@ class LogarithmBias(CalibrationBase):
         user_candidate_items = self.candidate_items[self.candidate_items['USER_ID'] == uid]
 
         # Target Distribution (p)
-        target_dist = self._distribution_component(items=self._item_in_memory.select_user_items(data=user_pref))
+        target_dist = self._distribution_component(
+            items=self._item_in_memory.select_user_items(data=user_pref))
         # Tradeoff weight (lambda)
         if self.environment['weight'][:2] == "C@":
             lmbda = self._tradeoff_weight_component
@@ -359,7 +381,8 @@ class LogarithmBias(CalibrationBase):
             lmbda=lmbda
         )
 
-        rec_list = merge(self._item_in_memory.transform_to_pandas(items=recommendation_list), user_candidate_items,
+        rec_list = merge(self._item_in_memory.transform_to_pandas(items=recommendation_list),
+                         user_candidate_items,
                          how="left", on=["ITEM_ID"])
 
         rec_list["USER_ID"] = uid
@@ -385,27 +408,32 @@ class LogarithmBias(CalibrationBase):
     def _computing_user_bias(self, user_item_list, user_bias_list, i_id):
         numerator = user_item_list[i_id].score - self.transaction_mean - user_item_list[i_id].bias
         user_bias_list.append(numerator)
-        return sum(user_bias_list) / (LogarithmBias.BIAS_SIGMA + len(user_bias_list)), user_bias_list
+        return sum(user_bias_list) / (
+                LogarithmBias.BIAS_SIGMA + len(user_bias_list)), user_bias_list
 
     def _compute_utility(self, target_distribution: dict, lmbda: float, temp_rec_items: dict,
                          bias_list: list, i_id: str):
         """
         The kernel of the Linear Tradeoff Balance.
-        :param target_distribution: A Dict with float numbers, which represents the distribution values - p.
+        :param target_distribution: A Dict with float numbers,
+            which represents the distribution values - p.
         :param lmbda: A float between [0;1], which represent the tradeoff weight.
         :param temp_rec_items: A temporary recommendation list.
         :return: A float between [0;1],
         """
         realized_dist = self._distribution_component(items=temp_rec_items)
 
-        fairness_value = self._fairness_component(p=list(target_distribution.values()), q=list(realized_dist.values()),
+        fairness_value = self._fairness_component(p=list(target_distribution.values()),
+                                                  q=list(realized_dist.values()),
                                                   d=self.environment["d"])
 
-        relevance_value = self._relevance_component([item.score for _, item in temp_rec_items.items()])
+        relevance_value = self._relevance_component(
+            [item.score for _, item in temp_rec_items.items()])
 
         utility_lin = self._tradeoff_balance_component(lmbda=lmbda, relevance_value=relevance_value,
                                                        fairness_value=fairness_value)
-        user_bias, new_bias_list = self._computing_user_bias(user_item_list=temp_rec_items, user_bias_list=bias_list,
+        user_bias, new_bias_list = self._computing_user_bias(user_item_list=temp_rec_items,
+                                                             user_bias_list=bias_list,
                                                              i_id=i_id)
         utility_value = sign(utility_lin) * log(abs(utility_lin) + 1) + user_bias
         return utility_value, new_bias_list
@@ -415,8 +443,11 @@ class LogarithmBias(CalibrationBase):
         Start with an empty recommendation list,
         loop over the candidate items, during each iteration
         update the list with the item that maximizes the utility function.
-        :param target_distribution: A Dict with float numbers, which represents the distribution values - p.
-        :param candidate_items: A Dict of Item Class instances, which represents the user candidate items.
+
+        :param target_distribution: A Dict with float numbers,
+            which represents the distribution values - p.
+        :param candidate_items: A Dict of Item Class instances,
+            which represents the user candidate items.
         :param lmbda: A float between [0;1], which represent the tradeoff weight.
         :return: A Dict of Item Class instances, which represents the user recommendation list.
         """
@@ -436,7 +467,7 @@ class LogarithmBias(CalibrationBase):
                 if i_id not in recommendation_dict.keys() and i_id is not None:
                     temp_rec_items = deepcopy(recommendation_dict)
                     temp_item = deepcopy(item)
-                    temp_item.time = float(1/int(order))
+                    temp_item.time = float(1 / int(order))
                     temp_rec_items[i_id] = temp_item
 
                     utility, bias_list = self._compute_utility(
@@ -463,4 +494,4 @@ class LogarithmBias(CalibrationBase):
         if algorithm_name.upper() == "SURROGATE":
             return self._surrogate
         else:
-            raise Exception("Select item algorithm not found!")
+            raise NameError("Select item algorithm not found!")

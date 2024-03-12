@@ -1,3 +1,7 @@
+"""
+This file contains all inner product family equations.
+"""
+
 import math
 
 
@@ -9,8 +13,10 @@ def inner_product(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     return sum([p_i * q_i for p_i, q_i in zip(p, q)])
@@ -24,8 +30,10 @@ def harmonic_mean(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -48,8 +56,10 @@ def cosine(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     numerator = sum([p_i * q_i for p_i, q_i in zip(p, q)])
@@ -70,8 +80,10 @@ def kumar_hassebrook(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     numerator = sum([p_i * q_i for p_i, q_i in zip(p, q)])
@@ -92,8 +104,10 @@ def jaccard(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     numerator = sum([(p_i - q_i) ** 2 for p_i, q_i in zip(p, q)])
@@ -115,8 +129,10 @@ def dice_similarity(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     numerator = 2 * sum([p_i * q_i for p_i, q_i in zip(p, q)])
@@ -135,8 +151,10 @@ def dice_divergence(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     numerator = sum([(p_i - q_i) ** 2 for p_i, q_i in zip(p, q)])

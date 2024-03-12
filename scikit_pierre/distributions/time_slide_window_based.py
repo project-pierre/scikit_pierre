@@ -1,5 +1,11 @@
-import math
+"""
+This file contains the distribution functions based on time slide window,
+which used the timestamp data.
+"""
+
 from collections import defaultdict
+
+import math
 from statistics import mean
 
 from .class_based import class_weighted_strategy
@@ -46,7 +52,8 @@ def temporal_slide_window_base_function(items: dict, major: int = 10, using: str
             floor = (i - 1) * batch_size
 
         distribution_list.append(base_distribution({
-            **dict(item for index, item in enum_items[:batch_size]), **dict(item for index, item in enum_items[floor:])
+            **dict(item for index, item in enum_items[:batch_size]),
+            **dict(item for index, item in enum_items[floor:])
         }))
 
         dd = defaultdict(list)
@@ -63,9 +70,11 @@ def temporal_slide_window_base_function(items: dict, major: int = 10, using: str
     return distribution
 
 
-def temporal_slide_window_base_function_with_probability_property(items: dict, using: str = "CWS") -> dict:
+def temporal_slide_window_base_function_with_probability_property(items: dict,
+                                                                  using: str = "CWS") -> dict:
     """
-    The Temporal Slide Window with Probability Property - (TSW_P). The reference for this implementation are from:
+    The Temporal Slide Window with Probability Property - (TSW_P).
+    The reference for this implementation are from:
 
     - <In process>
 
@@ -101,7 +110,8 @@ def temporal_slide_window(items: dict, using: str = "CWS") -> dict:
 
 def temporal_slide_window_with_probability_property(items: dict, using: str = "CWS") -> dict:
     """
-    The Temporal Slide Window with Probability Property - (TSW_P). The reference for this implementation are from:
+    The Temporal Slide Window with Probability Property - (TSW_P).
+    The reference for this implementation are from:
 
     - <In process>
 
@@ -175,7 +185,8 @@ def mixed_tsw_twb_with_probability_property(items: dict, using: str = "TWB") -> 
 
 def mixed_tsw_twb_gleb(items: dict, using: str = "GLEB_TWB") -> dict:
     """
-    The Temporal Slide Window with Time Weight Based and Global and Local Entropy Based - (TSW_TWB_GLEB).
+    The Temporal Slide Window with Time Weight Based and Global and Local Entropy Based -
+    (TSW_TWB_GLEB).
     The reference for this implementation are from:
 
     - <In process>
@@ -190,7 +201,8 @@ def mixed_tsw_twb_gleb(items: dict, using: str = "GLEB_TWB") -> dict:
 
 def mixed_tsw_twb_gleb_with_probability_property(items: dict, using: str = "GLEB_TWB") -> dict:
     """
-    The Temporal Slide Window with Time Weight Based and Global and Local Entropy Based - (TSW_TWB_GLEB_P).
+    The Temporal Slide Window with Time Weight Based and Global and Local Entropy Based -
+    (TSW_TWB_GLEB_P).
     The reference for this implementation are from:
 
     - <In process>

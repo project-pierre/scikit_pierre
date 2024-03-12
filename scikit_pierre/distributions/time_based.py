@@ -1,3 +1,8 @@
+"""
+This file contains the distribution functions based on timestamp data.
+"""
+
+
 # ############################################################################################### #
 # ######################################### Time Based ########################################## #
 # ############################################################################################### #
@@ -18,11 +23,13 @@ def time_weighted_based(items: dict) -> dict:
     def compute() -> None:
         for index, item in items.items():
             for category, genre_value in item.classes.items():
-                numerator[category] = numerator.get(category, 0) + item.time * item.score * genre_value
+                numerator[category] = numerator.get(category,
+                                                    0) + item.time * item.score * genre_value
                 denominator[category] = denominator.get(category, 0) + item.score
 
     def genre(g: str) -> float:
-        if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
+        if (g in denominator.keys() and denominator[g] > 0.0) and (
+                g in numerator.keys() and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
         else:
             return 0.00001
@@ -34,7 +41,8 @@ def time_weighted_based(items: dict) -> dict:
 
 def time_weighted_based_with_probability_property(items: dict) -> dict:
     """
-    The Time Weight Based with Probability Property - (TWB_P). The reference for this implementation are from:
+    The Time Weight Based with Probability Property - (TWB_P).
+    The reference for this implementation are from:
 
     - <In process>
 
@@ -66,7 +74,8 @@ def time_genre(items: dict) -> dict:
                 denominator[category] = denominator.get(category, 0.) + item.time
 
     def genre(g: str) -> float:
-        if (g in denominator.keys() and denominator[g] > 0.0) and (g in numerator.keys() and numerator[g] > 0.0):
+        if (g in denominator.keys() and denominator[g] > 0.0) and (
+                g in numerator.keys() and numerator[g] > 0.0):
             return numerator[g] / denominator[g]
         else:
             return 0.00001
@@ -78,7 +87,8 @@ def time_genre(items: dict) -> dict:
 
 def time_genre_with_probability_property(items: dict) -> dict:
     """
-    The Time Genre Distribution with Probability Property - (TGD_P). The reference for this implementation are from:
+    The Time Genre Distribution with Probability Property - (TGD_P).
+    The reference for this implementation are from:
 
     - <In process>
 
@@ -89,7 +99,6 @@ def time_genre_with_probability_property(items: dict) -> dict:
     norm = sum(dist.values())
     distribution = {g: value / norm for g, value in dist.items()}
     return distribution
-
 
 # ############################################################################################### #
 # ######################################### Unrevised ########################################### #

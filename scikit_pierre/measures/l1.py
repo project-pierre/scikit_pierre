@@ -1,3 +1,6 @@
+"""
+This file contains all l1 family equations.
+"""
 import math
 
 
@@ -9,8 +12,10 @@ def sorensen(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     numerator = sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
@@ -29,8 +34,10 @@ def gower(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     return (1 / len(p)) * sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
@@ -44,8 +51,10 @@ def soergel(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     numerator = sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
@@ -64,8 +73,10 @@ def kulczynski_d(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
     numerator = sum([abs(p_i - q_i) for p_i, q_i in zip(p, q)])
@@ -84,8 +95,10 @@ def canberra(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -108,8 +121,10 @@ def lorentzian(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 

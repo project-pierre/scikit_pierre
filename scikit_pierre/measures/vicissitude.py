@@ -1,3 +1,8 @@
+"""
+This file contains all vicissitude family equations.
+"""
+
+
 def vicis_wave_hedges(p: list, q: list, **kwargs) -> float:
     """
     Vicis-Wave Hedges (p, q) divergence. Low values means close, high values means far.
@@ -6,8 +11,10 @@ def vicis_wave_hedges(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -29,8 +36,10 @@ def vicis_symmetric_chi_square(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -46,14 +55,17 @@ def vicis_symmetric_chi_square(p: list, q: list, **kwargs) -> float:
 
 def vicis_symmetric_chi_square_emanon3(p: list, q: list, **kwargs) -> float:
     """
-    Vicis-Symmetric Chi Square Emanon 3(p, q) divergence. Low values means close, high values means far.
+    Vicis-Symmetric Chi Square Emanon 3(p, q) divergence.
+    Low values means close, high values means far.
 
     The reference for this implementation are from:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -69,14 +81,17 @@ def vicis_symmetric_chi_square_emanon3(p: list, q: list, **kwargs) -> float:
 
 def vicis_symmetric_chi_square_emanon4(p: list, q: list, **kwargs) -> float:
     """
-    Vicis-Symmetric Chi Square Emanon 4 (p, q) divergence. Low values means close, high values means far.
+    Vicis-Symmetric Chi Square Emanon 4 (p, q) divergence.
+    Low values means close, high values means far.
 
     The reference for this implementation are from:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -92,14 +107,17 @@ def vicis_symmetric_chi_square_emanon4(p: list, q: list, **kwargs) -> float:
 
 def max_symmetric_chi_square_emanon5(p: list, q: list, **kwargs) -> float:
     """
-    Vicis-Symmetric Chi Square Emanon 5 (p, q) divergence. Low values means close, high values means far.
+    Vicis-Symmetric Chi Square Emanon 5 (p, q) divergence.
+    Low values means close, high values means far.
 
     The reference for this implementation are from:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -123,14 +141,17 @@ def max_symmetric_chi_square_emanon5(p: list, q: list, **kwargs) -> float:
 
 def min_symmetric_chi_square_emanon6(p: list, q: list, **kwargs) -> float:
     """
-    Vicis-Symmetric Chi Square Emanon 6 (p, q) divergence. Low values means close, high values means far.
+    Vicis-Symmetric Chi Square Emanon 6 (p, q) divergence.
+    Low values means close, high values means far.
 
     The reference for this implementation are from:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 

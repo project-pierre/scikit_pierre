@@ -1,3 +1,6 @@
+"""
+This file contains all combinations family equations.
+"""
 from math import log, sqrt
 
 
@@ -9,8 +12,10 @@ def taneja(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -30,8 +35,10 @@ def kumar_johnson(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -51,8 +58,10 @@ def avg(p: list, q: list, **kwargs) -> float:
 
     - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
@@ -73,8 +82,10 @@ def weighted_total_variation(p: list, q: list, **kwargs) -> float:
 
     - Seymen et al. (2021). https://doi.org/10.1145/3460231.3478857
 
-    :param p: A list with float numbers, which represents the distribution values, p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values, p and q need to be the same size.
+    :param p: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
+    :param q: A list with float numbers, which represents the distribution values,
+                p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 

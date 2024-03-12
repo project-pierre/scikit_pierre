@@ -43,7 +43,7 @@ For the latest version, you can also clone the repo and build the source:
     $ cd scikit-pierre
     $ conda create --name scikit-pierre 
     $ conda activate scikit-pierre
-    $ conda install setuptools numpy pandas
+    $ conda install setuptools numpy pandas cython
     $ python setup.py sdist bdist_wheel
     $ pip install dist/scikit_pierre-0.0.1-py3-none-any.whl
 

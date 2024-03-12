@@ -1,3 +1,7 @@
+"""
+This file allow to access all relevance measures.
+"""
+
 from . import relevance_measures
 
 
@@ -11,5 +15,7 @@ def relevance_measures_funcs(relevance: str = "SUM"):
         return relevance_measures.sum_relevance_score
     elif relevance == "NDCG":
         return relevance_measures.ndcg_relevance_score
+    elif relevance == "UREL":
+        return relevance_measures.utility_relevance_scores
     else:
-        raise Exception("Relevance measure not found!")
+        raise NameError(f"Relevance Measure not found! {relevance}")
