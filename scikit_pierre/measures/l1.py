@@ -104,7 +104,7 @@ def canberra(p: list, q: list) -> float:
 
     def compute(p_i: float, q_i: float) -> float:
         numerator = abs(p_i - q_i)
-        denominator = (p_i + q_i)
+        denominator = p_i + q_i
         try:
             return numerator / denominator
         except ZeroDivisionError:
