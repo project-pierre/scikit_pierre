@@ -74,10 +74,8 @@ def amplitude(dist_vec: list) -> float:
     :param dist_vec: A list composed of float numbers.
     :return: A float between [0;1], which represent the degree of user genre preference.
     """
-    magnitude = sum(
-        sum(
-            map(lambda x: abs(x - y), dist_vec)) for y in dist_vec
-        )
+    summation = [sum(map(lambda x: abs(x - y), dist_vec)) for y in dist_vec]
+    magnitude = sum(summation)
     return 1 - (magnitude / len(dist_vec) ** 2)
 
 

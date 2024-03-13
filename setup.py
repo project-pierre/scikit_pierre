@@ -3,16 +3,16 @@ Setup of Scikit-Pierre
 """
 # Always prefer setuptools over distutils
 import os
-
+import sys
 # To use a consistent encoding
-from codecs import open
+from codecs import open as codec_open
 
 from setuptools import setup, find_packages, Extension
 
 try:
     import numpy as np
 except ImportError:
-    exit("Please install numpy>=1.17.3 first.")
+    sys.exit("Please install numpy>=1.17.3 first.")
 
 try:
     from Cython.Build import cythonize
@@ -27,32 +27,32 @@ __version__ = "0.0.1"
 here = os.path.abspath(os.path.dirname(__file__))
 
 # Get the long description from README.md
-with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
+with codec_open(os.path.join(here, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 # get the dependencies and installs
-with open(os.path.join(here, "requirements.txt"), encoding="utf-8") as f:
+with codec_open(os.path.join(here, "requirements.txt"), encoding="utf-8") as f:
     install_requires = [line.strip() for line in f.read().split("\n")]
 
 cmdclass = {}
 
 # ext = ".pyx" if USE_CYTHON else ".c"
-ext = ".py" if USE_CYTHON else ".c"
+EXT = ".py" if USE_CYTHON else ".c"
 
 extensions = [
     Extension(
         name="scikit_pierre.tradeoff.calibration",
-        sources=["scikit_pierre/tradeoff/calibration" + ext],
+        sources=["scikit_pierre/tradeoff/calibration" + EXT],
         include_dirs=[np.get_include()]
     ),
     Extension(
         name="scikit_pierre.distributions.compute_distribution",
-        sources=["scikit_pierre/distributions/compute_distribution" + ext],
+        sources=["scikit_pierre/distributions/compute_distribution" + EXT],
         include_dirs=[np.get_include()]
     ),
     Extension(
         name="scikit_pierre.metrics.evaluation",
-        sources=["scikit_pierre/metrics/evaluation" + ext],
+        sources=["scikit_pierre/metrics/evaluation" + EXT],
         include_dirs=[np.get_include()]
     ),
 ]
