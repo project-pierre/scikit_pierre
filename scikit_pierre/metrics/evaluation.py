@@ -145,12 +145,12 @@ def mace(
         for column in columns:
             try:
                 t_value = float(target_dist[column].iloc[0])
-            except ArithmeticError or ZeroDivisionError or KeyError:
+            except (ArithmeticError, ZeroDivisionError, KeyError):
                 t_value = 0.00001
 
             try:
                 r_value = float(realized_dist[column].iloc[0])
-            except ArithmeticError or ZeroDivisionError or KeyError:
+            except (ArithmeticError, ZeroDivisionError, KeyError):
                 r_value = 0.00001
 
             diff_result.append(abs(t_value - r_value))
@@ -181,8 +181,8 @@ def mace(
     users_preference_set.sort_values(by=['USER_ID'], inplace=True)
     users_recommendation_lists.sort_values(by=['USER_ID'], inplace=True)
 
-    set_1 = set([str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()])
-    set_2 = set([str(ix) for ix in users_preference_set['USER_ID'].unique().tolist()])
+    set_1 = set({str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()})
+    set_2 = set({str(ix) for ix in users_preference_set['USER_ID'].unique().tolist()})
 
     if set_1 != set_2:
         raise IndexError(
@@ -231,7 +231,7 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
         denominator = fairness_func(p=p, q=[0.00001 for _ in range(len(p))])
         try:
             return abs(numerator / denominator)
-        except ArithmeticError or ZeroDivisionError or KeyError:
+        except (ArithmeticError, ZeroDivisionError, KeyError):
             if numerator is None or numerator == [] or numerator == 0.0:
                 numerator = 0.00001
         return abs(numerator / denominator)
@@ -253,8 +253,8 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
     users_recommendation_lists.sort_values(by=['USER_ID'], inplace=True)
     users_target_dist.sort_index(inplace=True)
 
-    if set([str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()]) != set(
-            [str(ix) for ix in users_target_dist.index]):
+    if set({str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()}) != set(
+            {str(ix) for ix in users_target_dist.index}):
         raise IndexError(
             'Unknown users in recommendation or test set. Please make sure the users are the same.')
 

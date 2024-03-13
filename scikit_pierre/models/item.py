@@ -43,7 +43,9 @@ class Item:
 
 
 class ItemsInMemory:
-
+    """
+    Main class to deal with the items in memory.
+    """
     def __init__(self, data: DataFrame):
         """
         Init method
