@@ -41,7 +41,7 @@ def mean_average_precision(users_recommendation_list: DataFrame,
     def average_precision(rec_items: tuple, test_items: tuple) -> float:
         rec_items_ids = rec_items[1]['ITEM_ID'].tolist()
         test_items_ids = test_items[1]['ITEM_ID'].tolist()
-        precision = [True if x in test_items_ids else False for x in rec_items_ids]
+        precision = [x in test_items_ids for x in rec_items_ids]
         return get_ap_from_list(precision)
 
     users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
@@ -66,6 +66,15 @@ def mean_average_precision(users_recommendation_list: DataFrame,
 ######################################################################
 def mean_reciprocal_rank(users_recommendation_list: DataFrame,
                          users_test_items: DataFrame) -> float:
+    """
+    MRR function.
+
+    :param users_recommendation_list: A Pandas DataFrame,
+                                        which represents the users recommendation lists.
+    :param users_test_items: A Pandas DataFrame, which represents the test items for the experiment.
+
+    :return: A float, which represents the map value.
+    """
     def get_rr_from_list(relevance_array: list) -> float:
         relevance_list_size = len(relevance_array)
         if relevance_list_size == 0:
@@ -78,7 +87,7 @@ def mean_reciprocal_rank(users_recommendation_list: DataFrame,
     def reciprocal_rank(rec_items, test_items) -> float:
         rec_items_ids = rec_items[1]['ITEM_ID'].tolist()
         test_items_ids = test_items[1]['ITEM_ID'].tolist()
-        precision = [True if x in test_items_ids else False for x in rec_items_ids]
+        precision = [x in test_items_ids for x in rec_items_ids]
         return get_rr_from_list(precision)
 
     users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
@@ -136,12 +145,12 @@ def mace(
         for column in columns:
             try:
                 t_value = float(target_dist[column].iloc[0])
-            except Exception:
+            except ArithmeticError or ZeroDivisionError or KeyError:
                 t_value = 0.00001
 
             try:
                 r_value = float(realized_dist[column].iloc[0])
-            except Exception:
+            except ArithmeticError or ZeroDivisionError or KeyError:
                 r_value = 0.00001
 
             diff_result.append(abs(t_value - r_value))
@@ -222,7 +231,7 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
         denominator = fairness_func(p=p, q=[0.00001 for _ in range(len(p))])
         try:
             return abs(numerator / denominator)
-        except Exception as e:
+        except ArithmeticError or ZeroDivisionError or KeyError:
             if numerator is None or numerator == [] or numerator == 0.0:
                 numerator = 0.00001
         return abs(numerator / denominator)
@@ -262,6 +271,11 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
 
 ####################################################
 def gap(users_data: DataFrame) -> float:
+    """
+    GAP function
+    :param users_data:
+    :return:
+    """
     uuids = users_data['USER_ID'].unique()
 
     numerator = 0
@@ -366,7 +380,8 @@ def serendipity(users_recommendation_list: DataFrame, users_test_items: DataFram
 #     if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
 #             users_preference_items['USER_ID'].unique().tolist()):
 #         raise IndexError(
-#             'Unknown users in recommendation or test set. Please make sure the users are the same.')
+#             'Unknown users in recommendation or test set.
+#             Please make sure the users are the same.')
 #
 #     # preference_set = users_preference_items.groupby(by=['USER_ID'])
 #     rec_set = users_recommendation_list.groupby(by=['USER_ID'])
