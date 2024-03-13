@@ -36,8 +36,7 @@ def mean_average_precision(users_recommendation_list: DataFrame,
         ap = sum(hit_list)
         if ap > 0.0:
             return ap / relevance_list_size
-        else:
-            return 0.0
+        return 0.0
 
     def average_precision(rec_items: tuple, test_items: tuple) -> float:
         rec_items_ids = rec_items[1]['ITEM_ID'].tolist()
@@ -50,7 +49,7 @@ def mean_average_precision(users_recommendation_list: DataFrame,
 
     if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
             users_test_items['USER_ID'].unique().tolist()):
-        raise Exception(
+        raise IndexError(
             'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     test_set = users_test_items.groupby(by=['USER_ID'])
@@ -87,7 +86,7 @@ def mean_reciprocal_rank(users_recommendation_list: DataFrame,
 
     if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
             users_test_items['USER_ID'].unique().tolist()):
-        raise Exception(
+        raise IndexError(
             'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     test_set = users_test_items.groupby(by=['USER_ID'])
@@ -137,12 +136,12 @@ def mace(
         for column in columns:
             try:
                 t_value = float(target_dist[column].iloc[0])
-            except Exception as e:
+            except Exception:
                 t_value = 0.00001
 
             try:
                 r_value = float(realized_dist[column].iloc[0])
-            except Exception as e:
+            except Exception:
                 r_value = 0.00001
 
             diff_result.append(abs(t_value - r_value))
@@ -177,7 +176,7 @@ def mace(
     set_2 = set([str(ix) for ix in users_preference_set['USER_ID'].unique().tolist()])
 
     if set_1 != set_2:
-        raise Exception(
+        raise IndexError(
             'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     results = list(map(
@@ -247,7 +246,7 @@ def mrmc(users_target_dist, users_recommendation_lists, items_classes_set, dist_
 
     if set([str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()]) != set(
             [str(ix) for ix in users_target_dist.index]):
-        raise Exception(
+        raise IndexError(
             'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     results = list(map(
@@ -328,7 +327,7 @@ def serendipity(users_recommendation_list: DataFrame, users_test_items: DataFram
 
     if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
             users_test_items['USER_ID'].unique().tolist()):
-        raise Exception(
+        raise IndexError(
             'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     test_set = users_test_items.groupby(by=['USER_ID'])
@@ -346,37 +345,37 @@ def serendipity(users_recommendation_list: DataFrame, users_test_items: DataFram
 
 ###########################################################
 
-def surprise(users_recommendation_list: DataFrame, users_preference_items: DataFrame) -> float:
-    """
-    Serendipity
-
-    :param users_recommendation_list:
-        A Pandas DataFrame, which represents the users recommendation lists.
-    :param users_preference_items:
-
-    :return: A float, which represents the surprise value.
-    """
-
-    def surp(rec_items: tuple) -> float:
-        rec_items_ids = rec_items[1]['ITEM_ID'].tolist()
-        return 0
-
-    users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
-    users_preference_items.sort_values(by=['USER_ID'], inplace=True)
-
-    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
-            users_preference_items['USER_ID'].unique().tolist()):
-        raise Exception(
-            'Unknown users in recommendation or test set. Please make sure the users are the same.')
-
-    preference_set = users_preference_items.groupby(by=['USER_ID'])
-    rec_set = users_recommendation_list.groupby(by=['USER_ID'])
-
-    users_results = list(map(
-        surp,
-        rec_set
-    ))
-    return sum(users_results) / len(users_results)
+# def surprise(users_recommendation_list: DataFrame, users_preference_items: DataFrame) -> float:
+#     """
+#     Serendipity
+#
+#     :param users_recommendation_list:
+#         A Pandas DataFrame, which represents the users recommendation lists.
+#     :param users_preference_items:
+#
+#     :return: A float, which represents the surprise value.
+#     """
+#
+#     def surp(rec_items: tuple) -> float:
+#         rec_items_ids = rec_items[1]['ITEM_ID'].tolist()
+#         return 0
+#
+#     users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
+#     users_preference_items.sort_values(by=['USER_ID'], inplace=True)
+#
+#     if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
+#             users_preference_items['USER_ID'].unique().tolist()):
+#         raise IndexError(
+#             'Unknown users in recommendation or test set. Please make sure the users are the same.')
+#
+#     # preference_set = users_preference_items.groupby(by=['USER_ID'])
+#     rec_set = users_recommendation_list.groupby(by=['USER_ID'])
+#
+#     users_results = list(map(
+#         surp,
+#         rec_set
+#     ))
+#     return sum(users_results) / len(users_results)
 
 
 #######################################################
@@ -404,7 +403,7 @@ def unexpectedness(users_recommendation_list: DataFrame, users_test_items: DataF
 
     if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
             users_test_items['USER_ID'].unique().tolist()):
-        raise Exception(
+        raise IndexError(
             'Unknown users in recommendation or test set. Please make sure the users are the same.')
 
     test_set = users_test_items.groupby(by=['USER_ID'])

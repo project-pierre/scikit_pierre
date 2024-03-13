@@ -27,14 +27,36 @@ class Item:
         self.time = time
         self.position = None
 
+    def get_id(self):
+        """
+        Basic get id method
+        :return:
+        """
+        return self.id
+
+    def get_score(self):
+        """
+        Basic get score method
+        :return:
+        """
+        return self.score
+
 
 class ItemsInMemory:
 
     def __init__(self, data: DataFrame):
+        """
+        Init method
+        :param data: this dataframe has two columns [ITEM_ID, GENRES]
+        """
         self.items = {}
         self._data = data
 
     def item_by_genre(self):
+        """
+        Method to translate the Dataframe to an Item class
+        :return:
+        """
         for row in self._data.itertuples():
             item_id = getattr(row, "ITEM_ID")
             item_genre = getattr(row, "GENRES")
@@ -46,7 +68,9 @@ class ItemsInMemory:
             self.items[item_id] = item
 
     def item_by_bias(self, bias_data: DataFrame):
-        """Create a dictionary of item id to Item lookup."""
+        """
+        Create a dictionary of item id to Item lookup.
+        """
         item_bias_data = merge(
             self._data, bias_data,
             how='left', left_on='ITEM_ID', right_on='ITEM_ID'
@@ -106,6 +130,11 @@ class ItemsInMemory:
 
     @staticmethod
     def transform_to_pandas(items: dict) -> DataFrame:
+        """
+        Method to transform the class items in a pandas Dataframe.
+        :param items:
+        :return:
+        """
         user_results = []
         for _, item in items.items():
             user_results += [DataFrame(data=[[item.id, item.position]],

@@ -45,15 +45,16 @@ def temporal_slide_window_base_function(items: dict, major: int = 10, using: str
         for i in range(2, minor + 1):
             top = i * batch_size
             if i == minor:
-                to_use_items = dict({item for index, item in enum_items[floor:]})
+                distribution_list.append(
+                    base_distribution(dict({item for _, item in enum_items[floor:]})))
             else:
-                to_use_items = dict(item for index, item in enum_items[floor:top])
-            distribution_list.append(base_distribution(to_use_items))
+                distribution_list.append(
+                    base_distribution(dict(item for _, item in enum_items[floor:top])))
             floor = (i - 1) * batch_size
 
         distribution_list.append(base_distribution({
-            **dict(item for index, item in enum_items[:batch_size]),
-            **dict(item for index, item in enum_items[floor:])
+            **dict(item for _, item in enum_items[:batch_size]),
+            **dict(item for _, item in enum_items[floor:])
         }))
 
         dd = defaultdict(list)

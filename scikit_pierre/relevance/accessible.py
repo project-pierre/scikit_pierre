@@ -13,9 +13,9 @@ def relevance_measures_funcs(relevance: str = "SUM"):
     """
     if relevance == "SUM":
         return relevance_measures.sum_relevance_score
-    elif relevance == "NDCG":
+    if relevance == "NDCG":
         return relevance_measures.ndcg_relevance_score
-    elif relevance == "UREL":
+    if relevance == "UREL":
         return relevance_measures.utility_relevance_scores
     else:
         raise NameError(f"Relevance Measure not found! {relevance}")

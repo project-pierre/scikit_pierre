@@ -14,17 +14,16 @@ def tradeoff_weights_funcs(env_lambda: str):
     """
     if env_lambda[:2] == "C@":
         return float(env_lambda.split('@')[1])
-    elif env_lambda == "CGR":
+    if env_lambda == "CGR":
         return weight.genre_count
-    elif env_lambda == "VAR":
+    if env_lambda == "VAR":
         return weight.norm_var
-    elif env_lambda == "STD":
+    if env_lambda == "STD":
         return weight.norm_std
-    elif env_lambda == "TRT":
+    if env_lambda == "TRT":
         return weight.trust
-    elif env_lambda == "AMP":
+    if env_lambda == "AMP":
         return weight.amplitude
-    elif env_lambda == "EFF":
+    if env_lambda == "EFF":
         return weight.efficiency
-    else:
-        raise NameError(f"Tradeoff weight not found! {env_lambda}")
+    raise NameError(f"Tradeoff weight not found! {env_lambda}")
