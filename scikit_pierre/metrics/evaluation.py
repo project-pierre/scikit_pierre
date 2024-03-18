@@ -1,12 +1,13 @@
 """
 This file contains all evaluation metrics.
 """
-
+from numpy import mean
 from pandas import DataFrame
 
 from ..distributions.accessible import distributions_funcs
 from ..distributions.compute_distribution import computer_users_distribution
 from ..distributions.compute_tilde_q import compute_tilde_q
+from ..measures.accessible import calibration_measures_funcs
 from ..models.item import ItemsInMemory
 
 
@@ -160,13 +161,105 @@ def mace(
         user_rec_list_df.sort_values(by=['ORDER'], inplace=True)
         result_ace = [
             __calibration_error(
-                target_dist=user_target_distribution.to_frame().reset_index(),
+                target_dist=user_target_distribution.to_frame(),
                 realized_dist=__intermediate__(
                     user_rec_list_df=user_rec_list_df.head(k)
                 )
             ) for k in user_rec_list_df['ORDER'].tolist()
         ]
         return sum(result_ace) / len(result_ace)
+
+    _item_in_memory = ItemsInMemory(data=items_set_df)
+    _item_in_memory.item_by_genre()
+    _distribution_component = distributions_funcs(distribution=distribution)
+
+    users_target_dist = computer_users_distribution(
+        users_preference_set=users_preference_set, items_df=items_set_df, distribution=distribution
+    )
+    users_target_dist.sort_index(inplace=True)
+    users_target_dist.fillna(0, inplace=True)
+
+    users_preference_set.sort_values(by=['USER_ID'], inplace=True)
+    users_recommendation_lists.sort_values(by=['USER_ID'], inplace=True)
+
+    set_1 = set({str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()})
+    set_2 = set({str(ix) for ix in users_preference_set['USER_ID'].unique().tolist()})
+
+    if set_1 != set_2:
+        raise IndexError(
+            'Unknown users in recommendation or test set. Please make sure the users are the same.')
+
+    results = list(map(
+        lambda utarget_dist, urec_list: __ace(
+            user_target_distribution=utarget_dist[1], user_rec_list_df=urec_list[1]
+        ),
+        users_target_dist.iterrows(),
+        users_recommendation_lists.groupby(by=['USER_ID'])
+    ))
+    return sum(results) / len(results)
+
+
+def rank_miscalibration(
+        users_recommendation_lists: DataFrame, items_set_df: DataFrame,
+        distribution: str,
+        users_preference_set: DataFrame, distance_func_name: str
+) -> float:
+    """
+    Rank Miscalibration. Metric to calibrated recommendations systems.
+
+    Implementation based on:
+
+    -
+
+    :param distance_func_name:
+    :param users_preference_set: TODO: Docstring
+    :param users_recommendation_lists: A Pandas DataFrame,
+                                        which represents the users recommendation lists.
+    :param items_set_df: A Dataframe were the lines are the items,
+                            the columns are the classes and the cells are probability values.
+    :param distribution: A calibration function name.
+
+    :return: A float that's represents the mace value.
+    """
+
+    def __intermediate__(user_rec_list_df) -> DataFrame:
+        user_rec_list_dict = _item_in_memory.select_user_items(data=user_rec_list_df)
+        user_dist_dict = _distribution_component(
+            items=user_rec_list_dict,
+        )
+        return DataFrame([list(user_dist_dict.values())], columns=list(user_dist_dict.keys()))
+
+    def __miscalibration(target_dist, realized_dist):
+        p = []
+        q = []
+        columns = target_dist.columns.tolist() + realized_dist.columns.tolist()
+        for column in columns:
+            try:
+                p.append(float(target_dist[column].iloc[0]))
+            except (ArithmeticError, ZeroDivisionError, KeyError):
+                p.append(0.00001)
+
+            try:
+                q.append(float(realized_dist[column].iloc[0]))
+            except (ArithmeticError, ZeroDivisionError, KeyError):
+                q.append(0.00001)
+
+        tild = compute_tilde_q(p=p, q=q)
+        return calibration_function(p=p, q=tild)
+
+    def __ace(user_target_distribution: DataFrame, user_rec_list_df: DataFrame):
+        user_rec_list_df.sort_values(by=['ORDER'], inplace=True)
+        result_ace = [
+            __miscalibration(
+                target_dist=user_target_distribution.to_frame(),
+                realized_dist=__intermediate__(
+                    user_rec_list_df=user_rec_list_df.head(k)
+                )
+            ) for k in user_rec_list_df['ORDER'].tolist()
+        ]
+        return mean(result_ace)
+
+    calibration_function = calibration_measures_funcs(distance_func_name)
 
     _item_in_memory = ItemsInMemory(data=items_set_df)
     _item_in_memory.item_by_genre()
@@ -284,7 +377,7 @@ def gap(users_data: DataFrame) -> float:
     for uid in uuids:
         user_pref = users_data[users_data['USER_ID'] == uid]
 
-        numerator += user_pref['popularity'].mean()
+        numerator += float(user_pref['popularity'].mean())
 
     return numerator / denominator
 

@@ -1,3 +1,7 @@
+"""
+Unit Test Case to the Chi Family measure.
+"""
+
 import unittest
 from math import log, sqrt
 
@@ -5,8 +9,14 @@ from ....scikit_pierre.measures import combinations
 
 
 class TestCombinations(unittest.TestCase):
+    """
+    Unit Test Case classes to the Chi Family measure.
+    """
 
     def test_taneja(self):
+        """
+        This method is to test the Squared Euclidean measure.
+        """
         answer = sum([
             ((0.389 + 0.35) / 2) * log((0.389 + 0.35) / (2 * sqrt(0.389 * 0.35))),
             ((0.5 + 0.563) / 2) * log((0.5 + 0.563) / (2 * sqrt(0.5 * 0.563))),
