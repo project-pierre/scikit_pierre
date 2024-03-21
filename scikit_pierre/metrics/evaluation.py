@@ -1,11 +1,16 @@
 """
 This file contains all evaluation metrics.
 """
+from time import sleep
+
+from itertools import starmap
+
 from numpy import mean
 from pandas import DataFrame
 
 from ..distributions.accessible import distributions_funcs
-from ..distributions.compute_distribution import computer_users_distribution
+from ..distributions.compute_distribution import computer_users_distribution, \
+    computer_users_distribution_dict
 from ..distributions.compute_tilde_q import compute_tilde_q
 from ..measures.accessible import calibration_measures_funcs
 from ..models.item import ItemsInMemory
@@ -110,7 +115,178 @@ def mean_reciprocal_rank(users_recommendation_list: DataFrame,
     return sum(users_results) / len(users_results)
 
 
-#####################################################################
+# ################################################################################################ #
+# ###################################### Calibration Metrics ##################################### #
+# ################################################################################################ #
+class BaseCalibrationMetric:
+    """
+    Base calibration metric class.
+    """
+    def __init__(
+            self,
+            users_preference_set: DataFrame, users_recommendation_lists: DataFrame,
+            items_set_df: DataFrame, distribution: str = "CWS", distance_func_name: str = "KL"
+    ):
+        """
+
+        :param users_preference_set:
+        :param users_recommendation_lists:
+        :param items_set_df:
+        :param distribution:
+        :param distance_func_name:
+        """
+        self.pref_df = users_preference_set
+        self.target_dist = None
+
+        self.rec_df = users_recommendation_lists
+        self.realized_dist = None
+
+        self.items_df = items_set_df
+        self._item_in_memory = None
+
+        self.dist_func = distributions_funcs(distribution=distribution)
+        self.dist_name = distribution
+
+        self.calib_measure_func = calibration_measures_funcs(measure=distance_func_name)
+        self.calib_measure_name = distance_func_name
+
+    def item_preparation(self):
+        """
+
+        :return:
+        """
+        self._item_in_memory = ItemsInMemory(data=self.items_df)
+        self._item_in_memory.item_by_genre()
+
+    def transform_to_vec(self, target_dist, realized_dist):
+        """
+
+        :param target_dist:
+        :param realized_dist:
+        :return:
+        """
+        p = []
+        q = []
+        columns_list = list(set(list(target_dist.keys()) + list(realized_dist.keys())))
+        for column in columns_list:
+            if column in target_dist:
+                p.append(float(target_dist[str(column)]))
+            else:
+                p.append(0.00001)
+
+            if column in realized_dist:
+                q.append(float(realized_dist[str(column)]))
+            else:
+                q.append(0.00001)
+        return p, q
+
+    def compute_distribution(self, set_df: DataFrame):
+        """
+
+        :param set_df:
+        :return:
+        """
+        dist_dict = computer_users_distribution_dict(
+            users_preference_set=set_df, items_df=self.items_df,
+            distribution=self.dist_name
+        )
+        return dist_dict
+
+    def checking_users(self):
+        """
+
+        :return:
+        """
+        set_1 = set({str(ix) for ix in self.pref_df['USER_ID'].unique().tolist()})
+        set_2 = set({str(ix) for ix in self.rec_df['USER_ID'].unique().tolist()})
+
+        if set_1 != set_2:
+            raise IndexError(
+                'Unknown users in recommendation or test set. '
+                'Please make sure the users are the same.'
+            )
+
+    def main(self):
+        self.checking_users()
+        self.target_dist = self.compute_distribution(self.pref_df)
+
+
+class MeanAbsoluteCalibrationError(BaseCalibrationMetric):
+    """
+    Mean Average Calibration Error. Metric to calibrated recommendations systems.
+
+    Implementation based on:
+
+    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
+
+    """
+
+    def compute_ace(self, target_dist: dict, realized_dist: dict):
+        p, q = self.transform_to_vec(target_dist, realized_dist)
+        diff_result = [abs(t_value - r_value) for t_value, r_value in zip(p, q)]
+        return mean(diff_result)
+
+    def based_on_position(self, rec_pos_df: DataFrame, user_indexes: list):
+        """
+
+        :param user_indexes:
+        :param rec_pos_df:
+        :return:
+        """
+        self.realized_dist = self.compute_distribution(rec_pos_df)
+        results = [
+            self.compute_ace(
+                self.target_dist[str(ix)],
+                self.realized_dist[str(ix)],
+            ) for ix in user_indexes
+        ]
+        return mean(results)
+
+    def main(self):
+        """
+
+        :return:
+        """
+        super().main()
+        list_size = self.rec_df["ORDER"].max()
+
+        user_indexes = list(self.target_dist.keys())
+        results = [
+            self.based_on_position(
+                rec_pos_df=self.rec_df[self.rec_df["ORDER"] <= i].copy(),
+                user_indexes=user_indexes
+            ) for i in range(1, list_size + 1)
+        ]
+        return mean(results)
+
+
+class Miscalibration(BaseCalibrationMetric):
+    """
+    Miscalibration. Metric to calibrated recommendations systems.
+
+    Implementation based on:
+
+    """
+
+    def compute_miscalibration(self, target_dist, realized_dist):
+        p, q = self.transform_to_vec(target_dist, realized_dist)
+        tild = compute_tilde_q(p=p, q=q)
+        return self.calib_measure_func(p=p, q=tild)
+
+    def main(self):
+        super().main()
+        self.realized_dist = self.compute_distribution(self.rec_df)
+
+        user_indexes = list(self.target_dist.keys())
+
+        results = [
+            self.compute_miscalibration(self.target_dist[str(ix)], self.realized_dist[str(ix)])
+            for ix in user_indexes
+        ]
+
+        return mean(results)
+
+
 def mace(
         users_recommendation_lists: DataFrame, items_set_df: DataFrame,
         distribution: str,
@@ -141,7 +317,7 @@ def mace(
         return DataFrame([list(user_dist_dict.values())], columns=list(user_dist_dict.keys()))
 
     def __calibration_error(target_dist: DataFrame, realized_dist: DataFrame):
-        columns = target_dist.columns.tolist() + realized_dist.columns.tolist()
+        columns = list(set(target_dist.columns.tolist() + realized_dist.columns.tolist()))
         diff_result = []
         for column in columns:
             try:
@@ -199,6 +375,78 @@ def mace(
     return sum(results) / len(results)
 
 
+def miscalibration(
+        users_preference_set: DataFrame, users_recommendation_lists: DataFrame,
+        items_set_df: DataFrame,
+        distribution: str, distance_func_name: str
+) -> float:
+    """
+    Miscalibration. Metric to calibrated recommendations systems.
+
+    Implementation based on:
+
+    -
+
+    :param distance_func_name:
+    :param users_preference_set: TODO: Docstring
+    :param users_recommendation_lists: A Pandas DataFrame,
+                                        which represents the users recommendation lists.
+    :param items_set_df: A Dataframe were the lines are the items,
+                            the columns are the classes and the cells are probability values.
+    :param distribution: A calibration function name.
+
+    :return: A float that's represents the mace value.
+    """
+
+    def __miscalibration(target_dist, realized_dist):
+        p = []
+        q = []
+        columns_list = list(set(list(target_dist.keys()) + list(realized_dist.keys())))
+        for column in columns_list:
+            if column in target_dist:
+                p.append(float(target_dist[str(column)]))
+            else:
+                p.append(0.00001)
+
+            if column in realized_dist:
+                q.append(float(realized_dist[str(column)]))
+            else:
+                q.append(0.00001)
+
+        tild = compute_tilde_q(p=p, q=q)
+        return _calib_func_measure(p=p, q=tild)
+
+    set_1 = set({str(ix) for ix in users_recommendation_lists['USER_ID'].unique().tolist()})
+    set_2 = set({str(ix) for ix in users_preference_set['USER_ID'].unique().tolist()})
+
+    if set_1 != set_2:
+        raise IndexError(
+            'Unknown users in recommendation or test set. Please make sure the users are the same.')
+
+    _calib_func_measure = calibration_measures_funcs(measure=distance_func_name)
+    _dist_comp_func = distributions_funcs(distribution=distribution)
+
+    users_preference_set.sort_values(by=['USER_ID'], inplace=True)
+    users_target_dist_dict = computer_users_distribution_dict(
+        users_preference_set=users_preference_set, items_df=items_set_df, distribution=distribution
+    )
+
+    users_recommendation_lists.sort_values(by=['USER_ID'], inplace=True)
+    users_rec_dist_dict = computer_users_distribution_dict(
+        users_preference_set=users_recommendation_lists,
+        items_df=items_set_df, distribution=distribution
+    )
+
+    user_indexes = list(users_target_dist_dict.keys())
+
+    results = [
+        __miscalibration(users_target_dist_dict[str(ix)], users_rec_dist_dict[str(ix)])
+        for ix in user_indexes
+    ]
+
+    return mean(results)
+
+
 def rank_miscalibration(
         users_recommendation_lists: DataFrame, items_set_df: DataFrame,
         distribution: str,
@@ -232,7 +480,7 @@ def rank_miscalibration(
     def __miscalibration(target_dist, realized_dist):
         p = []
         q = []
-        columns = target_dist.columns.tolist() + realized_dist.columns.tolist()
+        columns = list(set(target_dist.columns.tolist() + realized_dist.columns.tolist()))
         for column in columns:
             try:
                 p.append(float(target_dist[column].iloc[0]))
@@ -249,9 +497,10 @@ def rank_miscalibration(
 
     def __ace(user_target_distribution: DataFrame, user_rec_list_df: DataFrame):
         user_rec_list_df.sort_values(by=['ORDER'], inplace=True)
+        user_target_distribution_df = user_target_distribution.to_frame()
         result_ace = [
             __miscalibration(
-                target_dist=user_target_distribution.to_frame(),
+                target_dist=user_target_distribution_df,
                 realized_dist=__intermediate__(
                     user_rec_list_df=user_rec_list_df.head(k)
                 )
@@ -288,7 +537,7 @@ def rank_miscalibration(
         users_target_dist.iterrows(),
         users_recommendation_lists.groupby(by=['USER_ID'])
     ))
-    return sum(results) / len(results)
+    return mean(results)
 
 
 #######################################################

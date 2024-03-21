@@ -196,8 +196,7 @@ class LinearCalibration(CalibrationBase):
         """
         realized_dist = self._distribution_component(items=temp_rec_items)
         fairness_value = self._fairness_component(
-            p=list(target_distribution.values()), q=list(realized_dist.values()),
-            d=self.environment["d"]
+            p=list(target_distribution.values()), q=list(realized_dist.values())
         )
         relevance_value = self._relevance_component(
             [item.score for _, item in temp_rec_items.items()])
@@ -422,8 +421,7 @@ class LogarithmBias(CalibrationBase):
         realized_dist = self._distribution_component(items=temp_rec_items)
 
         fairness_value = self._fairness_component(p=list(target_distribution.values()),
-                                                  q=list(realized_dist.values()),
-                                                  d=self.environment["d"])
+                                                  q=list(realized_dist.values()))
 
         relevance_value = self._relevance_component(
             [item.score for _, item in temp_rec_items.items()])

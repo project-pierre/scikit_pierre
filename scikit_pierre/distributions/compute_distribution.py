@@ -45,3 +45,35 @@ def computer_users_distribution(
         )
 
     return concat(users_pref_dist_list, ignore_index=False)
+
+
+def computer_users_distribution_dict(
+        users_preference_set: DataFrame, items_df: DataFrame, distribution: str
+) -> dict:
+    """
+
+    :param users_preference_set: A Pandas DataFrame with four columns
+                                [USER_ID, ITEM_ID, TRANSACTION_VALUE, TIMESTAMP].
+    :param items_df: A Pandas DataFrame of items with two columns
+                    [ITEM_ID, GENRES].
+    :param distribution: The string name of the used distribution.
+    :return: Dict
+    """
+    # Get the items classes
+    _item_in_memory = ItemsInMemory(data=items_df)
+    _item_in_memory.item_by_genre()
+
+    # Set the used distribution
+    _distribution_component = distributions_funcs(distribution=distribution)
+
+    # Compute the distribution to all users
+    return_dict = {}
+    for user_id in users_preference_set["USER_ID"].unique().tolist():
+        user_dist_dict = _distribution_component(
+            items=_item_in_memory.select_user_items(
+                data=users_preference_set[users_preference_set["USER_ID"] == user_id]
+            ),
+        )
+        return_dict[str(user_id)] = user_dist_dict
+
+    return return_dict
