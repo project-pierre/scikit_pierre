@@ -48,11 +48,11 @@ def computer_users_distribution(
 
 
 def computer_users_distribution_dict(
-        users_preference_set: DataFrame, items_df: DataFrame, distribution: str
+        interactions_df: DataFrame, items_df: DataFrame, distribution: str
 ) -> dict:
     """
 
-    :param users_preference_set: A Pandas DataFrame with four columns
+    :param interactions_df: A Pandas DataFrame with four columns
                                 [USER_ID, ITEM_ID, TRANSACTION_VALUE, TIMESTAMP].
     :param items_df: A Pandas DataFrame of items with two columns
                     [ITEM_ID, GENRES].
@@ -68,10 +68,10 @@ def computer_users_distribution_dict(
 
     # Compute the distribution to all users
     return_dict = {}
-    for user_id in users_preference_set["USER_ID"].unique().tolist():
+    for user_id in interactions_df["USER_ID"].unique().tolist():
         user_dist_dict = _distribution_component(
             items=_item_in_memory.select_user_items(
-                data=users_preference_set[users_preference_set["USER_ID"] == user_id]
+                data=interactions_df[interactions_df["USER_ID"] == user_id]
             ),
         )
         return_dict[str(user_id)] = user_dist_dict
