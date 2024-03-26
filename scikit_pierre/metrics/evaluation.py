@@ -1,6 +1,8 @@
 """
 This file contains all evaluation metrics.
 """
+import itertools
+
 from numpy import mean
 from pandas import DataFrame
 
@@ -660,3 +662,135 @@ def unexpectedness(users_recommendation_list: DataFrame, users_test_items: DataF
         test_set
     ))
     return sum(users_results) / len(users_results)
+
+
+# ################################################################################################ #
+# ###################################### Verification Metrics #################################### #
+# ################################################################################################ #
+class AverageNumberOfOItemsChanges(BaseMetric):
+    """
+    Average number of changes. A metric to get the average number of changes
+    between the candidate items and recommendation list.
+
+    """
+
+    def __init__(self, users_rec_list_df: DataFrame, users_cand_items_df: DataFrame):
+        """
+
+        :param users_rec_list_df: A Pandas DataFrame,
+        which represents the users recommendation lists.
+
+        :param users_cand_items_df: A Pandas DataFrame,
+        which represents the candidate items.
+        """
+        super().__init__(users_profile_df=users_cand_items_df, users_rec_list_df=users_rec_list_df)
+
+    def ordering(self) -> None:
+        """
+
+        :return:
+        """
+        self.profiles_df.sort_values(
+            by=['USER_ID', 'TRANSACTION_VALUE'], inplace=True, ascending=False
+        )
+        self.rec_df.sort_values(by=['USER_ID', 'ORDER'], inplace=True)
+
+    @staticmethod
+    def difference_number(rec_items: tuple, test_items: tuple) -> float:
+        """
+
+        :param rec_items:
+        :param test_items:
+        :return:
+        """
+        n = rec_items[1]["ORDER"].max()
+        set_a = test_items[1]["ITEM_ID"].head(n).tolist()
+        set_b = rec_items[1]["ITEM_ID"].tolist()
+        size = len(set(set_b) - set(set_a))
+        return size
+
+    def compute(self) -> float:
+        """
+
+        :return:
+        """
+        self.checking_users()
+        self.ordering_and_grouping()
+
+        users_results = list(map(
+            self.difference_number,
+            self.grouped_rec_df,
+            self.grouped_profiles_df
+        ))
+        return mean(users_results)
+
+
+class AverageNumberOfGenreChanges(BaseMetric):
+    """
+    Average number of changes. A metric to get the average number of changes
+    between the candidate items and recommendation list.
+
+    """
+
+    def __init__(
+            self, users_rec_list_df: DataFrame, users_cand_items_df: DataFrame, items_df: DataFrame
+    ):
+        """
+
+        :param users_rec_list_df: A Pandas DataFrame,
+        which represents the users recommendation lists.
+
+        :param users_cand_items_df: A Pandas DataFrame,
+        which represents the candidate items.
+        """
+        super().__init__(users_profile_df=users_cand_items_df, users_rec_list_df=users_rec_list_df)
+        self.items_df = items_df
+
+    def ordering(self) -> None:
+        """
+
+        :return:
+        """
+        self.profiles_df.sort_values(
+            by=['USER_ID', 'TRANSACTION_VALUE'], inplace=True, ascending=False
+        )
+        self.rec_df.sort_values(by=['USER_ID', 'ORDER'], inplace=True)
+
+    def difference_number(self, rec_items: tuple, test_items: tuple) -> float:
+        """
+
+        :param rec_items:
+        :param test_items:
+        :return:
+        """
+        n = rec_items[1]["ORDER"].max()
+
+        set_a = test_items[1]["ITEM_ID"].head(n).tolist()
+        set_b = rec_items[1]["ITEM_ID"].tolist()
+
+        genres_a = list(itertools.chain.from_iterable([
+            genres.split("|")
+            for genres in self.items_df[self.items_df["ITEM_ID"].isin(set_a)]["GENRES"].tolist()
+        ]))
+        genres_b = list(itertools.chain.from_iterable([
+            genres.split("|")
+            for genres in self.items_df[self.items_df["ITEM_ID"].isin(set_b)]["GENRES"].tolist()
+        ]))
+
+        size = len(set(genres_b) - set(genres_a))
+        return size
+
+    def compute(self) -> float:
+        """
+
+        :return:
+        """
+        self.checking_users()
+        self.ordering_and_grouping()
+
+        users_results = list(map(
+            self.difference_number,
+            self.grouped_rec_df,
+            self.grouped_profiles_df
+        ))
+        return mean(users_results)
