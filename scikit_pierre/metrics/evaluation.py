@@ -15,26 +15,43 @@ from ..models.item import ItemsInMemory
 
 class BaseMetric:
     """
+    This is the base class metric to be inherent by all other class metrics.
 
+    - df_1: It is a Pandas Dataframe that can represents: User profile or test items set.
+
+    - df_2: It is a Pandas Dataframe that can represents: User recommendation list.
+
+    - df_3: It is a Pandas Dataframe that can represents: User Candidate items or some baseline.
+
+    The specific meaning depends on the subclass which inherent this super class.
     """
 
-    def __init__(self, users_profile_df: DataFrame, users_rec_list_df: DataFrame):
+    def __init__(
+            self,
+            df_1: DataFrame, df_2: DataFrame, df_3: DataFrame = None
+    ):
         """
 
-        """
-        self.profiles_df = users_profile_df
-        self.rec_df = users_rec_list_df
+        :param df_1: It is a Pandas Dataframe that can represents: User profile or test items set.
 
-        self.grouped_profiles_df = None
-        self.grouped_rec_df = None
+        :param df_2: It is a Pandas Dataframe that can represents: User recommendation list.
 
-    def checking_users(self):
+        :param df_3: It is a Pandas Dataframe that can represents: Candidate or baseline items.
         """
+        self.df_1 = df_1
+        self.df_2 = df_2
+        self.df_3 = df_3
 
-        :return:
+        self.grouped_df_1 = None
+        self.grouped_df_2 = None
+        self.grouped_df_3 = None
+
+    def checking_users(self) -> None:
         """
-        set_1 = set({str(ix) for ix in self.profiles_df['USER_ID'].unique().tolist()})
-        set_2 = set({str(ix) for ix in self.rec_df['USER_ID'].unique().tolist()})
+        This method checks if the users ids matches. If it does not match an error is raised.
+        """
+        set_1 = set({str(ix) for ix in self.df_1['USER_ID'].unique().tolist()})
+        set_2 = set({str(ix) for ix in self.df_2['USER_ID'].unique().tolist()})
 
         if set_1 != set_2:
             raise IndexError(
@@ -45,10 +62,12 @@ class BaseMetric:
     @staticmethod
     def get_bool_list(rec_items: tuple, test_items: tuple) -> list:
         """
+        This method verify which items are in common in the two tuples.
 
-        :param rec_items:
-        :param test_items:
-        :return:
+        :param rec_items: A tuple where: 0 is the user id and 1 is a Dataframe.
+        :param test_items: A tuple where: 0 is the user id and 1 is a Dataframe.
+
+        :return: A list with True or False.
         """
         rec_items_ids = rec_items[1]['ITEM_ID'].tolist()
         test_items_ids = test_items[1]['ITEM_ID'].tolist()
@@ -56,27 +75,64 @@ class BaseMetric:
 
     def ordering(self) -> None:
         """
-
-        :return:
+        This method is to order the Dataframe based on the user ids.
         """
-        self.profiles_df.sort_values(by=['USER_ID'], inplace=True)
-        self.rec_df.sort_values(by=['USER_ID'], inplace=True)
+        if self.df_1 is not None:
+            self.df_1.sort_values(by=['USER_ID'], inplace=True)
+
+        if self.df_2 is not None:
+            self.df_2.sort_values(by=['USER_ID'], inplace=True)
+
+        if self.df_3 is not None:
+            self.df_3.sort_values(by=['USER_ID'], inplace=True)
 
     def grouping(self) -> None:
         """
-
-        :return:
+        This method is for grouping the users lines.
         """
-        self.grouped_profiles_df = self.profiles_df.groupby(by=['USER_ID'])
-        self.grouped_rec_df = self.rec_df.groupby(by=['USER_ID'])
+        if self.df_1 is not None:
+            self.grouped_df_1 = self.df_1.groupby(by=['USER_ID'])
+
+        if self.df_2 is not None:
+            self.grouped_df_2 = self.df_2.groupby(by=['USER_ID'])
+
+        if self.df_3 is not None:
+            self.grouped_df_3 = self.df_3.groupby(by=['USER_ID'])
 
     def ordering_and_grouping(self) -> None:
         """
-
-        :return:
+        This method is to order and group the Dataframe based on the user id.
+        It is a guarantee that the users are in the same positions in the interaction.
         """
         self.ordering()
         self.grouping()
+
+    def single_process(self, tuple_from_df_2: tuple, tuple_from_df_1: tuple) -> float:
+        """
+        This method is a base to be overridden by the subclass.
+
+        :param tuple_from_df_2: A tuple where: 0 is the user id and 1 is a Dataframe.
+        :param tuple_from_df_1: A tuple where: 0 is the user id and 1 is a Dataframe.
+
+        :return: A float with the single computation result.
+        """
+        pass
+
+    def compute(self) -> float:
+        """
+        This method is the generic one to start the metric computation.
+
+        :return: A float which comprises the metric value.
+        """
+        self.checking_users()
+        self.ordering_and_grouping()
+
+        users_results = list(map(
+            self.single_process,
+            self.grouped_df_2,
+            self.grouped_df_1
+        ))
+        return mean(users_results)
 
 
 # ################################################################################################ #
@@ -84,27 +140,29 @@ class BaseMetric:
 # ################################################################################################ #
 class MeanAveragePrecision(BaseMetric):
     """
-    Mean Average Precision. A metric to get the precision along the recommendation list.
+    Mean Average Precision (MAP).
+    A metric to get the average precision among all users' recommendation list.
 
     """
 
     def __init__(self, users_rec_list_df: DataFrame, users_test_set_df: DataFrame):
         """
-
         :param users_rec_list_df: A Pandas DataFrame,
-        which represents the users recommendation lists.
+            which represents the users recommendation lists.
 
         :param users_test_set_df: A Pandas DataFrame,
-        which represents the test items for the experiment.
+            which represents the test items set for the experiment.
         """
-        super().__init__(users_profile_df=users_test_set_df, users_rec_list_df=users_rec_list_df)
+        super().__init__(df_1=users_test_set_df, df_2=users_rec_list_df)
 
     @staticmethod
     def get_list_precision(relevance_array: list) -> float:
         """
+        This method is to compute the precision value of one list.
 
-        :param relevance_array:
-        :return:
+        :param relevance_array: A list with True or False in the positions.
+
+        :return: A float which comprises the metric value from the relevance array.
         """
         if len(relevance_array) == 0:
             return 0.0
@@ -116,56 +174,46 @@ class MeanAveragePrecision(BaseMetric):
             hit_list.append(relevant / (i + 1))
         return mean(hit_list)
 
-    def average_precision(self, rec_items: tuple, test_items: tuple) -> float:
+    def single_process(self, tuple_from_df_2: tuple, tuple_from_df_1: tuple) -> float:
         """
+        This method process the metric (MAP) value for one user.
 
-        :param rec_items:
-        :param test_items:
-        :return:
+        :param tuple_from_df_2: A tuple where: 0 is the user id and 1 is a Dataframe.
+        :param tuple_from_df_1: A tuple where: 0 is the user id and 1 is a Dataframe.
+
+        :return: A float which comprises the metric (MAP) value for one user.
         """
         return self.get_list_precision(
-            self.get_bool_list(rec_items=rec_items, test_items=test_items)
+            relevance_array=self.get_bool_list(
+                rec_items=tuple_from_df_2, test_items=tuple_from_df_1
+            )
         )
-
-    def compute(self) -> float:
-        """
-
-        :return:
-        """
-        self.checking_users()
-        self.ordering_and_grouping()
-
-        users_results = list(map(
-            self.average_precision,
-            self.grouped_rec_df,
-            self.grouped_profiles_df
-        ))
-        return mean(users_results)
 
 
 class MeanReciprocalRank(BaseMetric):
     """
-    Mean Reciprocal Rank.
+    Mean Reciprocal Rank (MRR).
 
     """
 
     def __init__(self, users_rec_list_df: DataFrame, users_test_set_df: DataFrame):
         """
-
         :param users_rec_list_df: A Pandas DataFrame,
-        which represents the users recommendation lists.
+            which represents the users recommendation lists.
 
         :param users_test_set_df: A Pandas DataFrame,
-        which represents the test items for the experiment.
+            which represents the test items set for the experiment.
         """
-        super().__init__(users_profile_df=users_test_set_df, users_rec_list_df=users_rec_list_df)
+        super().__init__(df_1=users_test_set_df, df_2=users_rec_list_df)
 
     @staticmethod
     def get_list_reciprocal(relevance_array: list) -> float:
         """
+        This method is to compute the reciprocal value of one list.
 
-        :param relevance_array:
-        :return:
+        :param relevance_array: A list with True or False in the positions.
+
+        :return: A float which comprises the metric value from the relevance array.
         """
         relevance_list_size = len(relevance_array)
         if relevance_list_size == 0:
@@ -175,31 +223,20 @@ class MeanReciprocalRank(BaseMetric):
                 return 1 / (i + 1)
         return 0.0
 
-    def average_reciprocal(self, rec_items: tuple, test_items: tuple) -> float:
+    def single_process(self, tuple_from_df_2: tuple, tuple_from_df_1: tuple) -> float:
         """
+        This method process the metric (MRR) value for one user.
 
-        :param rec_items:
-        :param test_items:
-        :return:
+        :param tuple_from_df_2: A tuple where: 0 is the user id and 1 is a Dataframe.
+        :param tuple_from_df_1: A tuple where: 0 is the user id and 1 is a Dataframe.
+
+        :return: A float which comprises the metric (MRR) value for one user.
         """
         return self.get_list_reciprocal(
-            self.get_bool_list(rec_items=rec_items, test_items=test_items)
+            relevance_array=self.get_bool_list(
+                rec_items=tuple_from_df_2, test_items=tuple_from_df_1
+            )
         )
-
-    def compute(self) -> float:
-        """
-
-        :return:
-        """
-        self.checking_users()
-        self.ordering_and_grouping()
-
-        users_results = list(map(
-            self.average_reciprocal,
-            self.grouped_rec_df,
-            self.grouped_profiles_df
-        ))
-        return mean(users_results)
 
 
 # ################################################################################################ #
@@ -222,7 +259,7 @@ class BaseCalibrationMetric(BaseMetric):
         :param distribution_name:
         :param distance_func_name:
         """
-        super().__init__(users_profile_df=users_profile_df, users_rec_list_df=users_rec_list_df)
+        super().__init__(df_1=users_profile_df, df_2=users_rec_list_df)
         self.target_dist = None
         self.realized_dist = None
 
@@ -235,6 +272,8 @@ class BaseCalibrationMetric(BaseMetric):
         self.calib_measure_func = calibration_measures_funcs(measure=distance_func_name)
         self.calib_measure_name = distance_func_name
 
+        self.users_ix = None
+
     def item_preparation(self) -> None:
         """
 
@@ -244,7 +283,7 @@ class BaseCalibrationMetric(BaseMetric):
         self._item_in_memory.item_by_genre()
 
     @staticmethod
-    def transform_to_vec(target_dist, realized_dist):
+    def transform_to_vec(target_dist: dict, realized_dist: dict):
         """
 
         :param target_dist:
@@ -254,6 +293,7 @@ class BaseCalibrationMetric(BaseMetric):
         p = []
         q = []
         columns_list = list(set(list(target_dist.keys()) + list(realized_dist.keys())))
+
         for column in columns_list:
             if column in target_dist:
                 p.append(float(target_dist[str(column)]))
@@ -264,6 +304,7 @@ class BaseCalibrationMetric(BaseMetric):
                 q.append(float(realized_dist[str(column)]))
             else:
                 q.append(0.00001)
+
         return p, q
 
     def compute_distribution(self, set_df: DataFrame) -> dict:
@@ -284,7 +325,7 @@ class BaseCalibrationMetric(BaseMetric):
         :return:
         """
         self.checking_users()
-        self.target_dist = self.compute_distribution(self.profiles_df)
+        self.target_dist = self.compute_distribution(self.df_1)
 
 
 class MeanAbsoluteCalibrationError(BaseCalibrationMetric):
@@ -292,6 +333,7 @@ class MeanAbsoluteCalibrationError(BaseCalibrationMetric):
     Mean Absolute Calibration Error. Metric to calibrated recommendations systems.
 
     Implementation based on:
+
     - Exploiting personalized calibration and metrics for fairness recommendation -
     Silva et al. (2021) - https://doi.org/10.1016/j.eswa.2021.115112
 
@@ -308,10 +350,9 @@ class MeanAbsoluteCalibrationError(BaseCalibrationMetric):
         diff_result = [abs(t_value - r_value) for t_value, r_value in zip(p, q)]
         return mean(diff_result)
 
-    def based_on_position(self, rec_pos_df: DataFrame, user_indexes: list) -> float:
+    def based_on_position(self, rec_pos_df: DataFrame) -> float:
         """
 
-        :param user_indexes:
         :param rec_pos_df:
         :return:
         """
@@ -320,7 +361,7 @@ class MeanAbsoluteCalibrationError(BaseCalibrationMetric):
             self.compute_ace(
                 self.target_dist[str(ix)],
                 self.realized_dist[str(ix)],
-            ) for ix in user_indexes
+            ) for ix in self.users_ix
         ]
         return mean(results)
 
@@ -330,13 +371,12 @@ class MeanAbsoluteCalibrationError(BaseCalibrationMetric):
         :return:
         """
         super().compute()
-        list_size = self.rec_df["ORDER"].max()
+        list_size = self.df_2["ORDER"].max()
 
-        user_indexes = list(self.target_dist.keys())
+        self.users_ix = list(self.target_dist.keys())
         results = [
             self.based_on_position(
-                rec_pos_df=self.rec_df[self.rec_df["ORDER"] <= i].copy(),
-                user_indexes=user_indexes
+                rec_pos_df=self.df_2[self.df_2["ORDER"] <= i].copy()
             ) for i in range(1, list_size + 1)
         ]
         return mean(results)
@@ -351,7 +391,7 @@ class Miscalibration(BaseCalibrationMetric):
 
     """
 
-    def compute_miscalibration(self, target_dist, realized_dist) -> float:
+    def compute_miscalibration(self, target_dist: dict, realized_dist: dict) -> float:
         """
 
         :param target_dist:
@@ -370,16 +410,16 @@ class Miscalibration(BaseCalibrationMetric):
         :return:
         """
         super().compute()
-        self.realized_dist = self.compute_distribution(self.rec_df)
+        self.realized_dist = self.compute_distribution(self.df_2)
 
-        user_indexes = list(self.target_dist.keys())
+        self.users_ix = list(self.target_dist.keys())
 
         results = [
             self.compute_miscalibration(
                 self.target_dist[str(ix)],
                 self.realized_dist[str(ix)]
             )
-            for ix in user_indexes
+            for ix in self.users_ix
         ]
 
         return mean(results)
@@ -394,10 +434,9 @@ class MeanAverageMiscalibration(Miscalibration):
 
     """
 
-    def based_on_position(self, rec_pos_df: DataFrame, user_indexes: list) -> float:
+    def based_on_position(self, rec_pos_df: DataFrame) -> float:
         """
 
-        :param user_indexes:
         :param rec_pos_df:
         :return:
         """
@@ -406,155 +445,67 @@ class MeanAverageMiscalibration(Miscalibration):
             self.compute_miscalibration(
                 self.target_dist[str(ix)],
                 self.realized_dist[str(ix)],
-            ) for ix in user_indexes
+            ) for ix in self.users_ix
         ]
         return mean(results)
 
     def compute(self) -> float:
         """
 
-        :return:
+        :return: A float which comprises the metric value.
         """
         super().compute()
-        list_size = self.rec_df["ORDER"].max()
+        list_size = self.df_2["ORDER"].max()
 
-        user_indexes = list(self.target_dist.keys())
+        self.users_ix = list(self.target_dist.keys())
         results = [
             self.based_on_position(
-                rec_pos_df=self.rec_df[self.rec_df["ORDER"] <= i].copy(),
-                user_indexes=user_indexes
+                rec_pos_df=self.df_2[self.df_2["ORDER"] <= i].copy()
             ) for i in range(1, list_size + 1)
         ]
         return mean(results)
 
 
-#######################################################
-
-def mrmc(users_target_dist, users_rec_list_df, items_classes_set, dist_func,
-         fairness_func):
-    """
-    Mean Rank MisCalibration. Metric to calibrated recommendations systems.
-
-    Implementation based on:
-
-    - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
-
-    :param users_target_dist:
-        A DataFrame were the lines are the users,
-        the columns are the classes and the cells are the distribution value.
-    :param users_rec_list_df:
-        A Pandas DataFrame, which represents the users recommendation lists.
-    :param items_classes_set:
-        A Dataframe were the lines are the items,
-        the columns are the classes and the cells are probability values.
-    :param fairness_func: A fairness function.
-    :param dist_func: ...
-
-    :return: A float that's represents the mace value.
-    """
-
-    def __miscalibration(target_dist, realized_dist):
-        p = list(target_dist)
-        q = list(realized_dist.values[0])
-        tild = compute_tilde_q(p=p, q=q)
-        numerator = fairness_func(p=p, q=tild)
-        denominator = fairness_func(p=p, q=[0.00001 for _ in range(len(p))])
-        try:
-            return abs(numerator / denominator)
-        except (ArithmeticError, ZeroDivisionError, KeyError):
-            if numerator is None or numerator == [] or numerator == 0.0:
-                numerator = 0.00001
-        return abs(numerator / denominator)
-
-    def __rank_miscalibration(user_id, user_target_distribution, user_rec_list):
-        user_rec_list.sort_values(by=['ORDER'])
-        result = [
-            __miscalibration(
-                target_dist=user_target_distribution,
-                realized_dist=dist_func(
-                    user_id=user_id,
-                    user_pref_set=user_rec_list.head(k),
-                    item_classes_set=items_classes_set
-                )
-            ) for k in user_rec_list['ORDER'].tolist()
-        ]
-        return sum(result) / len(result)
-
-    users_rec_list_df.sort_values(by=['USER_ID'], inplace=True)
-    users_target_dist.sort_index(inplace=True)
-
-    if set({str(ix) for ix in users_rec_list_df['USER_ID'].unique().tolist()}) != set(
-            {str(ix) for ix in users_target_dist.index}):
-        raise IndexError(
-            'Unknown users in recommendation or test set. Please make sure the users are the same.')
-
-    results = list(map(
-        lambda utarget_dist, urec_list: __rank_miscalibration(
-            user_target_distribution=utarget_dist[1], user_rec_list=urec_list[1],
-            user_id=urec_list[0]
-        ),
-        users_target_dist.iterrows(),
-        users_rec_list_df.groupby(by=['USER_ID'])
-    ))
-    return sum(results) / len(results)
-
-
 # ################################################################################################ #
-# ###################################### Popularity Metrics ###################################### #
+# ################################## Unexpectedness Base Metrics ################################# #
 # ################################################################################################ #
-def gap(users_data: DataFrame) -> float:
+class Serendipity(BaseMetric):
     """
-    GAP function
-    :param users_data:
-    :return:
-    """
-    uuids = users_data['USER_ID'].unique()
-
-    numerator = 0
-    denominator = len(uuids)
-
-    for uid in uuids:
-        user_pref = users_data[users_data['USER_ID'] == uid]
-
-        numerator += float(user_pref['popularity'].mean())
-
-    return numerator / denominator
-
-
-def popularity_lift(users_model: DataFrame, users_recommendations: DataFrame) -> float:
-    """
-    Positive values for PL indicate amplification of popularity bias by the algorithm.
-    A negative value for PL happens when, on average,
-    the recommendations are less concentrated on popular items than the users’ profile.
-    Moreover, the PL value of 0 means there is no popularity bias amplification.
-    :param users_model:
-    :param users_recommendations:
-    :return:
-    """
-    q = gap(users_recommendations)
-    p = gap(users_model)
-    return (q - p) / p
-
-
-################################################################
-def serendipity(users_recommendation_list: DataFrame, users_test_items: DataFrame,
-                users_baseline_items: DataFrame) -> float:
-    """
-    Serendipity
-
-    :param users_recommendation_list:
-        A Pandas DataFrame, which represents the users recommendation lists.
-    :param users_test_items:
-        A Pandas DataFrame, which represents the test items for the experiment.
-    :param users_baseline_items:
-
-    :return: A float, which represents the serendipity value.
+    Serendipity.
     """
 
-    def srdp(rec_items: tuple, test_items: tuple, baseline_items: tuple) -> float:
-        rec_items_ids = rec_items[1]['ITEM_ID'].tolist()
-        test_items_ids = test_items[1]['ITEM_ID'].tolist()
-        baselines_items_ids = baseline_items[1]['ITEM_ID'].tolist()
+    def __init__(
+            self,
+            users_rec_list_df: DataFrame, users_test_df: DataFrame, users_baseline_df: DataFrame
+    ):
+        """
+        :param users_rec_list_df: A Pandas DataFrame,
+            which represents the users recommendation lists.
+
+        :param users_test_df: A Pandas DataFrame,
+            which represents the test items.
+        """
+        super().__init__(
+            df_1=users_test_df, df_2=users_rec_list_df,
+            df_3=users_baseline_df
+        )
+
+    def single_process_serend(
+            self, tuple_from_df_3: tuple, tuple_from_df_2: tuple, tuple_from_df_1: tuple
+    ) -> float:
+        """
+        This method process the metric (Serendipity) value for one user.
+
+        :param tuple_from_df_3: A tuple where: 0 is the user id and 1 is a Dataframe.
+        :param tuple_from_df_2: A tuple where: 0 is the user id and 1 is a Dataframe.
+        :param tuple_from_df_1: A tuple where: 0 is the user id and 1 is a Dataframe.
+
+        :return: A float which comprises the metric (serendipity) value for one user.
+        """
+
+        rec_items_ids = tuple_from_df_2[1]['ITEM_ID'].tolist()
+        test_items_ids = tuple_from_df_1[1]['ITEM_ID'].tolist()
+        baselines_items_ids = tuple_from_df_3[1]['ITEM_ID'].tolist()
 
         useful = list(set(rec_items_ids) & set(test_items_ids))
 
@@ -567,101 +518,54 @@ def serendipity(users_recommendation_list: DataFrame, users_test_items: DataFram
             n_unexpected = len(sen) / len(rec_items_ids)
         return n_unexpected
 
-    users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
-    users_test_items.sort_values(by=['USER_ID'], inplace=True)
-    users_baseline_items.sort_values(by=['USER_ID'], inplace=True)
+    def compute(self) -> float:
+        """
 
-    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
-            users_test_items['USER_ID'].unique().tolist()):
-        raise IndexError(
-            'Unknown users in recommendation or test set. Please make sure the users are the same.')
+        :return: A float which comprises the metric value.
+        """
+        self.checking_users()
+        self.ordering_and_grouping()
 
-    test_set = users_test_items.groupby(by=['USER_ID'])
-    rec_set = users_recommendation_list.groupby(by=['USER_ID'])
-    baseline_set = users_baseline_items.groupby(by=['USER_ID'])
-
-    users_results = list(map(
-        srdp,
-        rec_set,
-        test_set,
-        baseline_set
-    ))
-    return sum(users_results) / len(users_results)
+        users_results = list(map(
+            self.single_process_serend,
+            self.grouped_df_3,
+            self.grouped_df_2,
+            self.grouped_df_1
+        ))
+        return mean(users_results)
 
 
-###########################################################
-
-# def surprise(users_recommendation_list: DataFrame, users_preference_items: DataFrame) -> float:
-#     """
-#     Serendipity
-#
-#     :param users_recommendation_list:
-#         A Pandas DataFrame, which represents the users recommendation lists.
-#     :param users_preference_items:
-#
-#     :return: A float, which represents the surprise value.
-#     """
-#
-#     def surp(rec_items: tuple) -> float:
-#         rec_items_ids = rec_items[1]['ITEM_ID'].tolist()
-#         return 0
-#
-#     users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
-#     users_preference_items.sort_values(by=['USER_ID'], inplace=True)
-#
-#     if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
-#             users_preference_items['USER_ID'].unique().tolist()):
-#         raise IndexError(
-#             'Unknown users in recommendation or test set.
-#             Please make sure the users are the same.')
-#
-#     # preference_set = users_preference_items.groupby(by=['USER_ID'])
-#     rec_set = users_recommendation_list.groupby(by=['USER_ID'])
-#
-#     users_results = list(map(
-#         surp,
-#         rec_set
-#     ))
-#     return sum(users_results) / len(users_results)
-
-
-#######################################################
-def unexpectedness(users_recommendation_list: DataFrame, users_test_items: DataFrame) -> float:
+class Unexpectedness(BaseMetric):
     """
-    Serendipity
-
-    :param users_recommendation_list: A Pandas DataFrame,
-        which represents the users recommendation lists.
-    :param users_test_items: A Pandas DataFrame, which represents the test items for the experiment.
-
-    :return: A float, which represents the map value.
+    Unexpectedness.
     """
 
-    def unex(rec_items: tuple, test_items: tuple) -> float:
-        rec_items_ids = rec_items[1]['ITEM_ID'].tolist()
-        test_items_ids = test_items[1]['ITEM_ID'].tolist()
+    def __init__(self, users_rec_list_df: DataFrame, users_test_df: DataFrame):
+        """
+
+        :param users_rec_list_df: A Pandas DataFrame,
+            which represents the users recommendation lists.
+
+        :param users_test_df: A Pandas DataFrame,
+            which represents the test items.
+        """
+        super().__init__(df_1=users_test_df, df_2=users_rec_list_df)
+
+    def single_process(self, tuple_from_df_2: tuple, tuple_from_df_1: tuple) -> float:
+        """
+        This method process the metric (unexpectedness) value for one user.
+
+        :param tuple_from_df_2: A tuple where: 0 is the user id and 1 is a Dataframe.
+        :param tuple_from_df_1: A tuple where: 0 is the user id and 1 is a Dataframe.
+
+        :return: A float which comprises the metric (unexpectedness) value for one user.
+        """
+        rec_items_ids = tuple_from_df_2[1]['ITEM_ID'].tolist()
+        test_items_ids = tuple_from_df_1[1]['ITEM_ID'].tolist()
 
         unexpected_ids = list(set(rec_items_ids) - set(test_items_ids))
         n_unexpected = len(unexpected_ids) / len(rec_items_ids)
         return n_unexpected
-
-    users_recommendation_list.sort_values(by=['USER_ID'], inplace=True)
-    users_test_items.sort_values(by=['USER_ID'], inplace=True)
-
-    if set(users_recommendation_list['USER_ID'].unique().tolist()) != set(
-            users_test_items['USER_ID'].unique().tolist()):
-        raise IndexError(
-            'Unknown users in recommendation or test set. Please make sure the users are the same.')
-
-    test_set = users_test_items.groupby(by=['USER_ID'])
-    rec_set = users_recommendation_list.groupby(by=['USER_ID'])
-
-    users_results = list(map(
-        unex,
-        rec_set,
-        test_set
-    ))
-    return sum(users_results) / len(users_results)
 
 
 # ################################################################################################ #
@@ -669,104 +573,88 @@ def unexpectedness(users_recommendation_list: DataFrame, users_test_items: DataF
 # ################################################################################################ #
 class AverageNumberOfOItemsChanges(BaseMetric):
     """
-    Average number of changes. A metric to get the average number of changes
-    between the candidate items and recommendation list.
-
+    Average Number of Items Changes (ANIC). A metric to get the average number of changes
+        between the candidate items and recommendation list.
     """
 
     def __init__(self, users_rec_list_df: DataFrame, users_cand_items_df: DataFrame):
         """
-
         :param users_rec_list_df: A Pandas DataFrame,
-        which represents the users recommendation lists.
+            which represents the users recommendation lists.
 
         :param users_cand_items_df: A Pandas DataFrame,
-        which represents the candidate items.
+            which represents the candidate items.
         """
-        super().__init__(users_profile_df=users_cand_items_df, users_rec_list_df=users_rec_list_df)
+        super().__init__(df_1=users_cand_items_df, df_2=users_rec_list_df)
 
     def ordering(self) -> None:
         """
-
-        :return:
+        This method is to order the Dataframe based on the user ids.
+        In special, this method overrides the original one, including one more attribute to order.
         """
-        self.profiles_df.sort_values(
+        self.df_1.sort_values(
             by=['USER_ID', 'TRANSACTION_VALUE'], inplace=True, ascending=False
         )
-        self.rec_df.sort_values(by=['USER_ID', 'ORDER'], inplace=True)
+        self.df_2.sort_values(by=['USER_ID', 'ORDER'], inplace=True)
 
-    @staticmethod
-    def difference_number(rec_items: tuple, test_items: tuple) -> float:
+    def single_process(self, tuple_from_df_2: tuple, tuple_from_df_1: tuple) -> float:
         """
+        This method process the metric (ANIC) value for one user.
 
-        :param rec_items:
-        :param test_items:
-        :return:
+        :param tuple_from_df_2: A tuple where: 0 is the user id and 1 is a Dataframe.
+        :param tuple_from_df_1: A tuple where: 0 is the user id and 1 is a Dataframe.
+
+        :return: A float which comprises the metric (ANIC) value for one user.
         """
-        n = rec_items[1]["ORDER"].max()
-        set_a = test_items[1]["ITEM_ID"].head(n).tolist()
-        set_b = rec_items[1]["ITEM_ID"].tolist()
+        n = tuple_from_df_2[1]["ORDER"].max()
+        set_a = tuple_from_df_1[1]["ITEM_ID"].head(n).tolist()
+        set_b = tuple_from_df_2[1]["ITEM_ID"].tolist()
         size = len(set(set_b) - set(set_a))
         return size
-
-    def compute(self) -> float:
-        """
-
-        :return:
-        """
-        self.checking_users()
-        self.ordering_and_grouping()
-
-        users_results = list(map(
-            self.difference_number,
-            self.grouped_rec_df,
-            self.grouped_profiles_df
-        ))
-        return mean(users_results)
 
 
 class AverageNumberOfGenreChanges(BaseMetric):
     """
     Average number of changes. A metric to get the average number of changes
-    between the candidate items and recommendation list.
-
+        between the candidate items and recommendation list.
     """
 
     def __init__(
             self, users_rec_list_df: DataFrame, users_cand_items_df: DataFrame, items_df: DataFrame
     ):
         """
-
         :param users_rec_list_df: A Pandas DataFrame,
-        which represents the users recommendation lists.
+            which represents the users recommendation lists.
 
         :param users_cand_items_df: A Pandas DataFrame,
-        which represents the candidate items.
+            which represents the candidate items.
         """
-        super().__init__(users_profile_df=users_cand_items_df, users_rec_list_df=users_rec_list_df)
+        super().__init__(df_1=users_cand_items_df, df_2=users_rec_list_df)
         self.items_df = items_df
 
     def ordering(self) -> None:
         """
-
-        :return:
+        This method is to order the Dataframe based on the user ids.
+        In special, this method overrides the original one, including one more attribute to order.
         """
-        self.profiles_df.sort_values(
+        self.df_1.sort_values(
             by=['USER_ID', 'TRANSACTION_VALUE'], inplace=True, ascending=False
         )
-        self.rec_df.sort_values(by=['USER_ID', 'ORDER'], inplace=True)
+        self.df_2.sort_values(by=['USER_ID', 'ORDER'], inplace=True)
 
-    def difference_number(self, rec_items: tuple, test_items: tuple) -> float:
+    def single_process(self, tuple_from_df_2: tuple, tuple_from_df_1: tuple) -> float:
         """
+        This method process the metric (ANGC) value for one user.
 
-        :param rec_items:
-        :param test_items:
-        :return:
+        :param tuple_from_df_2: A tuple where: 0 is the user id and 1 is a Dataframe.
+        :param tuple_from_df_1: A tuple where: 0 is the user id and 1 is a Dataframe.
+
+        :return: A float which comprises the metric (ANGC) value for one user.
         """
-        n = rec_items[1]["ORDER"].max()
+        n = tuple_from_df_2[1]["ORDER"].max()
 
-        set_a = test_items[1]["ITEM_ID"].head(n).tolist()
-        set_b = rec_items[1]["ITEM_ID"].tolist()
+        set_a = tuple_from_df_1[1]["ITEM_ID"].head(n).tolist()
+        set_b = tuple_from_df_2[1]["ITEM_ID"].tolist()
 
         genres_a = list(itertools.chain.from_iterable([
             genres.split("|")
@@ -779,18 +667,3 @@ class AverageNumberOfGenreChanges(BaseMetric):
 
         size = len(set(genres_b) - set(genres_a))
         return size
-
-    def compute(self) -> float:
-        """
-
-        :return:
-        """
-        self.checking_users()
-        self.ordering_and_grouping()
-
-        users_results = list(map(
-            self.difference_number,
-            self.grouped_rec_df,
-            self.grouped_profiles_df
-        ))
-        return mean(users_results)
