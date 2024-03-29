@@ -67,13 +67,22 @@ def computer_users_distribution_dict(
     _distribution_component = distributions_funcs(distribution=distribution)
 
     # Compute the distribution to all users
-    return_dict = {}
-    for user_id in interactions_df["USER_ID"].unique().tolist():
-        user_dist_dict = _distribution_component(
+    return_dict = {
+        str(user_id): _distribution_component(
             items=_item_in_memory.select_user_items(
-                data=interactions_df[interactions_df["USER_ID"] == user_id]
+                data=interactions_df[interactions_df["USER_ID"] == user_id].copy()
             ),
         )
-        return_dict[str(user_id)] = user_dist_dict
+        for user_id in interactions_df["USER_ID"].unique().tolist()
+    }
+    #
+    # return_dict = {}
+    # for user_id in interactions_df["USER_ID"].unique().tolist():
+    #     user_dist_dict = _distribution_component(
+    #         items=_item_in_memory.select_user_items(
+    #             data=interactions_df[interactions_df["USER_ID"] == user_id].copy()
+    #         ),
+    #     )
+    #     return_dict[str(user_id)] = user_dist_dict
 
     return return_dict
