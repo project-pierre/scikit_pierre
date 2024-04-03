@@ -3,11 +3,14 @@ This file contains all evaluation metrics.
 """
 import itertools
 
-from numpy import mean
+from numpy import mean, triu_indices
 from pandas import DataFrame
+import scipy.sparse as sp
+from sklearn.metrics.pairwise import cosine_similarity
 
 from .base import BaseMetric, BaseCalibrationMetric
 from ..distributions.compute_tilde_q import compute_tilde_q
+from ..models.item import ItemsInMemory
 
 
 # ################################################################################################ #
@@ -112,6 +115,66 @@ class MeanReciprocalRank(BaseMetric):
                 rec_items=tuple_from_df_2, test_items=tuple_from_df_1
             )
         )
+
+
+# ################################################################################################ #
+# ####################################### Diversity Metrics ###################################### #
+# ################################################################################################ #
+class IntraListSimilarity:
+    """
+
+    """
+
+    def __init__(self, users_rec_list_df: DataFrame, items_df: DataFrame):
+        self.rec_list_df = users_rec_list_df
+        self.items = items_df
+        self.encoded = None
+
+    def encoding(self):
+        _items = ItemsInMemory(data=self.items)
+        _items.one_hot_encode()
+        self.encoded = _items.get_encoded()
+
+    def compute(self):
+        rec_set = [
+            row["ITEM_ID"].tolist() for ix, row in
+            self.rec_list_df.groupby(by=["USER_ID"])
+        ]
+        self.encoding()
+
+        ils = [self._single_list_similarity(u_rec) for u_rec in rec_set]
+        return mean(ils)
+
+    def _single_list_similarity(self, predicted: list) -> float:
+        """
+        Computes the intra-list similarity for a single list of recommendations.
+        Parameters
+        ----------
+        predicted : a list
+            Ordered predictions
+            Example: ['X', 'Y', 'Z']
+        feature_df: dataframe
+            A dataframe with one hot encoded or latent features.
+            The dataframe should be indexed by the id used in the recommendations.
+        Returns:
+        -------
+        ils_single_user: float
+            The intra-list similarity for a single list of recommendations.
+        """
+        # get features for all recommended items
+        recs_content = self.encoded.loc[predicted]
+        recs_content = recs_content.dropna()
+        recs_content = sp.csr_matrix(recs_content.values)
+
+        # calculate similarity scores for all items in list
+        similarity = cosine_similarity(X=recs_content, dense_output=False)
+
+        # get indicies for upper right triangle w/o diagonal
+        upper_right = triu_indices(similarity.shape[0], k=1)
+
+        # calculate average similarity score of all recommended items in list
+        ils_single_user = mean(similarity[upper_right])
+        return ils_single_user
 
 
 # ################################################################################################ #
@@ -268,7 +331,7 @@ class MeanAverageMiscalibration(Miscalibration):
         return mean(results)
 
 
-class IncreaseAndDecreaseMiscalibration(Miscalibration):
+class NumberOfUserIncreaseAndDecreaseMiscalibration(Miscalibration):
     """
 
     """
@@ -294,35 +357,35 @@ class IncreaseAndDecreaseMiscalibration(Miscalibration):
         self.df_3 = users_baseline_df
         self.distri_df_3 = None
         self.increase = True
+        self.with_profile = True
 
     def set_choice(self, choice: bool) -> None:
         self.increase = choice
 
-    def count(self) -> float:
-        rec_dist = self.user_association_miscalibration(
+    def set_comparison(self, choice: bool) -> None:
+        self.with_profile = choice
+
+    def selecting_users(self) -> list:
+        rec_miscalib = self.user_association_miscalibration(
             self.realized_dist
         )
-        base_dist = self.user_association_miscalibration(
+        base_miscalib = self.user_association_miscalibration(
             self.distri_df_3
         )
         if self.increase:
-            return len([
-                ix
+            return [
+                rec_miscalib[ix]
                 for ix in self.users_ix
-                if rec_dist[ix] >= base_dist[ix]
-            ])
+                if rec_miscalib[ix] >= base_miscalib[ix]
+            ]
         else:
-            return len([
-                ix
+            return [
+                rec_miscalib[ix]
                 for ix in self.users_ix
-                if rec_dist[ix] < base_dist[ix]
-            ])
+                if rec_miscalib[ix] < base_miscalib[ix]
+            ]
 
-    def compute(self) -> float:
-        """
-
-        :return:
-        """
+    def base_dist_compute(self):
         self.checking_users()
         self.target_dist = self.compute_distribution(self.df_1)
         self.realized_dist = self.compute_distribution(self.df_2)
@@ -330,7 +393,36 @@ class IncreaseAndDecreaseMiscalibration(Miscalibration):
 
         self.users_ix = list(self.target_dist.keys())
 
-        return self.count()
+    def compute(self) -> float:
+        """
+
+        :return:
+        """
+        self.base_dist_compute()
+
+        return len(self.selecting_users())
+
+
+class UserIDMiscalibration(NumberOfUserIncreaseAndDecreaseMiscalibration):
+
+    def selecting_values(self):
+        """
+
+        :return:
+        """
+        return [
+            value
+            for value in self.selecting_users()
+        ]
+
+    def compute(self) -> float:
+        """
+
+        :return:
+        """
+        self.base_dist_compute()
+
+        return sum(self.selecting_values())
 
 
 # ################################################################################################ #

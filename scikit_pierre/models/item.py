@@ -1,6 +1,7 @@
 """
 This file contains the Item class used to storage the item attributes.
 """
+import itertools
 
 from copy import deepcopy
 
@@ -53,6 +54,18 @@ class ItemsInMemory:
         """
         self.items = {}
         self._data = data
+        self.encoded = None
+        self.uniques_genres = None
+
+    @staticmethod
+    def _map_by_genre(row):
+        item_id = getattr(row, "ITEM_ID")
+        item_genre = getattr(row, "GENRES")
+
+        splitted = item_genre.split('|')
+        genre_ratio = 1.0 / len(splitted)
+
+        return Item(_id=item_id, classes={genre: genre_ratio for genre in splitted})
 
     def item_by_genre(self):
         """
@@ -68,6 +81,39 @@ class ItemsInMemory:
 
             item = Item(_id=item_id, classes={genre: genre_ratio for genre in splitted})
             self.items[item_id] = item
+
+    def get_encoded(self):
+        return self.encoded
+
+    @staticmethod
+    def _getting_genres(row):
+        item_id = getattr(row, "ITEM_ID")
+        item_genre = getattr(row, "GENRES")
+
+        splitted = item_genre.split('|')
+        return item_id, splitted
+
+    def _map_encode(self, row):
+        item_id = getattr(row, "ITEM_ID")
+        item_genre = getattr(row, "GENRES")
+
+        splitted = item_genre.split('|')
+        return item_id, [1 if genre in splitted else 0 for genre in self.uniques_genres]
+
+    def one_hot_encode(self):
+
+        self.uniques_genres = list(set(itertools.chain.from_iterable([
+            genres.split("|")
+            for genres in self._data["GENRES"].tolist()
+        ])))
+
+        list_of_items = list(map(self._map_encode, self._data.itertuples()))
+
+        self.encoded = DataFrame(
+            data=[t[1] for t in list_of_items],
+            columns=self.uniques_genres, index=[t[0] for t in list_of_items]
+        )
+        self.encoded.fillna(0)
 
     def item_by_bias(self, bias_data: DataFrame):
         """
