@@ -82,11 +82,20 @@ class ItemsInMemory:
             item = Item(_id=item_id, classes={genre: genre_ratio for genre in splitted})
             self.items[item_id] = item
 
-    def get_encoded(self):
+    def get_encoded(self) -> DataFrame:
+        """
+        Method to get encoded data
+        :return:
+        """
         return self.encoded
 
     @staticmethod
     def _getting_genres(row):
+        """
+        Method to get genres data
+        :param row:
+        :return:
+        """
         item_id = getattr(row, "ITEM_ID")
         item_genre = getattr(row, "GENRES")
 
@@ -94,6 +103,11 @@ class ItemsInMemory:
         return item_id, splitted
 
     def _map_encode(self, row):
+        """
+
+        :param row:
+        :return:
+        """
         item_id = getattr(row, "ITEM_ID")
         item_genre = getattr(row, "GENRES")
 
@@ -101,7 +115,10 @@ class ItemsInMemory:
         return item_id, [1 if genre in splitted else 0 for genre in self.uniques_genres]
 
     def one_hot_encode(self):
-
+        """
+        Method to encode encoded data
+        :return:
+        """
         self.uniques_genres = list(set(itertools.chain.from_iterable([
             genres.split("|")
             for genres in self._data["GENRES"].tolist()
@@ -155,7 +172,7 @@ class ItemsInMemory:
             minimum = data['TIMESTAMP'].min()
 
         for row in data.itertuples():
-            item_id = getattr(row, "ITEM_ID")
+            item_id = str(getattr(row, "ITEM_ID"))
             item = self.items[item_id]
             user_items[item_id] = deepcopy(item)
             user_items[item_id].score = getattr(row, feedback_column)

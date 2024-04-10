@@ -2,7 +2,8 @@ from numpy import mean
 from pandas import DataFrame
 
 from scikit_pierre.distributions.accessible import distributions_funcs
-from scikit_pierre.distributions.compute_distribution import computer_users_distribution_dict
+from scikit_pierre.distributions.compute_distribution import computer_users_distribution_dict, \
+    transform_to_vec
 from scikit_pierre.measures.accessible import calibration_measures_funcs
 from scikit_pierre.models.item import ItemsInMemory
 
@@ -136,7 +137,8 @@ class BaseCalibrationMetric(BaseMetric):
     def __init__(
             self,
             users_profile_df: DataFrame, users_rec_list_df: DataFrame, items_set_df: DataFrame,
-            distribution_name: str = "CWS", distance_func_name: str = "KL"
+            distribution_name: str = "CWS", distance_func_name: str = "KL",
+            target_dist: dict = None, realized_dist: dict = None
     ):
         """
 
@@ -147,8 +149,8 @@ class BaseCalibrationMetric(BaseMetric):
         :param distance_func_name:
         """
         super().__init__(df_1=users_profile_df, df_2=users_rec_list_df)
-        self.target_dist = None
-        self.realized_dist = None
+        self.target_dist = target_dist
+        self.realized_dist = realized_dist
 
         self.items_df = items_set_df
         self._item_in_memory = None
@@ -177,23 +179,7 @@ class BaseCalibrationMetric(BaseMetric):
         :param realized_dist:
         :return:
         """
-        p = []
-        q = []
-        columns_list = list(set(list(target_dist.keys()) + list(realized_dist.keys())))
-
-        for column in columns_list:
-            if column in target_dist:
-                p.append(float(target_dist[str(column)]))
-            else:
-                # p.append(0.00001)
-                p.append(0.0)
-
-            if column in realized_dist:
-                q.append(float(realized_dist[str(column)]))
-            else:
-                # q.append(0.00001)
-                q.append(0.0)
-
+        p, q = transform_to_vec(target_dist, realized_dist)
         return p, q
 
     def compute_distribution(self, set_df: DataFrame) -> dict:
@@ -208,10 +194,18 @@ class BaseCalibrationMetric(BaseMetric):
         )
         return dist_dict
 
+    def compute_target_dist(self):
+        if self.target_dist is None:
+            self.target_dist = self.compute_distribution(self.df_1)
+
+    def compute_realized_dist(self):
+        if self.realized_dist is None:
+            self.realized_dist = self.compute_distribution(self.df_2)
+
     def compute(self):
         """
 
         :return:
         """
         self.checking_users()
-        self.target_dist = self.compute_distribution(self.df_1)
+        self.compute_target_dist()

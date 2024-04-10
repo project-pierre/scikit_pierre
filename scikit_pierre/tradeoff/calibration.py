@@ -11,6 +11,8 @@ from pandas import DataFrame, concat, merge
 
 from .basetradeoff import BaseTradeOff
 from ..distributions.accessible import distributions_funcs
+from ..distributions.compute_distribution import transform_to_vec
+from ..distributions.compute_tilde_q import compute_tilde_q
 from ..measures.accessible import calibration_measures_funcs, SIMILARITY_LIST
 from ..relevance.accessible import relevance_measures_funcs
 from ..tradeoff_weight.accessible import tradeoff_weights_funcs
@@ -149,16 +151,16 @@ class LinearCalibration(CalibrationBase):
         user_candidate_items = self.candidate_items[self.candidate_items['USER_ID'] == uid]
 
         # Target Distribution (p)
-        target_dist = self._distribution_component(
-            items=self._item_in_memory.select_user_items(data=user_pref))
-        # if self.users_distribution is None:
-        #     target_dist = self._distribution_component(
-        #         items=self._item_in_memory.select_user_items(data=user_pref))
-        # else:
-        #     pre_computed_distribution = self.users_distribution.loc[uid]
-        #     target_dist = {
-        #         col: value for col, value in zip(pre_computed_distribution.columns.tolist(),
-        #                                          pre_computed_distribution.values.tolist())}
+
+        target_dist = {}
+        if self.users_distribution is None:
+            target_dist = self._distribution_component(
+                items=self._item_in_memory.select_user_items(data=user_pref))
+        else:
+            pre_computed_distribution = self.users_distribution.loc[uid]
+            target_dist = {
+                col: value for col, value in zip(pre_computed_distribution.columns.tolist(),
+                                                 pre_computed_distribution.values.tolist())}
         # Tradeoff weight (lambda)
         if self.environment['weight'][:2] == "C@":
             lmbda = self._tradeoff_weight_component
@@ -172,10 +174,6 @@ class LinearCalibration(CalibrationBase):
             lmbda=lmbda, uid=uid
         )
 
-        if len(recommendation_list) < 10:
-            print(uid)
-            print(recommendation_list)
-
         rec_list = merge(self._item_in_memory.transform_to_pandas(items=recommendation_list),
                          user_candidate_items,
                          how="left", on=["ITEM_ID"])
@@ -183,8 +181,9 @@ class LinearCalibration(CalibrationBase):
         rec_list["USER_ID"] = uid
         return rec_list
 
-    def _compute_utility(self, target_distribution: dict, temp_rec_items: dict,
-                         lmbda: float) -> float:
+    def _compute_utility(
+            self, target_distribution: dict, temp_rec_items: dict, lmbda: float
+    ) -> float:
         """
         The kernel of the Linear Tradeoff Balance.
 
@@ -195,18 +194,23 @@ class LinearCalibration(CalibrationBase):
         :return: A float between [0;1],
         """
         realized_dist = self._distribution_component(items=temp_rec_items)
+        p, q = transform_to_vec(target_distribution, realized_dist)
+
         fairness_value = self._fairness_component(
-            p=list(target_distribution.values()), q=list(realized_dist.values())
+            p=p,
+            q=compute_tilde_q(p=p, q=q)
         )
+
         relevance_value = self._relevance_component(
-            [item.score for _, item in temp_rec_items.items()])
-        utility_value = self._tradeoff_balance_component(lmbda=lmbda,
-                                                         relevance_value=relevance_value,
-                                                         fairness_value=fairness_value)
+            [item.score for _, item in temp_rec_items.items()]
+        )
+        utility_value = self._tradeoff_balance_component(
+            lmbda=lmbda, relevance_value=relevance_value, fairness_value=fairness_value)
         return utility_value
 
-    def _surrogate(self, uid, target_distribution: dict, candidate_items: dict,
-                   lmbda: float) -> dict:
+    def _surrogate(
+            self, uid, target_distribution: dict, candidate_items: dict, lmbda: float
+    ) -> dict:
         """
         Start with an empty recommendation list,
         loop over the candidate items, during each iteration
