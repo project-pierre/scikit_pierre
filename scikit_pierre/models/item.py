@@ -73,7 +73,7 @@ class ItemsInMemory:
         :return:
         """
         for row in self._data.itertuples():
-            item_id = getattr(row, "ITEM_ID")
+            item_id = str(getattr(row, "ITEM_ID"))
             item_genre = getattr(row, "GENRES")
 
             splitted = item_genre.split('|')

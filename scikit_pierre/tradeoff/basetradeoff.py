@@ -29,15 +29,20 @@ class BaseTradeOff:
         else:
             raise KeyError("Some column is missing.")
 
-        if set(users_preferences['ITEM_ID'].unique().tolist() +
-               candidate_items['ITEM_ID'].unique().tolist()).issubset(
-            set(item_set['ITEM_ID'].unique().tolist())):
-            self.item_set = deepcopy(item_set)
-        else:
+        set_1 = set({str(ix) for ix in users_preferences['ITEM_ID'].unique().tolist() +
+                     candidate_items['ITEM_ID'].unique().tolist()})
+        set_2 = set({str(ix) for ix in item_set['ITEM_ID'].unique().tolist()})
+
+        if len(set_1 - set_2) > 0:
+            print(set_1 - set_2)
             raise NameError("Some wrong information in the ITEM ID.")
+
+        self.item_set = deepcopy(item_set)
 
         self._item_in_memory = ItemsInMemory(data=self.item_set)
         self.users_distribution = users_distribution
+        if self.users_distribution is not None:
+            self.users_distribution.fillna(0, inplace=True)
 
         self.environment = {}
 

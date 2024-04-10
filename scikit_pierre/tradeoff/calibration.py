@@ -147,8 +147,8 @@ class LinearCalibration(CalibrationBase):
         return recommendation_lists
 
     def _user_recommendation(self, uid) -> DataFrame:
-        user_pref = self.users_preferences[self.users_preferences['USER_ID'] == uid]
-        user_candidate_items = self.candidate_items[self.candidate_items['USER_ID'] == uid]
+        user_pref = self.users_preferences[self.users_preferences['USER_ID'] == uid].copy()
+        user_candidate_items = self.candidate_items[self.candidate_items['USER_ID'] == uid].copy()
 
         # Target Distribution (p)
 
@@ -159,8 +159,9 @@ class LinearCalibration(CalibrationBase):
         else:
             pre_computed_distribution = self.users_distribution.loc[uid]
             target_dist = {
-                col: value for col, value in zip(pre_computed_distribution.columns.tolist(),
+                col: value for col, value in zip(self.users_distribution.columns.tolist(),
                                                  pre_computed_distribution.values.tolist())}
+
         # Tradeoff weight (lambda)
         if self.environment['weight'][:2] == "C@":
             lmbda = self._tradeoff_weight_component
@@ -173,8 +174,12 @@ class LinearCalibration(CalibrationBase):
             candidate_items=self._item_in_memory.select_user_items(data=user_candidate_items),
             lmbda=lmbda, uid=uid
         )
+        # print({uid: recommendation_list})
+        recommendations = self._item_in_memory.transform_to_pandas(items=recommendation_list)
+        recommendations["ITEM_ID"] = recommendations["ITEM_ID"].astype(int)
+        user_candidate_items["ITEM_ID"] = user_candidate_items["ITEM_ID"].astype(int)
 
-        rec_list = merge(self._item_in_memory.transform_to_pandas(items=recommendation_list),
+        rec_list = merge(recommendations,
                          user_candidate_items,
                          how="left", on=["ITEM_ID"])
 
