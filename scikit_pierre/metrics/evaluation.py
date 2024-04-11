@@ -216,8 +216,8 @@ class MeanAbsoluteCalibrationError(BaseCalibrationMetric):
         self.realized_dist = self.compute_distribution(rec_pos_df)
         results = [
             self.compute_ace(
-                self.target_dist[str(ix)],
-                self.realized_dist[str(ix)],
+                self.target_dist[ix],
+                self.realized_dist[ix],
             ) for ix in self.users_ix
         ]
         return mean(results)
@@ -264,9 +264,9 @@ class Miscalibration(BaseCalibrationMetric):
 
     def user_association_miscalibration(self, distri: dict):
         return {
-            str(ix): self.compute_miscalibration(
-                self.target_dist[str(ix)],
-                distri[str(ix)]
+            ix: self.compute_miscalibration(
+                self.target_dist[ix],
+                distri[ix]
             )
             for ix in self.users_ix
         }
@@ -283,8 +283,8 @@ class Miscalibration(BaseCalibrationMetric):
 
         results = [
             self.compute_miscalibration(
-                self.target_dist[str(ix)],
-                self.realized_dist[str(ix)]
+                self.target_dist[ix],
+                self.realized_dist[ix]
             )
             for ix in self.users_ix
         ]
@@ -311,8 +311,8 @@ class MeanAverageMiscalibration(Miscalibration):
         self.realized_dist = self.compute_distribution(rec_pos_df)
         results = [
             self.compute_miscalibration(
-                self.target_dist[str(ix)],
-                self.realized_dist[str(ix)],
+                self.target_dist[ix],
+                self.realized_dist[ix],
             ) for ix in self.users_ix
         ]
         return mean(results)
