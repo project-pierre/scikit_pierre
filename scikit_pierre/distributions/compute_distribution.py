@@ -30,7 +30,7 @@ def computer_users_distribution_pandas(
         return DataFrame(
                 data=[list(user_dist_dict.values())],
                 columns=list(user_dist_dict.keys()),
-                index=[str(user_id)]
+                index=[user_id]
             )
 
     # Get the items classes
@@ -86,7 +86,7 @@ def computer_users_distribution_dict(
 
     # Compute the distribution to all users
     return_dict = {
-        str(user_id): _distribution_component(
+        user_id: _distribution_component(
             items=_item_in_memory.select_user_items(
                 data=interactions_df[interactions_df["USER_ID"] == user_id].copy()
             ),
