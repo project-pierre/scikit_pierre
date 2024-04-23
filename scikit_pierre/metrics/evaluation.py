@@ -2,9 +2,11 @@
 This file contains all evaluation metrics.
 """
 import itertools
+from collections import Counter
+from typing import List
 
-from numpy import mean, triu_indices
-from pandas import DataFrame
+from numpy import mean, triu_indices, array, log2
+from pandas import DataFrame, notna
 import scipy.sparse as sp
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -178,6 +180,144 @@ class IntraListSimilarity:
         # calculate average similarity score of all recommended items in list
         ils_single_user = mean(similarity[upper_right])
         return ils_single_user
+
+
+class Personalization(BaseMetric):
+    """
+    Personalization.
+    """
+
+    def __init__(
+            self,
+            users_rec_list_df: DataFrame
+    ):
+        """
+        :param users_rec_list_df: A Pandas DataFrame,
+            which represents the users recommendation lists.
+        """
+        super().__init__(
+            df_2=users_rec_list_df
+        )
+
+    def make_rec_matrix(self) -> sp.csr_matrix:
+        """
+        This method construct the matrix to process the personalization.
+        :return:
+        """
+        predicted = [row["ITEM_ID"].tolist() for ix, row in self.df_2.groupby(by=["USER_ID"])]
+        predicted = array(predicted)
+        df = DataFrame(data=predicted).reset_index().melt(
+            id_vars='index', value_name='item',
+        )
+        df = df[['index', 'item']].pivot(index='index', columns='item', values='item')
+        df = notna(df)*1
+        rec_matrix = sp.csr_matrix(df.values)
+        return rec_matrix
+
+    def compute(self):
+        """
+
+        :return:
+        """
+
+        # create matrix for recommendations
+        rec_matrix_sparse = self.make_rec_matrix()
+
+        # calculate similarity for every user's recommendation list
+        similarity = cosine_similarity(X=rec_matrix_sparse, dense_output=False)
+
+        # calculate average similarity
+        dim = similarity.shape[0]
+        personalization = (similarity.sum() - dim) / (dim * (dim - 1))
+        return 1-personalization
+
+
+class Novelty(BaseMetric):
+    """
+    Novelty.
+    """
+
+    def __init__(
+            self,
+            users_profile_df: DataFrame,
+            users_rec_list_df: DataFrame,
+            items_df: DataFrame,
+    ):
+        """
+        :param users_rec_list_df: A Pandas DataFrame,
+            which represents the users recommendation lists.
+        """
+        super().__init__(
+            df_2=users_rec_list_df,
+            df_1=users_profile_df
+        )
+        self.items_df = items_df
+
+    @staticmethod
+    def single_process_nov(predicted: List[list], pop: dict, u: int, n: int) -> (float, list):
+        """
+        This method construct the matrix to process the personalization.
+        :return:
+        """
+
+        mean_self_information = []
+        k = 0
+        for sublist in predicted:
+            self_information = 0
+            k += 1
+            for i in sublist:
+                self_information += sum(-log2(pop[i]/u))
+            mean_self_information.append(self_information/n)
+        novelty = sum(mean_self_information)/k
+        return novelty, mean_self_information
+
+    def compute(self):
+        """
+
+        :return:
+        """
+
+        rec_set = [row["ITEM_ID"].tolist() for ix, row in self.df_2.groupby(by=["USER_ID"])]
+        pop = Counter(self.df_1["ITEM_ID"].tolist())
+        u = self.df_1["USER_ID"].nunique()
+
+        return self.single_process_nov(
+            predicted=rec_set, pop=pop, u=u, n=max(self.df_2["ORDER"])
+        )
+
+
+class Coverage(BaseMetric):
+    """
+    Personalization.
+    """
+
+    def __init__(
+            self,
+            users_rec_list_df: DataFrame,
+            items_df: DataFrame,
+    ):
+        """
+        :param users_rec_list_df: A Pandas DataFrame,
+            which represents the users recommendation lists.
+        """
+        super().__init__(
+            df_2=users_rec_list_df
+        )
+        self.items_df = items_df
+
+    def compute(self):
+        """
+
+        :return:
+        """
+        predicted = [row["ITEM_ID"].tolist() for ix, row in self.df_2.groupby(by=["USER_ID"])]
+        catalog = self.items_df["ITEM_ID"].tolist()
+
+        predicted_flattened = [p for sublist in predicted for p in sublist]
+        unique_predictions = len(set(predicted_flattened))
+        prediction_coverage = round(unique_predictions/(len(catalog) * 1.0) * 100, 2)
+
+        return prediction_coverage
 
 
 # ################################################################################################ #

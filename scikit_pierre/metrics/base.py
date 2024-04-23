@@ -23,7 +23,7 @@ class BaseMetric:
 
     def __init__(
             self,
-            df_1: DataFrame, df_2: DataFrame, df_3: DataFrame = None
+            df_1: DataFrame = None, df_2: DataFrame = None, df_3: DataFrame = None
     ):
         """
 
