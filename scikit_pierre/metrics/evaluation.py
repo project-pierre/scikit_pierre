@@ -5,7 +5,7 @@ import itertools
 from collections import Counter
 from typing import List
 
-from numpy import mean, triu_indices, array, log2
+from numpy import mean, triu_indices, array, log2, sum
 from pandas import DataFrame, notna
 import scipy.sparse as sp
 from sklearn.metrics.pairwise import cosine_similarity
@@ -254,7 +254,7 @@ class Novelty(BaseMetric):
         self.items_df = items_df
 
     @staticmethod
-    def single_process_nov(predicted: List[list], pop: dict, u: int, n: int) -> (float, list):
+    def single_process_nov(predicted: List[list], pop: dict, u: int, n: int) -> float:
         """
         This method construct the matrix to process the personalization.
         :return:
@@ -265,11 +265,15 @@ class Novelty(BaseMetric):
         for sublist in predicted:
             self_information = 0
             k += 1
+
             for i in sublist:
-                self_information += sum(-log2(pop[i]/u))
+                v = pop[str(i)]
+                if v == 0:
+                    v = 0.00001
+                self_information += sum(-log2(v/u))
             mean_self_information.append(self_information/n)
         novelty = sum(mean_self_information)/k
-        return novelty, mean_self_information
+        return novelty
 
     def compute(self):
         """
@@ -278,7 +282,11 @@ class Novelty(BaseMetric):
         """
 
         rec_set = [row["ITEM_ID"].tolist() for ix, row in self.df_2.groupby(by=["USER_ID"])]
-        pop = Counter(self.df_1["ITEM_ID"].tolist())
+        pop = dict(Counter(self.df_1["ITEM_ID"].tolist()))
+        item_ids = self.items_df["ITEM_ID"].tolist()
+        diff_ids = set(item_ids) - set(pop.keys())
+        for diff_id in diff_ids:
+            pop[diff_id] = 0
         u = self.df_1["USER_ID"].nunique()
 
         return self.single_process_nov(
