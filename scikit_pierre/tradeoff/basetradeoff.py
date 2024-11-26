@@ -13,7 +13,7 @@ class BaseTradeOff:
     """
 
     def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame,
-                 item_set: DataFrame, users_distribution: DataFrame = None):
+                 item_set: DataFrame, users_distribution: DataFrame = None, batch: int = 128):
         """
         :param users_preferences: A Pandas Dataframe with three columns
             [USER_ID, ITEM_ID, TRANSACTION_VALUE]
@@ -45,6 +45,7 @@ class BaseTradeOff:
             self.users_distribution.fillna(0, inplace=True)
 
         self.environment = {}
+        self.batch = batch
 
     def env(self, environment: dict) -> None:
         """

@@ -1,6 +1,6 @@
 # Scikit Pierre
 
-[![Version](https://img.shields.io/badge/version-v0.1-green)](https://github.com/scikit-pierre/scikit-pierre) ![PyPI - Python Version](https://img.shields.io/badge/python-3.8-blue)
+[![Version](https://img.shields.io/badge/version-v0.0.2-green)](https://github.com/scikit-pierre/scikit-pierre) ![PyPI - Python Version](https://img.shields.io/badge/python-3.8-blue)
 
 [Docs](https://readthedocs.io/) | [Paper](https://doi.org/xx.xxx/xxxxx.xxxxxx)
 
@@ -28,8 +28,9 @@ The original code draft is made by [Diego Corrêa da Silva](https://github.com/D
 
 Pierre was designed with the following contexts in mind:
 
-- Version 0.1 comprehends the context of **Calibrated Recommendations**.
-- Version 0.2 comprehends a new implementations. (Incoming)
+- Version 0.0.1 comprehends the context of **Calibrated Recommendations**.
+- Version 0.0.2 supports Calibrated Popularity, Time and Entropy distribution derivation.
+- Version 0.0.3 Incoming
 
 ## Install and Config
 

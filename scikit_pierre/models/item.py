@@ -2,6 +2,7 @@
 This file contains the Item class used to storage the item attributes.
 """
 import itertools
+from collections import Counter
 
 from copy import deepcopy
 
@@ -82,6 +83,66 @@ class ItemsInMemory:
             item = Item(_id=item_id, classes={genre: genre_ratio for genre in splitted})
             self.items[item_id] = item
 
+    def item_by_popularity(self):
+        """
+        Method to translate the Dataframe to an Item class
+        :return:
+        """
+        for row in self._data.itertuples():
+            item_id = str(getattr(row, "ITEM_ID"))
+            try:
+                item_genre = getattr(row, "GENRES")
+            except AttributeError:
+                print(
+                    "We do not find the column called GENRES "
+                    "with the popularity groups of each item.\n"
+                    "Please verify the example directory to understand how to produce the groups."
+                )
+                exit(0)
+
+            splitted = item_genre.split('|')
+            genre_ratio = 1.0
+
+            item = Item(_id=item_id, classes={genre: genre_ratio for genre in splitted})
+            self.items[item_id] = item
+
+    def classifying_item_by_popularity(self, users_transactions: DataFrame):
+        """
+        Method to translate the Dataframe to an Item class
+        :return:
+        """
+        def group_by_ratio(value: float) -> str:
+            if 0.0 <= value < 0.1:
+                return 'G10'
+            elif 0.1 <= value < 0.2:
+                return 'G09'
+            elif 0.2 <= value < 0.3:
+                return 'G08'
+            elif 0.3 <= value < 0.4:
+                return 'G07'
+            elif 0.4 <= value < 0.5:
+                return 'G06'
+            elif 0.5 <= value < 0.6:
+                return 'G05'
+            elif 0.6 <= value < 0.7:
+                return 'G04'
+            elif 0.7 <= value < 0.8:
+                return 'G03'
+            elif 0.8 <= value < 0.9:
+                return 'G02'
+            elif 0.9 <= value <= 1:
+                return 'G01'
+            return 'G00'
+
+        dict_of_items = Counter(users_transactions["ITEM_ID"].tolist())
+        max_value = max(dict_of_items.values())
+        count_items_trans = dict(sorted(
+            dict_of_items.items(), key=lambda i: i[1], reverse=True
+        ))
+
+        for ix, vl in count_items_trans.items():
+            self.items[ix] = Item(_id=ix, classes={group_by_ratio(vl/max_value): 1})
+
     def get_encoded(self) -> DataFrame:
         """
         Method to get encoded data
@@ -151,7 +212,7 @@ class ItemsInMemory:
             item_genre = {genre: genre_ratio for genre in splitted}
 
             item = Item(_id=item_id, classes=item_genre, bias=item_bias)
-            self.items[item_id] = item
+            self.items[str(item_id)] = item
 
     def select_user_items(self, data: DataFrame) -> dict:
         """
@@ -204,4 +265,17 @@ class ItemsInMemory:
         for _, item in items.items():
             user_results += [DataFrame(data=[[item.id, item.position]],
                                        columns=["ITEM_ID", "ORDER"])]
+        return concat(user_results, sort=False)
+
+    def transform_to_pandas_items(self) -> DataFrame:
+        """
+        Method to transform the class items in a pandas Dataframe.
+        :param items:
+        :return:
+        """
+        user_results = []
+        for _, item in self.items.items():
+            genres = "|".join([g for g in item.classes.keys()])
+            user_results += [DataFrame(data=[[item.id, genres]],
+                                       columns=["ITEM_ID", "GENRES"])]
         return concat(user_results, sort=False)

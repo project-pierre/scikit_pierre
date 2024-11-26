@@ -30,7 +30,7 @@ def ndcg_relevance_score(scores: list) -> float:
 
     The reference for this implementation are from:
 
-    - Silva and Durão. (2022).
+    - Silva and Durão. (2022). https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4195978
 
     :param scores: A list of float in which represents the relevance score
         for each item in its position.
@@ -54,7 +54,7 @@ def ndcg_relevance_score(scores: list) -> float:
 
 def utility_relevance_scores(scores: list) -> float:
     """
-    The ... computes the list relevance.
+    The Utility computes the list relevance.
 
     The reference for this implementation are from:
 
@@ -74,3 +74,19 @@ def utility_relevance_scores(scores: list) -> float:
     ideal = utility(sorted(scores, reverse=True))
 
     return summation / ideal
+
+def relevance_tecrec(scores: list) -> float:
+    """
+    The relevance from tecrec computes the list relevance.
+
+    The reference for this implementation are from:
+
+    - Xing Zhao, Ziwei Zhu, James Caverlee (2021) -
+        https://dl.acm.org/doi/abs/10.1145/3442381.3450099
+
+    :param scores: A list of float in which represents the relevance score
+        for each item in its position.
+
+    :return: A float which represents the list relevance.
+    """
+    return sum(duv/(len(scores) + 1) for duv in scores)
