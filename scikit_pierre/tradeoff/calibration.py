@@ -188,7 +188,7 @@ class LinearCalibration(CalibrationBase):
         # Tradeoff weight (lambda)
         if self.environment['weight'][:2] == "C@":
             lmbda = self._tradeoff_weight_component
-        elif self.environment['weight'][:2] == "MIT":
+        elif self.environment['weight'] == "MIT":
             cand_dist = self._distribution_component(
                 items=self._item_in_memory.select_user_items(data=user_candidate_items)
             )
