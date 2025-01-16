@@ -192,7 +192,7 @@ class LinearCalibration(CalibrationBase):
             cand_dist = self._distribution_component(
                 items=self._item_in_memory.select_user_items(data=user_candidate_items)
             )
-            lmbda = self._distribution_component(
+            lmbda = self._tradeoff_weight_component(
                 dist_vec=user_candidate_items["TRANSACTION_VALUE"].tolist(),
                 target_dist=target_dist, cand_dist=cand_dist
             )
