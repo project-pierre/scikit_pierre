@@ -4,6 +4,9 @@ This file contains the trade-off weight equations.
 
 from math import sqrt
 
+from scikit_pierre.measures.shannon import jensen_shannon
+from scikit_pierre.relevance.relevance_measures import ndcg_relevance_score
+
 
 def genre_count(dist_vec: list) -> float:
     """
@@ -93,3 +96,10 @@ def efficiency(dist_vec: list) -> float:
     numerator = sum(map(lambda x: abs(x - mean) ** 2, dist_vec))
     var = numerator / len(dist_vec)
     return var / mean**2
+
+
+def mitigation(dist_vec, target_dist, cand_dist) -> float:
+    ndcg = ndcg_relevance_score(dist_vec)
+    jsf = 1 - jensen_shannon(p=target_dist, q=cand_dist)
+    result = (ndcg * jsf) / (ndcg + jsf)
+    return result

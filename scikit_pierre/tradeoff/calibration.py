@@ -83,7 +83,7 @@ class LinearCalibration(CalibrationBase):
         :param users_preferences: A Pandas DataFrame with four columns
             [USER_ID, ITEM_ID, TRANSACTION_VALUE, TIMESTAMP].
         :param candidate_items: A Pandas DataFrame with three columns
-            [USER_ID, ITEM_ID, PREDICTED_VALUE].
+            [USER_ID, ITEM_ID, TRANSACTION_VALUE].
         :param item_set: A Pandas DataFrame of items.
         """
         # Constructing the instance with the basic
@@ -188,6 +188,14 @@ class LinearCalibration(CalibrationBase):
         # Tradeoff weight (lambda)
         if self.environment['weight'][:2] == "C@":
             lmbda = self._tradeoff_weight_component
+        elif self.environment['weight'][:2] == "MIT":
+            cand_dist = self._distribution_component(
+                items=self._item_in_memory.select_user_items(data=user_candidate_items)
+            )
+            lmbda = self._distribution_component(
+                dist_vec=user_candidate_items["TRANSACTION_VALUE"].tolist(),
+                target_dist=target_dist, cand_dist=cand_dist
+            )
         else:
             lmbda = self._tradeoff_weight_component(dist_vec=list(target_dist.values()))
 

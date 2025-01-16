@@ -26,4 +26,6 @@ def tradeoff_weights_funcs(env_lambda: str):
         return weight.amplitude
     if env_lambda == "EFF":
         return weight.efficiency
+    if env_lambda == "MIT":
+        return weight.mitigation
     raise NameError(f"Tradeoff weight not found! {env_lambda}")
