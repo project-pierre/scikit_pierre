@@ -428,8 +428,17 @@ class LogarithmBias(CalibrationBase):
         else:
             target_dist = self.users_distribution.loc[uid].to_dict()
         # Tradeoff weight (lambda)
+
         if self.environment['weight'][:2] == "C@":
             lmbda = self._tradeoff_weight_component
+        elif self.environment['weight'] == "MIT":
+            cand_dist = self._distribution_component(
+                items=self._item_in_memory.select_user_items(data=user_candidate_items)
+            )
+            lmbda = self._tradeoff_weight_component(
+                dist_vec=user_candidate_items["TRANSACTION_VALUE"].tolist(),
+                target_dist=list(target_dist.values()), cand_dist=list(cand_dist.values())
+            )
         else:
             lmbda = self._tradeoff_weight_component(dist_vec=list(target_dist.values()))
 
