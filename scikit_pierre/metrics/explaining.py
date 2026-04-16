@@ -2,8 +2,8 @@ import itertools
 
 from pandas import DataFrame
 
-from scikit_pierre.distributions.compute_tilde_q import compute_tilde_q
-from scikit_pierre.metrics.base import BaseCalibrationMetric
+from ..distributions.compute_tilde_q import compute_tilde_q
+from ..metrics.base import BaseCalibrationMetric
 
 
 class ExplainingMiscalibration(BaseCalibrationMetric):

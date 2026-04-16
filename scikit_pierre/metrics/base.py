@@ -1,11 +1,11 @@
 from numpy import mean
 from pandas import DataFrame
 
-from scikit_pierre.distributions.accessible import distributions_funcs
-from scikit_pierre.distributions.compute_distribution import computer_users_distribution_dict, \
+from ..distributions.accessible import distributions_funcs
+from ..distributions.compute_distribution import computer_users_distribution_dict, \
     transform_to_vec
-from scikit_pierre.measures.accessible import calibration_measures_funcs
-from scikit_pierre.models.item import ItemsInMemory
+from ..measures.accessible import calibration_measures_funcs
+from ..models.item import ItemsInMemory
 
 
 class BaseMetric:

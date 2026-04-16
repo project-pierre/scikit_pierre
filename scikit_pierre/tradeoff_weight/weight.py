@@ -4,8 +4,8 @@ This file contains the trade-off weight equations.
 
 from math import sqrt
 
-from scikit_pierre.measures.shannon import jensen_shannon
-from scikit_pierre.relevance.relevance_measures import ndcg_relevance_score
+from ..measures.shannon import jensen_shannon
+from ..relevance.relevance_measures import ndcg_relevance_score
 
 
 def genre_count(dist_vec: list) -> float:
