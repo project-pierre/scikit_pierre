@@ -1,5 +1,18 @@
 """
-This file contains all inner product family equations.
+Inner-product family of pairwise distribution similarity and divergence measures.
+
+Similarity functions return higher values for more similar distributions;
+divergence functions return lower values.  All functions accept two
+equal-length lists *p* and *q* of non-negative floats.
+
+Division-by-zero conditions are handled by substituting a small epsilon
+(1e-5) as the denominator.
+
+Reference
+---------
+Cha, S.-H. (2007). Comprehensive study of distance/similarity measures
+between probability density functions.
+https://www.gly.fsu.edu/~parker/geostats/Cha.pdf
 """
 
 import math

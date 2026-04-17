@@ -1,5 +1,10 @@
 """
-This file contains the Item class used to storage the item attributes.
+Item domain model and in-memory item catalogue.
+
+Defines ``Item``, a lightweight data-carrier for a single catalogue item,
+and ``ItemsInMemory``, which loads a DataFrame of items, builds an in-memory
+lookup dictionary, and exposes helpers used by the distribution and
+calibration modules.
 """
 import itertools
 from collections import Counter
@@ -11,16 +16,43 @@ from pandas import DataFrame, merge, concat
 
 class Item:
     """
-    The Item model to be used by the system.
+    Data carrier for a single catalogue item.
+
+    Attributes
+    ----------
+    id : any
+        Unique item identifier (usually an integer or string).
+    score : float or None
+        Predicted or observed interaction value for a specific user context.
+        ``None`` until assigned by a data-loading helper.
+    classes : dict
+        Mapping of class/genre label to fractional weight.  Weights
+        typically sum to 1.0 for probability-property distributions.
+    bias : float or None
+        Precomputed item bias term used by ``LogarithmBias`` calibration.
+        ``None`` unless loaded via :meth:`ItemsInMemory.item_by_bias`.
+    time : float or None
+        Normalised timestamp or reciprocal-rank position weight.
+        ``None`` until assigned by a data-loading helper.
+    position : int or None
+        Rank position in a recommendation list, set during re-ranking.
     """
 
     def __init__(self, _id, classes: dict, score: float = None, bias: float = None,
                  time: float = None):
         """
-        :param _id:
-        :param classes:
-        :param score:
-        :return:
+        Parameters
+        ----------
+        _id : any
+            Unique item identifier.
+        classes : dict
+            Mapping of genre/class label to fractional weight.
+        score : float, optional
+            Predicted or observed interaction value.
+        bias : float, optional
+            Precomputed item bias term.
+        time : float, optional
+            Normalised temporal weight or reciprocal-rank position.
         """
         self.id = _id
         self.score = score
@@ -31,27 +63,56 @@ class Item:
 
     def get_id(self):
         """
-        Basic get id method
-        :return:
+        Return the item's unique identifier.
+
+        Returns
+        -------
+        any
+            The value of ``self.id``.
         """
         return self.id
 
     def get_score(self):
         """
-        Basic get score method
-        :return:
+        Return the item's score in the current user context.
+
+        Returns
+        -------
+        float or None
+            The value of ``self.score``; ``None`` if not yet assigned.
         """
         return self.score
 
 
 class ItemsInMemory:
     """
-    Main class to deal with the items in memory.
+    In-memory catalogue of :class:`Item` objects.
+
+    Loads a raw items DataFrame and exposes several loading strategies
+    (by genre, by popularity, by bias) that populate ``self.items``.
+    Also provides one-hot encoding and per-user item selection helpers
+    consumed by the distribution and calibration modules.
+
+    Attributes
+    ----------
+    items : dict
+        Mapping of str(item_id) -> :class:`Item` instance, populated by
+        one of the ``item_by_*`` loading methods.
+    encoded : DataFrame or None
+        One-hot encoded item feature matrix produced by
+        :meth:`one_hot_encode`.
+    uniques_genres : list or None
+        Sorted list of unique genre labels used as columns in
+        :attr:`encoded`.
     """
+
     def __init__(self, data: DataFrame):
         """
-        Init method
-        :param data: this dataframe has two columns [ITEM_ID, GENRES]
+        Parameters
+        ----------
+        data : DataFrame
+            Must contain at least the columns ``ITEM_ID`` and ``GENRES``
+            (pipe-separated genre string).
         """
         self.items = {}
         self._data = data
@@ -70,8 +131,10 @@ class ItemsInMemory:
 
     def item_by_genre(self):
         """
-        Method to translate the Dataframe to an Item class
-        :return:
+        Populate ``self.items`` using uniform genre weights.
+
+        Each item's genres receive equal weight (1 / number_of_genres).
+        Populates ``self.items`` as a side effect; returns nothing.
         """
         for row in self._data.itertuples():
             item_id = str(getattr(row, "ITEM_ID"))
@@ -85,8 +148,17 @@ class ItemsInMemory:
 
     def item_by_popularity(self):
         """
-        Method to translate the Dataframe to an Item class
-        :return:
+        Populate ``self.items`` using popularity group labels with weight 1.0.
+
+        Expects the ``GENRES`` column to contain pre-computed popularity group
+        labels (e.g. ``"G01|G02"``).  Each group is assigned a weight of 1.0
+        rather than a fractional split.  Exits the process with a descriptive
+        message if the ``GENRES`` column is missing.
+
+        Raises
+        ------
+        SystemExit
+            If ``GENRES`` is not a column of the underlying DataFrame.
         """
         for row in self._data.itertuples():
             item_id = str(getattr(row, "ITEM_ID"))
@@ -108,8 +180,18 @@ class ItemsInMemory:
 
     def classifying_item_by_popularity(self, users_transactions: DataFrame):
         """
-        Method to translate the Dataframe to an Item class
-        :return:
+        Classify items into popularity decile groups and populate ``self.items``.
+
+        Counts how many times each item appears in ``users_transactions``,
+        normalises by the maximum count, and assigns a decile label
+        (``"G01"`` … ``"G10"``).  Items with a normalised popularity ratio
+        close to 1.0 receive ``"G01"`` (most popular); those close to 0.0
+        receive ``"G10"`` (least popular).
+
+        Parameters
+        ----------
+        users_transactions : DataFrame
+            Must contain at least the column ``ITEM_ID``.
         """
         def group_by_ratio(value: float) -> str:
             if 0.0 <= value < 0.1:
@@ -145,17 +227,31 @@ class ItemsInMemory:
 
     def get_encoded(self) -> DataFrame:
         """
-        Method to get encoded data
-        :return:
+        Return the one-hot encoded item feature matrix.
+
+        Returns
+        -------
+        DataFrame or None
+            The DataFrame produced by :meth:`one_hot_encode`, or ``None`` if
+            that method has not yet been called.
         """
         return self.encoded
 
     @staticmethod
     def _getting_genres(row):
         """
-        Method to get genres data
-        :param row:
-        :return:
+        Extract the item identifier and split genre list from a DataFrame row.
+
+        Parameters
+        ----------
+        row : pandas named-tuple
+            A row produced by ``DataFrame.itertuples()``.  Must expose the
+            attributes ``ITEM_ID`` and ``GENRES``.
+
+        Returns
+        -------
+        tuple[any, list[str]]
+            ``(item_id, [genre1, genre2, ...])``
         """
         item_id = getattr(row, "ITEM_ID")
         item_genre = getattr(row, "GENRES")
@@ -165,9 +261,20 @@ class ItemsInMemory:
 
     def _map_encode(self, row):
         """
+        Produce a binary genre presence vector for a single item row.
 
-        :param row:
-        :return:
+        Requires ``self.uniques_genres`` to be set (i.e. :meth:`one_hot_encode`
+        must be called first).
+
+        Parameters
+        ----------
+        row : pandas named-tuple
+            A row produced by ``DataFrame.itertuples()``.
+
+        Returns
+        -------
+        tuple[any, list[int]]
+            ``(item_id, [1_or_0, ...])`` aligned with ``self.uniques_genres``.
         """
         item_id = getattr(row, "ITEM_ID")
         item_genre = getattr(row, "GENRES")
@@ -177,8 +284,11 @@ class ItemsInMemory:
 
     def one_hot_encode(self):
         """
-        Method to encode encoded data
-        :return:
+        Build a one-hot genre encoding for all items in ``self._data``.
+
+        Collects all unique genres across the catalogue, then creates a
+        binary matrix stored in ``self.encoded`` (index = item IDs,
+        columns = unique genre labels).  Also sets ``self.uniques_genres``.
         """
         self.uniques_genres = list(set(itertools.chain.from_iterable([
             genres.split("|")
@@ -216,11 +326,29 @@ class ItemsInMemory:
 
     def select_user_items(self, data: DataFrame) -> dict:
         """
-        Function to select items used in the DataFrame.
-        :param data: A Pandas DataFrame with three or four columns:
-            [USER_ID, ITEM_ID, TRANSACTION_VALUE, TIMESTAMP] or [USER_ID, ITEM_ID, PREDICTED_VALUE].
+        Build a user-specific item dictionary from a user interaction slice.
 
-        :return: A subset of variable items.
+        Copies each referenced :class:`Item` from ``self.items``, then
+        attaches the interaction score and, if available, a normalised
+        timestamp or reciprocal-rank position weight.
+
+        Parameters
+        ----------
+        data : DataFrame
+            A per-user interaction slice.  Expected columns:
+
+            - ``ITEM_ID`` (required)
+            - ``TRANSACTION_VALUE`` *or* ``PREDICTED_VALUE`` (at least one)
+            - ``TIMESTAMP`` (optional) — normalised to ``[0, 1]`` using the
+              min/max within the slice; used as ``item.time``.
+            - ``ORDER`` (optional) — position index; sets
+              ``item.time = 1 / ORDER``.
+
+        Returns
+        -------
+        dict
+            Mapping of str(item_id) -> deep-copied :class:`Item` with
+            ``score`` and (when applicable) ``time`` populated.
         """
         user_items = {}
         feedback_column = "PREDICTED_VALUE"
@@ -257,9 +385,18 @@ class ItemsInMemory:
     @staticmethod
     def transform_to_pandas(items: dict) -> DataFrame:
         """
-        Method to transform the class items in a pandas Dataframe.
-        :param items:
-        :return:
+        Convert a recommendation-list item dictionary to a DataFrame.
+
+        Parameters
+        ----------
+        items : dict
+            Mapping of item_id -> :class:`Item`.  Each ``Item`` must have
+            ``id`` and ``position`` set.
+
+        Returns
+        -------
+        DataFrame
+            Two-column DataFrame with ``ITEM_ID`` and ``ORDER`` (position).
         """
         user_results = []
         for _, item in items.items():
@@ -269,9 +406,16 @@ class ItemsInMemory:
 
     def transform_to_pandas_items(self) -> DataFrame:
         """
-        Method to transform the class items in a pandas Dataframe.
-        :param items:
-        :return:
+        Convert ``self.items`` back into the original two-column DataFrame format.
+
+        Reconstructs the ``GENRES`` string by joining the keys of each item's
+        ``classes`` dict with ``"|"``.
+
+        Returns
+        -------
+        DataFrame
+            Two-column DataFrame with ``ITEM_ID`` and ``GENRES``
+            (pipe-separated genre string).
         """
         user_results = []
         for _, item in self.items.items():

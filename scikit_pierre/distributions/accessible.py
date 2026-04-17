@@ -1,16 +1,52 @@
 """
-File to allow access all distribution functions.
+Factory accessor for per-user item-class probability distribution functions.
+
+Maps string acronyms to the underlying callables.  Each distribution
+function accepts a ``dict`` of :class:`~scikit_pierre.models.item.Item`
+instances and returns a ``dict`` mapping genre/class label to a float value.
 """
 from . import class_based, entropy_based, time_based, mixed_based, time_slide_window_based
 
 
 def distributions_funcs(distribution: str):
     """
-    Function to decide what distance measure will be used.
+    Return the distribution function identified by *distribution*.
 
-    :param distribution: The acronyms (initials) assigned to a distribution finder,
-                        which will be used by.
-    :return: The choose function.
+    Parameters
+    ----------
+    distribution : str
+        Acronym for the desired distribution strategy.  Supported values:
+
+        - ``"CWS"``          — Class Weighted Strategy
+        - ``"WPS"``          — Weighted Probability Strategy
+        - ``"PGD"``          — Pure Genre Distribution
+        - ``"PGD_P"``        — Pure Genre Distribution (probability-normalised)
+        - ``"TWB"``          — Time Weight Based
+        - ``"TWB_P"``        — Time Weight Based (probability-normalised)
+        - ``"TGD"``          — Time Genre Distribution
+        - ``"TGD_P"``        — Time Genre Distribution (probability-normalised)
+        - ``"GLEB"``         — Global-Local Entropy Based
+        - ``"GLEB_P"``       — Global-Local Entropy Based (probability-normalised)
+        - ``"TWB_GLEB"``     — Time Weight + Entropy Based
+        - ``"TWB_GLEB_P"``   — Time Weight + Entropy Based (probability-normalised)
+        - ``"TSW"``          — Temporal Slide Window
+        - ``"TSW_P"``        — Temporal Slide Window (probability-normalised)
+        - ``"TSW_GLEB"``     — Temporal Slide Window + Entropy
+        - ``"TSW_GLEB_P"``   — Temporal Slide Window + Entropy (probability-normalised)
+        - ``"TSW_TWB"``      — Temporal Slide Window + Time Weight
+        - ``"TSW_TWB_P"``    — Temporal Slide Window + Time Weight (probability-normalised)
+        - ``"TSW_TWB_GLEB"`` — Temporal Slide Window + Time Weight + Entropy
+        - ``"TSW_TWB_GLEB_P"`` — all combined (probability-normalised)
+
+    Returns
+    -------
+    callable
+        A function with signature ``(items: dict) -> dict``.
+
+    Raises
+    ------
+    NameError
+        If *distribution* does not match any known key.
     """
     if distribution == "CWS":
         return class_based.class_weighted_strategy

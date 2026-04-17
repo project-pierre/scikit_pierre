@@ -1,5 +1,13 @@
 """
-This file contains the distribution functions based on entropy.
+Entropy-based probability distribution functions.
+
+These distributions weight each genre by an entropy term that captures
+how globally and locally concentrated the genre is across the item set,
+promoting less common genres relative to dominant ones.
+
+All public functions accept a ``dict`` of
+:class:`~scikit_pierre.models.item.Item` instances and return a
+``dict`` mapping genre label to a float.
 """
 from collections import Counter
 
@@ -8,12 +16,23 @@ from math import log2
 
 def global_local_entropy_based(items: dict) -> dict:
     """
-    The Global and Local Entropy Based - (GLEB). The reference for this implementation are from:
+    Compute the Global and Local Entropy Based (GLEB) distribution.
 
-    - <In process>
+    First computes a global entropy weight for each genre based on its
+    frequency across all items; then weights each item's genre contribution
+    by both the interaction score and this entropy weight.  This discounts
+    over-represented genres and boosts underrepresented ones.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+        Each ``Item`` must have ``score`` and ``classes`` set.
+
+    Returns
+    -------
+    dict
+        Mapping of genre label -> GLEB distribution value.
     """
     numerator = {}
     denominator = {}
@@ -51,19 +70,20 @@ def global_local_entropy_based(items: dict) -> dict:
 
 def global_local_entropy_based_with_probability_property(items: dict) -> dict:
     """
-    The Global and Local Entropy Based with Probability Property - (GLEB_P).
-    The reference for this implementation are from:
+    Compute the GLEB distribution normalised to sum to 1.0 (GLEB_P).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Normalised GLEB genre probability distribution summing to 1.0.
     """
     distribution = global_local_entropy_based(items)
     total = sum(distribution.values())
     final_distribution = {g: value / total for g, value in distribution.items()}
     return final_distribution
 
-# ############################################################################################### #
-# ######################################### Unrevised ########################################### #
-# ############################################################################################### #

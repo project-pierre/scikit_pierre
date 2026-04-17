@@ -1,5 +1,10 @@
 """
-This file contains the call to all similarity and divergence measure.
+Factory accessor for pairwise distribution similarity and divergence measures.
+
+Maps string acronyms to the underlying callables grouped by family.
+Also exposes :data:`SIMILARITY_LIST`, the set of acronyms whose measures
+return *higher* values for *more similar* distributions (as opposed to
+divergence measures, which return lower values for closer distributions).
 """
 
 from . import minkowski, l1, intersection, inner_product, shannon, fidelity, chi, combinations, \
@@ -8,10 +13,24 @@ from . import minkowski, l1, intersection, inner_product, shannon, fidelity, chi
 
 def calibration_measures_funcs(measure: str = "KL"):
     """
-    Function to decide what distance measure will be used.
+    Return the similarity or divergence function identified by *measure*.
 
-    :param measure: The acronyms (initials) assigned to a distance measure, which will be used by.
-    :return: The choose function.
+    Parameters
+    ----------
+    measure : str, optional
+        Acronym for the desired measure.  See module docstring for the full
+        list of supported keys grouped by family.  Defaults to ``"KL"``
+        (Kullback-Leibler divergence).
+
+    Returns
+    -------
+    callable
+        A function with signature ``(p: list, q: list) -> float``.
+
+    Raises
+    ------
+    NameError
+        If *measure* does not match any known key.
     """
     # Minkowski Family
     if measure == "MINKOWSKI":
@@ -139,6 +158,9 @@ def calibration_measures_funcs(measure: str = "KL"):
     raise NameError(f"Measure not found! {measure}")
 
 
+# Acronyms of measures that return *higher* values for *more similar*
+# distributions.  The calibration trade-off adds the fairness term for
+# these measures instead of subtracting it.
 SIMILARITY_LIST = [
     # Intersection
     'INTERSECTION_SIM',

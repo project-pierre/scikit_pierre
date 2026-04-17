@@ -1,5 +1,18 @@
 """
-This file contains all combinations family equations.
+Combination family of pairwise distribution divergence measures.
+
+These measures blend ideas from multiple distance families.  All functions
+accept two equal-length lists *p* and *q* of non-negative floats and return
+a non-negative float (divergence convention: lower = closer).
+
+Zero values in *p* or *q* are replaced by a small epsilon (1e-5) to avoid
+division-by-zero or logarithm-of-zero errors.
+
+Reference
+---------
+Cha, S.-H. (2007). Comprehensive study of distance/similarity measures
+between probability density functions.
+https://www.gly.fsu.edu/~parker/geostats/Cha.pdf
 """
 from math import log, sqrt
 

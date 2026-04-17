@@ -1,5 +1,10 @@
 """
-This file presents the distributions based on the class/genre.
+Class/genre-based probability distribution functions.
+
+All functions accept a ``dict`` of :class:`~scikit_pierre.models.item.Item`
+instances (keyed by item ID) and return a ``dict`` mapping genre/class label
+to a non-negative float.  The ``*_P`` variants additionally normalise the
+output so that values sum to 1.0.
 """
 
 
@@ -8,16 +13,33 @@ This file presents the distributions based on the class/genre.
 # ############################################################################################### #
 def class_weighted_strategy(items: dict) -> dict:
     """
-    The Class Weighted Strategy - (CWS). The reference for this implementation are from:
+    Compute the Class Weighted Strategy (CWS) distribution.
 
+    For each genre *g*, the distribution value is::
+
+        CWS(g) = sum(score_i * genre_weight_ig) / sum(score_i)
+
+    where the sums range over all items whose ``classes`` dict contains *g*.
+    Genres where the numerator or denominator is non-positive receive a small
+    epsilon (1e-5) instead of 0.0 to avoid issues with logarithm-based
+    divergence measures downstream.
+
+    References
+    ----------
     - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
-
     - Kaya and Bridge (2019). https://doi.org/10.1145/3298689.3347045
-
     - Steck (2018). https://doi.org/10.1145/3240323.3240372
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+        Each ``Item`` must have ``score`` and ``classes`` set.
+
+    Returns
+    -------
+    dict
+        Mapping of genre label -> CWS value.
     """
     numerator = {}
     denominator = {}
@@ -41,12 +63,24 @@ def class_weighted_strategy(items: dict) -> dict:
 
 def weighted_probability_strategy(items: dict) -> dict:
     """
-    The Weighted Probability Strategy - (WPS). The reference for this implementation are from:
+    Compute the Weighted Probability Strategy (WPS) distribution.
 
+    Normalises the CWS output so that genre values sum to 1.0, giving it
+    proper probability semantics.
+
+    References
+    ----------
     - Silva and Durão (2022). https://arxiv.org/abs/2204.03706
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+
+    Returns
+    -------
+    dict
+        Normalised genre probability distribution summing to 1.0.
     """
     distribution = class_weighted_strategy(items)
     total = sum(value for g, value in distribution.items())
@@ -56,12 +90,20 @@ def weighted_probability_strategy(items: dict) -> dict:
 
 def pure_genre(items: dict) -> dict:
     """
-    The Pure Genre Distribution - (PGD). The reference for this implementation are from:
+    Compute the Pure Genre Distribution (PGD).
 
-    - <In process>
+    Accumulates the raw genre weights from each item's ``classes`` dict
+    without score weighting.  Useful as a simple genre-frequency baseline.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+
+    Returns
+    -------
+    dict
+        Mapping of genre label -> accumulated genre weight.
     """
     distribution = {}
     for _, item in items.items():
@@ -72,19 +114,22 @@ def pure_genre(items: dict) -> dict:
 
 def pure_genre_with_probability_property(items: dict) -> dict:
     """
-    The Pure Genre Distribution with Probability Property - (PGD_P).
-    The reference for this implementation are from:
+    Compute the Pure Genre Distribution with Probability Property (PGD_P).
 
-    - <In process>
+    Normalises the PGD output so that genre values sum to 1.0.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+
+    Returns
+    -------
+    dict
+        Normalised genre probability distribution summing to 1.0.
     """
     dist = pure_genre(items)
     norm = sum(dist.values())
     distribution = {g: value / norm for g, value in dist.items()}
     return distribution
 
-# ############################################################################################### #
-# ######################################### Unrevised ########################################## #
-# ############################################################################################### #

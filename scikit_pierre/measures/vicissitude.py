@@ -1,5 +1,18 @@
 """
-This file contains all vicissitude family equations.
+Vicissitude family of pairwise distribution divergence measures.
+
+These are variants of the chi-square and wave-hedges measures that use the
+*minimum* or *maximum* of the element pair as the denominator, making them
+more robust to imbalanced distributions.
+
+Zero values in *p* or *q* are replaced by a small epsilon (1e-5) to avoid
+division-by-zero.
+
+Reference
+---------
+Cha, S.-H. (2007). Comprehensive study of distance/similarity measures
+between probability density functions.
+https://www.gly.fsu.edu/~parker/geostats/Cha.pdf
 """
 
 

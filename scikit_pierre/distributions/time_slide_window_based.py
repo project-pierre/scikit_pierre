@@ -1,6 +1,16 @@
 """
-This file contains the distribution functions based on time slide window,
-which used the timestamp data.
+Temporal sliding-window distribution functions.
+
+These functions split the user's interaction history into time windows,
+compute a base distribution per window, and then average the results.
+This captures gradual preference drift without discarding older data entirely.
+
+When the number of interactions is small (≤ ``2 * major`` windows), the
+base distribution is applied to the full item set without windowing.
+
+All public functions accept a ``dict`` of
+:class:`~scikit_pierre.models.item.Item` instances and return a ``dict``
+mapping genre label to a float.
 """
 
 from collections import defaultdict
@@ -16,15 +26,29 @@ from .time_based import time_weighted_based
 
 def temporal_slide_window_base_function(items: dict, major: int = 10, using: str = "CWS") -> dict:
     """
-    The Temporal Slide Window - (TSW). The reference for this implementation are from:
+    Core implementation of the Temporal Slide Window (TSW) distribution.
 
-    - <In process>
+    Splits the item set into ``2 * major`` windows, computes the base
+    distribution for each window (plus one combined boundary window), and
+    returns the mean per-genre value across all windows.  Falls back to a
+    single-window computation when ``len(items) <= 2 * major``.
 
-    :param items: A Dict of Item Class instances.
-    :param major: TODO
-    :param using: TODO
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    major : int, optional
+        Number of primary windows.  Total windows = ``2 * major``.
+        Defaults to 10.
+    using : str, optional
+        Acronym of the base distribution to apply within each window.
+        Supported values: ``"CWS"`` (default), ``"GLEB"``, ``"TWB"``,
+        ``"GLEB_TWB"``.
 
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Mapping of genre label -> mean distribution value across windows.
     """
     base_distribution = None
     if using == "GLEB":
@@ -71,18 +95,24 @@ def temporal_slide_window_base_function(items: dict, major: int = 10, using: str
     return distribution
 
 
-def temporal_slide_window_base_function_with_probability_property(items: dict,
-                                                                  using: str = "CWS") -> dict:
+def temporal_slide_window_base_function_with_probability_property(
+        items: dict, using: str = "CWS"
+) -> dict:
     """
-    The Temporal Slide Window with Probability Property - (TSW_P).
-    The reference for this implementation are from:
+    Core implementation of TSW normalised to sum to 1.0.
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    using : str, optional
+        Acronym of the base distribution.  See
+        :func:`temporal_slide_window_base_function`.
 
-    :param items: A Dict of Item Class instances.
-    :param using: TODO
-
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Normalised TSW genre probability distribution summing to 1.0.
     """
     distribution = temporal_slide_window_base_function(items=items, using=using)
     total = sum(distribution.values())
@@ -90,127 +120,153 @@ def temporal_slide_window_base_function_with_probability_property(items: dict,
     return final_distribution
 
 
-# ############################################################################################### #
-# ######################################### Usage ########################################### #
-# ############################################################################################### #
-
-
 def temporal_slide_window(items: dict, using: str = "CWS") -> dict:
     """
-    The Temporal Slide Window - (TSW). The reference for this implementation are from:
+    Compute the Temporal Slide Window (TSW) distribution using CWS windows.
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    using : str, optional
+        Base distribution acronym.  Defaults to ``"CWS"``.
 
-    :param items: A Dict of Item Class instances.
-    :param using: TODO
-
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Mapping of genre label -> mean TSW distribution value.
     """
     return temporal_slide_window_base_function(items=items, using=using)
 
 
 def temporal_slide_window_with_probability_property(items: dict, using: str = "CWS") -> dict:
     """
-    The Temporal Slide Window with Probability Property - (TSW_P).
-    The reference for this implementation are from:
+    Compute the TSW distribution normalised to sum to 1.0 (TSW_P).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    using : str, optional
+        Base distribution acronym.  Defaults to ``"CWS"``.
 
-    :param items: A Dict of Item Class instances.
-    :param using: TODO
-
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Normalised TSW genre probability distribution summing to 1.0.
     """
     return temporal_slide_window_base_function_with_probability_property(items=items, using=using)
 
 
 def mixed_tsw_gleb(items: dict, using: str = "GLEB") -> dict:
     """
-    The Temporal Slide Window with Global and Local Entropy Based - (TSW_GLEB).
-    The reference for this implementation are from:
+    Compute the TSW distribution using GLEB windows (TSW_GLEB).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    using : str, optional
+        Base distribution acronym.  Defaults to ``"GLEB"``.
 
-    :param items: A Dict of Item Class instances.
-    :param using: TODO
-
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Mapping of genre label -> mean TSW_GLEB distribution value.
     """
     return temporal_slide_window_base_function(items=items, using=using)
 
 
 def mixed_tsw_gleb_with_probability_property(items: dict, using: str = "GLEB") -> dict:
     """
-    The TThe Temporal Slide Window with Global and Local Entropy Based - (TSW_GLEB_P).
-    The reference for this implementation are from:
+    Compute the TSW_GLEB distribution normalised to sum to 1.0 (TSW_GLEB_P).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    using : str, optional
+        Base distribution acronym.  Defaults to ``"GLEB"``.
 
-    :param items: A Dict of Item Class instances.
-    :param using: TODO
-
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Normalised TSW_GLEB genre probability distribution summing to 1.0.
     """
     return temporal_slide_window_base_function_with_probability_property(items=items, using=using)
 
 
 def mixed_tsw_twb(items: dict, using: str = "TWB") -> dict:
     """
-    The Temporal Slide Window with Time Weight Based - (TSW_TWB).
-    The reference for this implementation are from:
+    Compute the TSW distribution using TWB windows (TSW_TWB).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    using : str, optional
+        Base distribution acronym.  Defaults to ``"TWB"``.
 
-    :param items: A Dict of Item Class instances.
-    :param using: TODO
-
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Mapping of genre label -> mean TSW_TWB distribution value.
     """
     return temporal_slide_window_base_function(items=items, using=using)
 
 
 def mixed_tsw_twb_with_probability_property(items: dict, using: str = "TWB") -> dict:
     """
-    The TThe Temporal Slide Window with Global and Local Entropy Based - (TSW_TWB_P).
-    The reference for this implementation are from:
+    Compute the TSW_TWB distribution normalised to sum to 1.0 (TSW_TWB_P).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    using : str, optional
+        Base distribution acronym.  Defaults to ``"TWB"``.
 
-    :param items: A Dict of Item Class instances.
-    :param using: TODO
-
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Normalised TSW_TWB genre probability distribution summing to 1.0.
     """
     return temporal_slide_window_base_function_with_probability_property(items=items, using=using)
 
 
 def mixed_tsw_twb_gleb(items: dict, using: str = "GLEB_TWB") -> dict:
     """
-    The Temporal Slide Window with Time Weight Based and Global and Local Entropy Based -
-    (TSW_TWB_GLEB).
-    The reference for this implementation are from:
+    Compute the TSW distribution using combined GLEB+TWB windows (TSW_TWB_GLEB).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    using : str, optional
+        Base distribution acronym.  Defaults to ``"GLEB_TWB"``.
 
-    :param items: A Dict of Item Class instances.
-    :param using: TODO
-
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Mapping of genre label -> mean TSW_TWB_GLEB distribution value.
     """
     return temporal_slide_window_base_function(items=items, using=using)
 
 
 def mixed_tsw_twb_gleb_with_probability_property(items: dict, using: str = "GLEB_TWB") -> dict:
     """
-    The Temporal Slide Window with Time Weight Based and Global and Local Entropy Based -
-    (TSW_TWB_GLEB_P).
-    The reference for this implementation are from:
+    Compute the TSW_TWB_GLEB distribution normalised to sum to 1.0 (TSW_TWB_GLEB_P).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+    using : str, optional
+        Base distribution acronym.  Defaults to ``"GLEB_TWB"``.
 
-    :param items: A Dict of Item Class instances.
-    :param using: TODO
-
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Normalised TSW_TWB_GLEB genre probability distribution summing to 1.0.
     """
     return temporal_slide_window_base_function_with_probability_property(items=items, using=using)

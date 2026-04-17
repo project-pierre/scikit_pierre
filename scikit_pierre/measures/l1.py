@@ -1,5 +1,18 @@
 """
-This file contains all l1 family equations.
+L1 family of pairwise distribution divergence measures.
+
+All functions accept two equal-length lists *p* and *q* of non-negative
+floats and return a non-negative float (divergence convention: lower
+values indicate closer distributions).
+
+Division-by-zero conditions are handled by substituting a small epsilon
+(1e-5) as the denominator.
+
+Reference
+---------
+Cha, S.-H. (2007). Comprehensive study of distance/similarity measures
+between probability density functions.
+https://www.gly.fsu.edu/~parker/geostats/Cha.pdf
 """
 import math
 

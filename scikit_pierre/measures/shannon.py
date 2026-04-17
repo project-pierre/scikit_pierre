@@ -1,5 +1,15 @@
 """
-This file contains all shanon family equations.
+Shannon's entropy family of pairwise distribution divergence measures.
+
+All functions accept two equal-length lists *p* and *q* of non-negative
+floats.  Zero values are replaced by a small epsilon (1e-5) before applying
+logarithms to avoid undefined results.
+
+Reference
+---------
+Cha, S.-H. (2007). Comprehensive study of distance/similarity measures
+between probability density functions.
+https://www.gly.fsu.edu/~parker/geostats/Cha.pdf
 """
 
 from math import log

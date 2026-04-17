@@ -1,5 +1,10 @@
 """
-This file contains all relevance measure equations.
+Relevance scoring functions for ranked recommendation lists.
+
+Each function receives a list of per-item scores (one per position) and
+returns a single scalar that summarises how relevant the list is.  These
+scalars are used as the relevance component inside the calibration
+trade-off objective.
 """
 
 from math import log
@@ -8,34 +13,48 @@ import numpy as np
 
 def sum_relevance_score(scores: list) -> float:
     """
-    Sum Revelance Score computes the list relevance.
+    Compute list relevance as the plain sum of per-item scores.
 
-    The reference for this implementation are from:
-
+    References
+    ----------
     - Silva et al. (2021). https://doi.org/10.1016/j.eswa.2021.115112
-
     - Steck (2018). https://doi.org/10.1145/3240323.3240372
 
-    :param scores: A list with float numbers,
-        which represents the weight for each item in its position.
+    Parameters
+    ----------
+    scores : list of float
+        Per-item relevance weights in ranked order.
 
-    :return: A float, which represent list weight.
+    Returns
+    -------
+    float
+        Sum of all values in ``scores``.
     """
     return sum(scores)
 
 
 def ndcg_relevance_score(scores: list) -> float:
     """
-    The Normalized Discount Cumulative Gain (NDCG) computes the list relevance.
+    Compute list relevance using Normalized Discounted Cumulative Gain (NDCG).
 
-    The reference for this implementation are from:
+    The ideal DCG is computed from the same score list sorted in descending
+    order, so the result is always in [0, 1].  Returns 0.0 for an empty or
+    all-zero list.
 
-    - Silva and Durão. (2022). https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4195978
+    References
+    ----------
+    - Silva and Durão (2022).
+      https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4195978
 
-    :param scores: A list of float in which represents the relevance score
-        for each item in its position.
+    Parameters
+    ----------
+    scores : list of float
+        Per-item relevance scores in ranked order.
 
-    :return: A float which represents the list relevance.
+    Returns
+    -------
+    float
+        NDCG value in ``[0, 1]``.
     """
 
     def __dcg_at_k(rel: list) -> float:
@@ -54,17 +73,27 @@ def ndcg_relevance_score(scores: list) -> float:
 
 def utility_relevance_scores(scores: list) -> float:
     """
-    The Utility computes the list relevance.
+    Compute list relevance using a logarithmic utility function.
 
-    The reference for this implementation are from:
+    Utility is defined as ``sum(score_i * (1 / log(i+1)))`` starting from
+    position 1.  The result is normalised by the ideal (sorted-descending)
+    utility, so the output is in ``[0, 1]``.  Returns 0.0 when the ideal
+    utility is zero.
 
-    - Sacharidis, Mouratidis, Kleftogiannis (2019) -
-        https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=7946&context=sis_research
+    References
+    ----------
+    - Sacharidis, Mouratidis, Kleftogiannis (2019).
+      https://ink.library.smu.edu.sg/cgi/viewcontent.cgi?article=7946&context=sis_research
 
-    :param scores: A list of float in which represents the relevance score
-        for each item in its position.
+    Parameters
+    ----------
+    scores : list of float
+        Per-item relevance scores in ranked order.
 
-    :return: A float which represents the list relevance.
+    Returns
+    -------
+    float
+        Normalised utility value in ``[0, 1]``.
     """
 
     def utility(values: list) -> float:
@@ -79,16 +108,24 @@ def utility_relevance_scores(scores: list) -> float:
 
 def relevance_tecrec(scores: list) -> float:
     """
-    The relevance from tecrec computes the list relevance.
+    Compute list relevance using the TecRec position-discounted summation.
 
-    The reference for this implementation are from:
+    Each score is discounted by ``1 / (|scores| + 1)`` regardless of
+    position.  This is a simplified uniform-discount variant.
 
-    - Xing Zhao, Ziwei Zhu, James Caverlee (2021) -
-        https://dl.acm.org/doi/abs/10.1145/3442381.3450099
+    References
+    ----------
+    - Xing Zhao, Ziwei Zhu, James Caverlee (2021).
+      https://dl.acm.org/doi/abs/10.1145/3442381.3450099
 
-    :param scores: A list of float in which represents the relevance score
-        for each item in its position.
+    Parameters
+    ----------
+    scores : list of float
+        Per-item relevance scores in ranked order.
 
-    :return: A float which represents the list relevance.
+    Returns
+    -------
+    float
+        Position-discounted sum of scores.
     """
     return sum(duv/(len(scores) + 1) for duv in scores)
