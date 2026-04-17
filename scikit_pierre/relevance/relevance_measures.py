@@ -68,11 +68,13 @@ def utility_relevance_scores(scores: list) -> float:
     """
 
     def utility(values: list) -> float:
-        return sum(ix * (1 / log(ix + 1)) for ix, value in enumerate(values, start=1))
+        return sum(value * (1 / log(ix + 1)) for ix, value in enumerate(values, start=1))
 
     summation = utility(values=scores)
     ideal = utility(sorted(scores, reverse=True))
 
+    if not ideal:
+        return 0.0
     return summation / ideal
 
 def relevance_tecrec(scores: list) -> float:
