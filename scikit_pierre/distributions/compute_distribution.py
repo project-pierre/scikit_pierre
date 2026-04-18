@@ -63,7 +63,8 @@ def computer_users_distribution_pandas(
 
 
 def computer_users_distribution_dict(
-        interactions_df: DataFrame, items_df: DataFrame, distribution: str
+        interactions_df: DataFrame, items_df: DataFrame, distribution: str,
+        item_in_memory: "ItemsInMemory" = None
 ) -> dict:
     """
     Compute per-user genre distributions and return the result as a nested dict.
@@ -79,6 +80,11 @@ def computer_users_distribution_dict(
     distribution : str
         Acronym identifying the distribution strategy (see
         :func:`~scikit_pierre.distributions.accessible.distributions_funcs`).
+    item_in_memory : ItemsInMemory, optional
+        Pre-built catalogue object.  When provided, the ``ItemsInMemory``
+        construction and ``item_by_genre()`` call are skipped, which is
+        significant when this function is called many times (e.g. once per
+        list position in MAM/MACE).
 
     Returns
     -------
@@ -86,18 +92,17 @@ def computer_users_distribution_dict(
         Mapping of ``user_id -> {genre: probability_value}`` for every
         unique user in *interactions_df*.
     """
-    _item_in_memory = ItemsInMemory(data=items_df)
-    _item_in_memory.item_by_genre()
+    if item_in_memory is None:
+        item_in_memory = ItemsInMemory(data=items_df)
+        item_in_memory.item_by_genre()
 
     _distribution_component = distributions_funcs(distribution=distribution)
 
     return_dict = {
         user_id: _distribution_component(
-            items=_item_in_memory.select_user_items(
-                data=interactions_df[interactions_df["USER_ID"] == user_id].copy()
-            ),
+            items=item_in_memory.select_user_items(data=group),
         )
-        for user_id in interactions_df["USER_ID"].unique().tolist()
+        for user_id, group in interactions_df.groupby("USER_ID", sort=False)
     }
 
     return return_dict

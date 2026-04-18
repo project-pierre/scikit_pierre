@@ -31,12 +31,14 @@ def sorensen(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
-    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
+    num = den = 0.0
+    for p_i, q_i in zip(p, q):
+        num += abs(p_i - q_i)
+        den += p_i + q_i
     try:
-        return numerator / denominator
+        return num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return num / 0.00001
 
 
 def gower(p: list, q: list) -> float:
@@ -70,12 +72,14 @@ def soergel(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
-    denominator = sum(max([p_i, q_i]) for p_i, q_i in zip(p, q))
+    num = den = 0.0
+    for p_i, q_i in zip(p, q):
+        num += abs(p_i - q_i)
+        den += max(p_i, q_i)
     try:
-        return numerator / denominator
+        return num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return num / 0.00001
 
 
 def kulczynski_d(p: list, q: list) -> float:
@@ -92,12 +96,14 @@ def kulczynski_d(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
-    denominator = sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
+    num = den = 0.0
+    for p_i, q_i in zip(p, q):
+        num += abs(p_i - q_i)
+        den += min(p_i, q_i)
     try:
-        return numerator / denominator
+        return num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return num / 0.00001
 
 
 def canberra(p: list, q: list) -> float:

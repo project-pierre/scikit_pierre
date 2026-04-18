@@ -350,36 +350,46 @@ class ItemsInMemory:
             Mapping of str(item_id) -> deep-copied :class:`Item` with
             ``score`` and (when applicable) ``time`` populated.
         """
-        user_items = {}
-        feedback_column = "PREDICTED_VALUE"
-        maximum = 0
-        minimum = 0
-        if "TRANSACTION_VALUE" in data.columns.tolist():
-            feedback_column = "TRANSACTION_VALUE"
-        if 'TIMESTAMP' in data.columns.tolist():
-            maximum = data['TIMESTAMP'].max()
-            minimum = data['TIMESTAMP'].min()
+        cols = data.columns
+        feedback_column = "TRANSACTION_VALUE" if "TRANSACTION_VALUE" in cols else "PREDICTED_VALUE"
+        has_timestamp = "TIMESTAMP" in cols
+        has_order = "ORDER" in cols
 
-        for row in data.itertuples():
-            item_id = str(getattr(row, "ITEM_ID"))
+        user_items = {}
+
+        item_ids = data["ITEM_ID"].values
+        scores = data[feedback_column].values
+        orders = data["ORDER"].values if has_order else None
+
+        if has_timestamp:
+            timestamps = data["TIMESTAMP"].values
+            minimum = timestamps.min()
+            maximum = timestamps.max()
+            divisor = maximum - minimum
+
+        for idx in range(len(item_ids)):
+            item_id = str(item_ids[idx])
             item = self.items[item_id]
-            user_items[item_id] = deepcopy(item)
-            user_items[item_id].score = getattr(row, feedback_column)
-            if 'TIMESTAMP' in data.columns.tolist():
-                upper = getattr(row, 'TIMESTAMP') - minimum
-                divisor = maximum - minimum
+            # Share the immutable classes dict — distribution functions never mutate it.
+            new_item = Item(_id=item.id, classes=item.classes, bias=item.bias)
+            new_item.score = float(scores[idx])
+            user_items[item_id] = new_item
+
+            if has_timestamp:
+                upper = float(timestamps[idx]) - minimum
                 try:
-                    user_items[item_id].time = upper / divisor
+                    new_item.time = upper / divisor
                 except ZeroDivisionError:
                     if divisor == 0 and upper == 0:
-                        user_items[item_id].time = 1
+                        new_item.time = 1
                     elif divisor == 0:
-                        user_items[item_id].time = upper / 1
+                        new_item.time = upper / 1
                     else:
-                        user_items[item_id].time = 1 / divisor
+                        new_item.time = 1 / divisor
 
-            if 'ORDER' in data.columns.tolist():
-                user_items[item_id].time = float(1 / int(getattr(row, "ORDER")))
+            if has_order:
+                new_item.time = float(1 / int(orders[idx]))
+
         return user_items
 
     @staticmethod

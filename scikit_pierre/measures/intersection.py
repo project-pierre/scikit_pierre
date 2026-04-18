@@ -30,7 +30,7 @@ def intersection_similarity(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    return sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
+    return sum(min(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def intersection_divergence(p: list, q: list) -> float:
@@ -67,7 +67,7 @@ def wave_hedges(p: list, q: list) -> float:
 
     def compute(p_i: float, q_i: float) -> float:
         numerator = abs(p_i - q_i)
-        denominator = max([p_i, q_i])
+        denominator = max(p_i, q_i)
         try:
             return numerator / denominator
         except ZeroDivisionError:
@@ -90,12 +90,14 @@ def czekanowski_similarity(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = 2 * sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
-    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
+    num = den = 0.0
+    for p_i, q_i in zip(p, q):
+        num += min(p_i, q_i)
+        den += p_i + q_i
     try:
-        return numerator / denominator
+        return 2 * num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return 2 * num / 0.00001
 
 
 def czekanowski_divergence(p: list, q: list) -> float:
@@ -112,12 +114,14 @@ def czekanowski_divergence(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
-    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
+    num = den = 0.0
+    for p_i, q_i in zip(p, q):
+        num += abs(p_i - q_i)
+        den += p_i + q_i
     try:
-        return numerator / denominator
+        return num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return num / 0.00001
 
 
 def motyka_similarity(p: list, q: list) -> float:
@@ -134,12 +138,14 @@ def motyka_similarity(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
-    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
+    num = den = 0.0
+    for p_i, q_i in zip(p, q):
+        num += min(p_i, q_i)
+        den += p_i + q_i
     try:
-        return numerator / denominator
+        return num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return num / 0.00001
 
 
 def motyka_divergence(p: list, q: list) -> float:
@@ -156,12 +162,14 @@ def motyka_divergence(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum(max([p_i, q_i]) for p_i, q_i in zip(p, q))
-    denominator = sum(p_i + q_i for p_i, q_i in zip(p, q))
+    num = den = 0.0
+    for p_i, q_i in zip(p, q):
+        num += max(p_i, q_i)
+        den += p_i + q_i
     try:
-        return numerator / denominator
+        return num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return num / 0.00001
 
 
 def kulczynski_s(p: list, q: list) -> float:
@@ -178,12 +186,14 @@ def kulczynski_s(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
-    denominator = sum(abs(p_i - q_i) for p_i, q_i in zip(p, q))
+    num = den = 0.0
+    for p_i, q_i in zip(p, q):
+        num += min(p_i, q_i)
+        den += abs(p_i - q_i)
     try:
-        return numerator / denominator
+        return num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return num / 0.00001
 
 
 def ruzicka(p: list, q: list) -> float:
@@ -200,12 +210,14 @@ def ruzicka(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum(min([p_i, q_i]) for p_i, q_i in zip(p, q))
-    denominator = sum(max([p_i, q_i]) for p_i, q_i in zip(p, q))
+    num = den = 0.0
+    for p_i, q_i in zip(p, q):
+        num += min(p_i, q_i)
+        den += max(p_i, q_i)
     try:
-        return numerator / denominator
+        return num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return num / 0.00001
 
 
 def tanimoto(p: list, q: list) -> float:
@@ -222,9 +234,13 @@ def tanimoto(p: list, q: list) -> float:
                 p and q need to be the same size.
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
-    numerator = sum(max([p_i, q_i]) - min([p_i, q_i]) for p_i, q_i in zip(p, q))
-    denominator = sum(max([p_i, q_i]) for p_i, q_i in zip(p, q))
+    num = 0.0
+    den = 0.0
+    for p_i, q_i in zip(p, q):
+        mx = max(p_i, q_i)
+        num += mx - min(p_i, q_i)
+        den += mx
     try:
-        return numerator / denominator
+        return num / den
     except ZeroDivisionError:
-        return numerator / 0.00001
+        return num / 0.00001

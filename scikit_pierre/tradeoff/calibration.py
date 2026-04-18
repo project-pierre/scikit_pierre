@@ -187,7 +187,7 @@ class LinearCalibration(CalibrationBase):
         self._tradeoff_balance_component = None
 
     def config(self, distribution_component: str = "CWS",
-               fairness_component: str = "CHI", relevance_component: str = "SUM",
+               fairness_component: str = "CHI_SQUARE", relevance_component: str = "SUM",
                tradeoff_weight_component: str = "STD",
                select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01,
                d: int = 3):
@@ -201,7 +201,7 @@ class LinearCalibration(CalibrationBase):
             ``"CWS"`` (Class Weighted Strategy).
         fairness_component : str, optional
             Acronym for the calibration/fairness measure.  Defaults to
-            ``"CHI"`` (Pearson Chi-Square).
+            ``"CHI_SQUARE"`` (Pearson Chi-Square).
         relevance_component : str, optional
             Acronym for the relevance scoring function.  Defaults to
             ``"SUM"``.
@@ -468,7 +468,7 @@ class LogarithmBias(CalibrationBase):
         self._tradeoff_balance_component = None
 
     def config(self, distribution_component: str = "CWS",
-               fairness_component: str = "CHI", relevance_component: str = "SUM",
+               fairness_component: str = "CHI_SQUARE", relevance_component: str = "SUM",
                tradeoff_weight_component: str = "STD",
                select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01,
                d: int = 3):
@@ -481,7 +481,7 @@ class LogarithmBias(CalibrationBase):
             Acronym for the genre distribution strategy.  Defaults to
             ``"CWS"``.
         fairness_component : str, optional
-            Acronym for the calibration measure.  Defaults to ``"CHI"``.
+            Acronym for the calibration measure.  Defaults to ``"CHI_SQUARE"``.
         relevance_component : str, optional
             Acronym for the relevance scoring function.  Defaults to
             ``"SUM"``.

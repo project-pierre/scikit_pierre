@@ -134,22 +134,14 @@ def max_symmetric_chi_square_emanon5(p: list, q: list) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute_left(p_i: float, q_i: float) -> float:
+    left = right = 0.0
+    for p_i, q_i in zip(p, q):
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
-        numerator = (p_a - q_b) ** 2
-        denominator = p_a
-        return numerator / denominator
-
-    def compute_right(p_i: float, q_i: float) -> float:
-        p_a = 0.00001 if p_i == 0 else p_i
-        q_b = 0.00001 if q_i == 0 else q_i
-        numerator = (p_a - q_b) ** 2
-        denominator = q_b
-        return numerator / denominator
-
-    return max([sum(compute_left(p_i, q_i) for p_i, q_i in zip(p, q)),
-                sum(compute_right(p_i, q_i) for p_i, q_i in zip(p, q))])
+        diff_sq = (p_a - q_b) ** 2
+        left += diff_sq / p_a
+        right += diff_sq / q_b
+    return max(left, right)
 
 
 def min_symmetric_chi_square_emanon6(p: list, q: list) -> float:
@@ -168,19 +160,11 @@ def min_symmetric_chi_square_emanon6(p: list, q: list) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute_left(p_i: float, q_i: float) -> float:
+    left = right = 0.0
+    for p_i, q_i in zip(p, q):
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
-        numerator = (p_a - q_b) ** 2
-        denominator = p_a
-        return numerator / denominator
-
-    def compute_right(p_i: float, q_i: float) -> float:
-        p_a = 0.00001 if p_i == 0 else p_i
-        q_b = 0.00001 if q_i == 0 else q_i
-        numerator = (p_a - q_b) ** 2
-        denominator = q_b
-        return numerator / denominator
-
-    return min([sum(compute_left(p_i, q_i) for p_i, q_i in zip(p, q)),
-                sum(compute_right(p_i, q_i) for p_i, q_i in zip(p, q))])
+        diff_sq = (p_a - q_b) ** 2
+        left += diff_sq / p_a
+        right += diff_sq / q_b
+    return min(left, right)

@@ -220,6 +220,12 @@ class BaseCalibrationMetric(BaseMetric):
         p, q = transform_to_vec(target_dist, realized_dist)
         return p, q
 
+    def _ensure_item_in_memory(self) -> None:
+        """Build and cache ``self._item_in_memory`` if not already done."""
+        if self._item_in_memory is None:
+            self._item_in_memory = ItemsInMemory(data=self.items_df)
+            self._item_in_memory.item_by_genre()
+
     def compute_distribution(self, set_df: DataFrame) -> dict:
         """
         Compute per-user genre distributions from an interaction DataFrame.
@@ -236,9 +242,10 @@ class BaseCalibrationMetric(BaseMetric):
             Mapping of ``user_id -> {genre: value}`` for all users in
             *set_df*.
         """
+        self._ensure_item_in_memory()
         dist_dict = computer_users_distribution_dict(
             interactions_df=set_df, items_df=self.items_df,
-            distribution=self.dist_name
+            distribution=self.dist_name, item_in_memory=self._item_in_memory
         )
         return dist_dict
 

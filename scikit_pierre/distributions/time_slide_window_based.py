@@ -16,7 +16,6 @@ mapping genre label to a float.
 from collections import defaultdict
 
 import math
-from statistics import mean
 
 from .class_based import class_weighted_strategy
 from .entropy_based import global_local_entropy_based
@@ -88,7 +87,7 @@ def temporal_slide_window_base_function(items: dict, major: int = 10, using: str
 
         distribution = {}
         for key, value in dd.items():
-            distribution[key] = mean(value)
+            distribution[key] = sum(value) / len(value)
     else:
         distribution = base_distribution(items)
 

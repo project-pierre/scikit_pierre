@@ -42,7 +42,7 @@ import itertools
 from collections import Counter
 from typing import List
 
-from numpy import mean, triu_indices, array, log2, sum
+from numpy import mean, triu_indices, array, log2, sum, linalg
 from pandas import DataFrame, notna
 import scipy.sparse as sp
 from sklearn.metrics.pairwise import cosine_similarity
@@ -234,11 +234,14 @@ class IntraListSimilarity:
             Mean pairwise cosine similarity over the upper triangle of
             the item-by-item similarity matrix (diagonal excluded).
         """
-        recs_content = self.encoded.loc[predicted]
-        recs_content = recs_content.dropna()
-        recs_content = sp.csr_matrix(recs_content.values)
+        vecs = self.encoded.loc[predicted].fillna(0).values.astype(float)
 
-        similarity = cosine_similarity(X=recs_content, dense_output=False)
+        # Normalize rows to unit length for cosine similarity via dot product.
+        norms = linalg.norm(vecs, axis=1, keepdims=True)
+        norms[norms == 0] = 1.0
+        vecs /= norms
+
+        similarity = vecs @ vecs.T
 
         # Upper triangle (k=1) excludes self-similarity on the diagonal.
         upper_right = triu_indices(similarity.shape[0], k=1)
@@ -996,6 +999,10 @@ class AverageNumberOfGenreChanges(BaseMetric):
         """
         super().__init__(df_1=users_baseline_df, df_2=users_rec_list_df)
         self.items_df = items_df
+        self._genre_lookup = {
+            str(item_id): genres_str.split("|")
+            for item_id, genres_str in zip(items_df["ITEM_ID"], items_df["GENRES"])
+        }
 
     def ordering(self) -> None:
         """
@@ -1029,14 +1036,12 @@ class AverageNumberOfGenreChanges(BaseMetric):
         set_a = tuple_from_df_1[1]["ITEM_ID"].tolist()
         set_b = tuple_from_df_2[1]["ITEM_ID"].tolist()
 
-        genres_a = list(itertools.chain.from_iterable([
-            genres.split("|")
-            for genres in self.items_df[self.items_df["ITEM_ID"].isin(set_a)]["GENRES"].tolist()
-        ]))
-        genres_b = list(itertools.chain.from_iterable([
-            genres.split("|")
-            for genres in self.items_df[self.items_df["ITEM_ID"].isin(set_b)]["GENRES"].tolist()
-        ]))
+        genres_a = list(itertools.chain.from_iterable(
+            self._genre_lookup[str(i)] for i in set_a if str(i) in self._genre_lookup
+        ))
+        genres_b = list(itertools.chain.from_iterable(
+            self._genre_lookup[str(i)] for i in set_b if str(i) in self._genre_lookup
+        ))
 
         size = len(set(genres_b) - set(genres_a))
         return size

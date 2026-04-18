@@ -136,8 +136,8 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
     def user_association_miscalibration(self, distri: dict):
         return {
             str(ix): self.compute_miscalibration(
-                self.target_dist[str(ix)],
-                distri[str(ix)]
+                self.target_dist[ix],
+                distri[ix]
             )
             for ix in self.users_ix
         }

@@ -7,7 +7,8 @@ scalars are used as the relevance component inside the calibration
 trade-off objective.
 """
 
-from math import log
+from math import log2
+
 import numpy as np
 
 
@@ -58,7 +59,7 @@ def ndcg_relevance_score(scores: list) -> float:
     """
 
     def __dcg_at_k(rel: list) -> float:
-        return sum(round((round(2 ** round(score, 5), 5) - 1) / (np.log2(ix + 2)), 5) for ix, score in enumerate(rel))
+        return sum((2 ** score - 1) / log2(ix + 2) for ix, score in enumerate(rel))
 
     def ndcg_at_k(rel: list) -> float:
         idcg = __dcg_at_k(sorted(rel, reverse=True))
@@ -96,11 +97,11 @@ def utility_relevance_scores(scores: list) -> float:
         Normalised utility value in ``[0, 1]``.
     """
 
-    def utility(values: list) -> float:
-        return sum(value * (1 / log(ix + 1)) for ix, value in enumerate(values, start=1))
-
-    summation = utility(values=scores)
-    ideal = utility(sorted(scores, reverse=True))
+    n = len(scores)
+    weights = 1.0 / np.log(np.arange(2, n + 2))  # 1/log(1)…1/log(n), 1-indexed positions
+    arr = np.asarray(scores, dtype=float)
+    summation = float(np.dot(arr, weights))
+    ideal = float(np.dot(np.sort(arr)[::-1], weights))
 
     if not ideal:
         return 0.0
@@ -128,4 +129,4 @@ def relevance_tecrec(scores: list) -> float:
     float
         Position-discounted sum of scores.
     """
-    return sum(duv/(len(scores) + 1) for duv in scores)
+    return sum(scores) / (len(scores) + 1)
