@@ -12,7 +12,7 @@ from setuptools import setup, find_packages, Extension
 try:
     import numpy as np
 except ImportError:
-    sys.exit("Please install numpy>=1.17.3 first.")
+    sys.exit("Please install numpy>=2.1 first.")
 
 try:
     from Cython.Build import cythonize
@@ -113,9 +113,7 @@ setup(
         'License :: OSI Approved :: Apache Software License :: 2.0',
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent"
     ],
     keywords=(
@@ -123,7 +121,7 @@ setup(
         "Collaborative Filtering, Recommender Systems"
     ),
     packages=find_packages(),
-    python_requires=">=3.8",
+    python_requires=">=3.11",
     include_package_data=True,
     install_requires=install_requires,
     ext_modules=cythonize(extensions),
