@@ -1,5 +1,13 @@
 """
-This file contains the distribution functions based on timestamp data.
+Timestamp-weighted probability distribution functions.
+
+These distributions incorporate the normalised interaction timestamp
+(``item.time``) so that more recent interactions contribute more strongly
+to the genre distribution.
+
+All public functions accept a ``dict`` of
+:class:`~scikit_pierre.models.item.Item` instances and return a ``dict``
+mapping genre label to a float.
 """
 
 
@@ -10,12 +18,22 @@ This file contains the distribution functions based on timestamp data.
 
 def time_weighted_based(items: dict) -> dict:
     """
-    The Time Weight Based - (TWB). The reference for this implementation are from:
+    Compute the Time Weight Based (TWB) distribution.
 
-    - <In process>
+    Extends CWS by multiplying each item's score by its normalised timestamp
+    (``item.time``) before accumulating genre weights, so that recent
+    interactions have a stronger influence.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+        Each ``Item`` must have ``score``, ``time``, and ``classes`` set.
+
+    Returns
+    -------
+    dict
+        Mapping of genre label -> TWB distribution value.
     """
     numerator = {}
     denominator = {}
@@ -40,13 +58,17 @@ def time_weighted_based(items: dict) -> dict:
 
 def time_weighted_based_with_probability_property(items: dict) -> dict:
     """
-    The Time Weight Based with Probability Property - (TWB_P).
-    The reference for this implementation are from:
+    Compute the TWB distribution normalised to sum to 1.0 (TWB_P).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Normalised TWB genre probability distribution summing to 1.0.
     """
     distribution = time_weighted_based(items)
     total = sum(value for g, value in distribution.items())
@@ -56,12 +78,22 @@ def time_weighted_based_with_probability_property(items: dict) -> dict:
 
 def time_genre(items: dict) -> dict:
     """
-    The Time Genre Distribution - (TGD). The reference for this implementation are from:
+    Compute the Time Genre Distribution (TGD).
 
-    - <In process>
+    Weights genre contributions solely by the normalised timestamp
+    (``item.time``), ignoring interaction scores.  This focuses on the
+    temporal recency of genre exposure rather than rating magnitude.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+        Each ``Item`` must have ``time`` and ``classes`` set.
+
+    Returns
+    -------
+    dict
+        Mapping of genre label -> TGD distribution value.
     """
     numerator = {}
     denominator = {}
@@ -85,19 +117,19 @@ def time_genre(items: dict) -> dict:
 
 def time_genre_with_probability_property(items: dict) -> dict:
     """
-    The Time Genre Distribution with Probability Property - (TGD_P).
-    The reference for this implementation are from:
+    Compute the TGD distribution normalised to sum to 1.0 (TGD_P).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Normalised TGD genre probability distribution summing to 1.0.
     """
     dist = time_genre(items)
     norm = sum(dist.values())
     distribution = {g: value / norm for g, value in dist.items()}
     return distribution
-
-# ############################################################################################### #
-# ######################################### Unrevised ########################################### #
-# ############################################################################################### #

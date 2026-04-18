@@ -1,5 +1,5 @@
 import unittest
-from ...scikit_pierre.tradeoff_weight.weight import genre_count, norm_var
+from scikit_pierre.tradeoff_weight.weight import genre_count, norm_var
 
 
 class TestBaseWeights(unittest.TestCase):

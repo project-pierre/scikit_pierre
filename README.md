@@ -1,6 +1,6 @@
 # Scikit Pierre
 
-[![Version](https://img.shields.io/badge/version-v0.0.2-green)](https://github.com/scikit-pierre/scikit-pierre) ![PyPI - Python Version](https://img.shields.io/badge/python-3.8-blue)
+[![Version](https://img.shields.io/badge/version-v0.0.2-green)](https://github.com/scikit-pierre/scikit-pierre) ![PyPI - Python Version](https://img.shields.io/badge/python-3.11-blue)
 
 [Docs](https://readthedocs.io/) | [Paper](https://doi.org/xx.xxx/xxxxx.xxxxxx)
 

@@ -1,5 +1,13 @@
 """
-This file contains the distribution functions based on mixed equations.
+Mixed probability distribution functions (entropy + time weighting).
+
+Combines the GLEB entropy weighting with the TWB timestamp weighting to
+produce distributions that simultaneously capture recency and information
+content of each genre.
+
+All public functions accept a ``dict`` of
+:class:`~scikit_pierre.models.item.Item` instances and return a ``dict``
+mapping genre label to a float.
 """
 from collections import Counter
 
@@ -8,13 +16,22 @@ from math import log2
 
 def mixed_gleb_twb(items: dict) -> dict:
     """
-    The Global and Local Entropy Based with Time Weight Based - (TWB_GLEB).
-    The reference for this implementation are from:
+    Compute the mixed GLEB + TWB distribution (TWB_GLEB).
 
-    - <In process>
+    Combines global entropy weighting with temporal (timestamp) weighting:
+    the entropy term discounts overrepresented genres while the time weight
+    favours recent interactions.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
+        Each ``Item`` must have ``score``, ``time``, and ``classes`` set.
+
+    Returns
+    -------
+    dict
+        Mapping of genre label -> TWB_GLEB distribution value.
     """
     numerator = {}
     denominator = {}
@@ -52,20 +69,19 @@ def mixed_gleb_twb(items: dict) -> dict:
 
 def mixed_gleb_twb_with_probability_property(items: dict) -> dict:
     """
-    The Global and Local Entropy Based with Time Window Based with Probability Property -
-    (TWB_GLEB_P).
-    The reference for this implementation are from:
+    Compute the TWB_GLEB distribution normalised to sum to 1.0 (TWB_GLEB_P).
 
-    - <In process>
+    Parameters
+    ----------
+    items : dict
+        Mapping of item_id -> :class:`~scikit_pierre.models.item.Item`.
 
-    :param items: A Dict of Item Class instances.
-    :return: A Dict of genre and value.
+    Returns
+    -------
+    dict
+        Normalised TWB_GLEB genre probability distribution summing to 1.0.
     """
     distribution = mixed_gleb_twb(items)
     total = sum(distribution.values())
     final_distribution = {g: value / total for g, value in distribution.items()}
     return final_distribution
-
-# ############################################################################################### #
-# ######################################### Unrevised ########################################## #
-# ############################################################################################### #

@@ -1,24 +1,29 @@
+"""Base classes for evaluation metrics."""
 from numpy import mean
 from pandas import DataFrame
 
-from scikit_pierre.distributions.accessible import distributions_funcs
-from scikit_pierre.distributions.compute_distribution import computer_users_distribution_dict, \
+from ..distributions.accessible import distributions_funcs
+from ..distributions.compute_distribution import computer_users_distribution_dict, \
     transform_to_vec
-from scikit_pierre.measures.accessible import calibration_measures_funcs
-from scikit_pierre.models.item import ItemsInMemory
+from ..measures.accessible import calibration_measures_funcs
+from ..models.item import ItemsInMemory
 
 
 class BaseMetric:
     """
-    This is the base class metric to be inherent by all other class metrics.
+    Abstract base class for all evaluation metrics.
 
-    - df_1: It is a Pandas Dataframe that can represents: User profile or test items set.
+    Provides shared infrastructure for user-level grouping, ordering, and
+    the map-reduce computation pattern used by accuracy, diversity, and
+    unexpectedness metrics.
 
-    - df_2: It is a Pandas Dataframe that can represents: User recommendation list.
+    The semantic meaning of ``df_1``, ``df_2``, and ``df_3`` depends on the
+    concrete subclass:
 
-    - df_3: It is a Pandas Dataframe that can represents: User Candidate items or some baseline.
-
-    The specific meaning depends on the subclass which inherent this super class.
+    - ``df_1`` — user interaction profile, test-item set, or baseline list.
+    - ``df_2`` — recommendation list being evaluated.
+    - ``df_3`` — candidate items, baseline recommendations, or a second
+      comparison set (optional).
     """
 
     def __init__(
@@ -26,12 +31,14 @@ class BaseMetric:
             df_1: DataFrame = None, df_2: DataFrame = None, df_3: DataFrame = None
     ):
         """
-
-        :param df_1: It is a Pandas Dataframe that can represents: User profile or test items set.
-
-        :param df_2: It is a Pandas Dataframe that can represents: User recommendation list.
-
-        :param df_3: It is a Pandas Dataframe that can represents: Candidate or baseline items.
+        Parameters
+        ----------
+        df_1 : DataFrame, optional
+            User profiles or test-item set.
+        df_2 : DataFrame, optional
+            Recommendation lists to evaluate.
+        df_3 : DataFrame, optional
+            Candidate items, baseline list, or comparison set.
         """
         self.df_1 = df_1
         self.df_2 = df_2
@@ -111,7 +118,6 @@ class BaseMetric:
 
         :return: A float with the single computation result.
         """
-        pass
 
     def compute(self) -> float:
         """
@@ -130,23 +136,41 @@ class BaseMetric:
         return mean(users_results)
 
 
-class BaseCalibrationMetric(BaseMetric):
+class BaseCalibrationMetric(BaseMetric):  # pylint: disable=too-many-instance-attributes
     """
-    Base calibration metric class.
+    Abstract base class for calibration-based evaluation metrics.
+
+    Extends :class:`BaseMetric` with distribution computation helpers,
+    a configurable divergence measure, and lazy target/realized distribution
+    caching.
     """
-    def __init__(
+
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
             self,
             users_profile_df: DataFrame, users_rec_list_df: DataFrame, items_set_df: DataFrame,
             distribution_name: str = "CWS", distance_func_name: str = "KL",
             target_dist: dict = None, realized_dist: dict = None
     ):
         """
-
-        :param users_profile_df:
-        :param users_rec_list_df:
-        :param items_set_df:
-        :param distribution_name:
-        :param distance_func_name:
+        Parameters
+        ----------
+        users_profile_df : DataFrame
+            User interaction history used to compute the target distribution.
+        users_rec_list_df : DataFrame
+            Recommendation lists used to compute the realized distribution.
+        items_set_df : DataFrame
+            Item catalogue with ``ITEM_ID`` and ``GENRES`` columns.
+        distribution_name : str, optional
+            Acronym for the genre distribution strategy.  Defaults to
+            ``"CWS"``.
+        distance_func_name : str, optional
+            Acronym for the calibration divergence measure.  Defaults to
+            ``"KL"`` (Kullback-Leibler divergence).
+        target_dist : dict, optional
+            Pre-computed target distributions keyed by user ID.  When
+            provided, the distribution computation step is skipped.
+        realized_dist : dict, optional
+            Pre-computed realized distributions keyed by user ID.
         """
         super().__init__(df_1=users_profile_df, df_2=users_rec_list_df)
         self.target_dist = target_dist
@@ -165,8 +189,10 @@ class BaseCalibrationMetric(BaseMetric):
 
     def item_preparation(self) -> None:
         """
+        Initialise the in-memory item catalogue from ``self.items_df``.
 
-        :return:
+        Loads items by genre into ``self._item_in_memory`` so that
+        distribution functions can access per-item class information.
         """
         self._item_in_memory = ItemsInMemory(data=self.items_df)
         self._item_in_memory.item_by_genre()
@@ -174,31 +200,62 @@ class BaseCalibrationMetric(BaseMetric):
     @staticmethod
     def transform_to_vec(target_dist: dict, realized_dist: dict):
         """
+        Align two genre-keyed distribution dicts into parallel numeric vectors.
 
-        :param target_dist:
-        :param realized_dist:
-        :return:
+        Thin wrapper around
+        :func:`~scikit_pierre.distributions.compute_distribution.transform_to_vec`.
+
+        Parameters
+        ----------
+        target_dist : dict
+            Target distribution mapping ``genre -> float``.
+        realized_dist : dict
+            Realized distribution mapping ``genre -> float``.
+
+        Returns
+        -------
+        tuple[list[float], list[float]]
+            ``(p, q)`` aligned over the union of genre keys.
         """
         p, q = transform_to_vec(target_dist, realized_dist)
         return p, q
 
+    def _ensure_item_in_memory(self) -> None:
+        """Build and cache ``self._item_in_memory`` if not already done."""
+        if self._item_in_memory is None:
+            self._item_in_memory = ItemsInMemory(data=self.items_df)
+            self._item_in_memory.item_by_genre()
+
     def compute_distribution(self, set_df: DataFrame) -> dict:
         """
+        Compute per-user genre distributions from an interaction DataFrame.
 
-        :param set_df:
-        :return:
+        Parameters
+        ----------
+        set_df : DataFrame
+            User interactions or recommendation slice with columns
+            ``USER_ID``, ``ITEM_ID``, and a value column.
+
+        Returns
+        -------
+        dict
+            Mapping of ``user_id -> {genre: value}`` for all users in
+            *set_df*.
         """
+        self._ensure_item_in_memory()
         dist_dict = computer_users_distribution_dict(
             interactions_df=set_df, items_df=self.items_df,
-            distribution=self.dist_name
+            distribution=self.dist_name, item_in_memory=self._item_in_memory
         )
         return dist_dict
 
     def compute_target_dist(self):
+        """Compute and cache the target distribution from df_1."""
         if self.target_dist is None:
             self.target_dist = self.compute_distribution(self.df_1)
 
     def compute_realized_dist(self):
+        """Compute and cache the realized distribution from df_2."""
         if self.realized_dist is None:
             self.realized_dist = self.compute_distribution(self.df_2)
 

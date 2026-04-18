@@ -1,32 +1,59 @@
+"""
+Explainability metric for calibrated recommendations.
+
+Provides :class:`ExplainingMiscalibration`, a diagnostic class that
+identifies users with the largest and smallest item-level changes between
+a baseline and a calibrated recommendation list and prints a
+position-by-position explanation of how each item swap affected
+miscalibration.
+"""
+
 import itertools
 
 from pandas import DataFrame
 
-from scikit_pierre.distributions.compute_tilde_q import compute_tilde_q
-from scikit_pierre.metrics.base import BaseCalibrationMetric
+from ..distributions.compute_tilde_q import compute_tilde_q
+from ..metrics.base import BaseCalibrationMetric
 
 
 class ExplainingMiscalibration(BaseCalibrationMetric):
     """
-    Explaining Miscalibration. Metric to explain the recommendations Based on calibration.
+    Diagnostic tool for explaining recommendation changes in terms of calibration.
 
-    Implementation based on:
-    -
+    Computes miscalibration for both the recommendation list and a baseline
+    list, identifies users with the fewest and most item changes (ANIC), and
+    prints a position-by-position explanation of how each item swap affected
+    calibration.
 
+    Notes
+    -----
+    This class is primarily intended for qualitative analysis and prints
+    results directly to stdout via :meth:`printing_list_changing` and
+    :meth:`user_explain_history`.  Its :meth:`compute` method always returns
+    0.0 as a sentinel value.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
             self,
             users_profile_df: DataFrame, users_rec_list_df: DataFrame,
             users_baseline_df: DataFrame, items_df: DataFrame,
             distribution_name: str = "CWS", distance_func_name: str = "KL"
     ):
         """
-        :param users_rec_list_df: A Pandas DataFrame,
-            which represents the users recommendation lists.
-
-        :param users_baseline_df: A Pandas DataFrame,
-            which represents the candidate items.
+        Parameters
+        ----------
+        users_profile_df : DataFrame
+            User interaction history for computing the target distribution.
+        users_rec_list_df : DataFrame
+            Calibrated recommendation lists to be explained.
+        users_baseline_df : DataFrame
+            Baseline (e.g. candidate) lists for comparison.
+        items_df : DataFrame
+            Item catalogue with ``ITEM_ID`` and ``GENRES``.
+        distribution_name : str, optional
+            Genre distribution strategy acronym.  Defaults to ``"CWS"``.
+        distance_func_name : str, optional
+            Calibration measure acronym.  Defaults to ``"KL"``.
         """
         super().__init__(
             users_profile_df=users_profile_df, users_rec_list_df=users_rec_list_df,
@@ -65,8 +92,13 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
 
     def find_user_based_on_changes(self) -> dict:
         """
+        Compute the number of item changes (ANIC) per user between the
+        recommendation list and the baseline list.
 
-        :return:
+        Returns
+        -------
+        dict
+            Mapping of str(user_id) -> number of items changed.
         """
         return {
             str(g2[0][0]): self.single_process_anic(
@@ -81,11 +113,19 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
 
     def compute_miscalibration(self, target_dist: dict, realized_dist: dict) -> float:
         """
+        Compute miscalibration between a target and a realized distribution.
 
-        :param target_dist:
-        :param realized_dist:
+        Parameters
+        ----------
+        target_dist : dict
+            Target genre distribution *p*.
+        realized_dist : dict
+            Realized genre distribution *q*.
 
-        :return:
+        Returns
+        -------
+        float
+            Divergence value after tilde-q smoothing.
         """
         p, q = self.transform_to_vec(target_dist, realized_dist)
         return self.calib_measure_func(
@@ -94,18 +134,27 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
         )
 
     def user_association_miscalibration(self, distri: dict):
+        """Map each user id to their miscalibration score."""
         return {
             str(ix): self.compute_miscalibration(
-                self.target_dist[str(ix)],
-                distri[str(ix)]
+                self.target_dist[ix],
+                distri[ix]
             )
             for ix in self.users_ix
         }
 
-    def compute(self) -> float:
+    def compute(self) -> float:  # pylint: disable=too-many-locals
         """
+        Run the explanation pipeline and print results to stdout.
 
-        :return:
+        Identifies extreme users (min/max ANIC) and users whose calibration
+        improved or worsened, then prints a per-position change analysis for
+        selected users.
+
+        Returns
+        -------
+        float
+            Always returns 0.0; outputs are printed to stdout.
         """
         super().compute()
         self.ordering_and_grouping()
@@ -181,21 +230,25 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
                 calib_rec=mis_2_results[str(_min_changes_high[0])]
             )
 
-        # self.printing_list_changing(
-        #     user_id=_aux_id_min,
-        #     calib_base=mis_3_results[str(_aux_id_min)],
-        #     calib_rec=mis_2_results[str(_aux_id_min)]
-        # )
-        #
-        # self.printing_list_changing(
-        #     user_id=_aux_id_max,
-        #     calib_base=mis_3_results[str(_aux_id_max)],
-        #     calib_rec=mis_2_results[str(_aux_id_max)]
-        # )
-
         return 0.0
 
-    def printing_list_changing(self, user_id: str, calib_base, calib_rec):
+    def printing_list_changing(self, user_id: str, calib_base: float, calib_rec: float):
+        """
+        Print a summary of item and genre changes for a single user.
+
+        Shows which items were added to or removed from the recommendation
+        list relative to the baseline, along with the before/after
+        miscalibration values.
+
+        Parameters
+        ----------
+        user_id : str
+            User identifier.
+        calib_base : float
+            Miscalibration of the baseline list.
+        calib_rec : float
+            Miscalibration of the recommendation list.
+        """
         user_rec_ids = self.df_2[self.df_2["USER_ID"] == int(user_id)]["ITEM_ID"].tolist()
         user_base_ids = self.df_3[self.df_3["USER_ID"] == int(user_id)]["ITEM_ID"].tolist()
 
@@ -240,7 +293,17 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
         print("\n")
 
     @staticmethod
-    def user_analyzing_genres(genres_a, genres_b):
+    def user_analyzing_genres(genres_a: list, genres_b: list):
+        """
+        Print genre-level inclusion and exclusion summary.
+
+        Parameters
+        ----------
+        genres_a : list of str
+            Genres present in the recommendation list (added items).
+        genres_b : list of str
+            Genres present in the baseline list (removed items).
+        """
         rec_genres = list(set(genres_a) - set(genres_b))
         print("Genres included in the recommendation list: ", len(rec_genres))
         print(rec_genres)
@@ -251,7 +314,20 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
         print("Genres excluded from the recommendation list: ", len(base_genres))
         print(base_genres)
 
-    def user_explain_history(self, user_id):
+    def user_explain_history(self, user_id: str):
+        """
+        Print a position-by-position explanation of how item swaps affected
+        miscalibration for a single user.
+
+        Iterates over each position in the recommendation list, compares the
+        item against the corresponding baseline item, and prints the
+        miscalibration change caused by each swap.
+
+        Parameters
+        ----------
+        user_id : str
+            User identifier whose history is to be explained.
+        """
         cut_value = self.df_2["ORDER"].max()
 
         base_list = self.df_3[self.df_3["USER_ID"] == int(user_id)].iloc[:cut_value].copy()

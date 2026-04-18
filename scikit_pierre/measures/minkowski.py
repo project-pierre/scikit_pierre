@@ -1,73 +1,98 @@
 """
-This file contains all minkowski family equations.
+Minkowski family of pairwise distance measures.
+
+All functions accept two equal-length lists *p* and *q* of floats and
+return a non-negative float (divergence convention: lower = closer).
+
+Reference
+---------
+Cha, S.-H. (2007). Comprehensive study of distance/similarity measures
+between probability density functions.
+https://www.gly.fsu.edu/~parker/geostats/Cha.pdf
 """
 from math import sqrt
 
 
 def minkowski(p: list, q: list, d: int = 3) -> float:
     """
-    Minkowski (p, q) divergence. Low values means close, high values means far.
+    Compute the Minkowski distance of order *d* between p and q.
 
-    The reference for this implementation are from:
+    Parameters
+    ----------
+    p : list of float
+        First distribution vector.  Must be the same length as *q*.
+    q : list of float
+        Second distribution vector.  Must be the same length as *p*.
+    d : int, optional
+        Order of the Minkowski metric.  ``d=1`` is the City-Block (Manhattan)
+        distance; ``d=2`` is the Euclidean distance.  Defaults to 3.
 
-    - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
-
-    :param p: A list with float numbers, which represents the distribution values,
-                p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values,
-                p and q need to be the same size.
-    :param d: A value to indicate the Minkowski formulation, 1 is City Block, 2 is Euclidean, etc.
-    :return: A float between [0;+inf], which represent the distance between p and q.
+    Returns
+    -------
+    float
+        Minkowski distance in ``[0, +inf)``.
     """
     return sum(abs(p_i - q_j) ** d for p_i, q_j in zip(p, q)) ** (1 / d)
 
 
 def euclidean(p: list, q: list) -> float:
     """
-    Euclidean (p, q) divergence. Low values means close, high values means far.
+    Compute the Euclidean distance between p and q.
 
-    The reference for this implementation are from:
+    Equivalent to :func:`minkowski` with ``d=2``.
 
-    - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
+    Parameters
+    ----------
+    p : list of float
+        First distribution vector.  Must be the same length as *q*.
+    q : list of float
+        Second distribution vector.  Must be the same length as *p*.
 
-    :param p: A list with float numbers, which represents the distribution values,
-                p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values,
-                p and q need to be the same size.
-    :return: A float between [0;+inf], which represent the distance between p and q.
+    Returns
+    -------
+    float
+        Euclidean distance in ``[0, +inf)``.
     """
     return sqrt(sum(abs(p_i - q_j) ** 2 for p_i, q_j in zip(p, q)))
 
 
 def city_block(p: list, q: list) -> float:
     """
-    City Block (p, q) divergence. Low values means close, high values means far.
+    Compute the City-Block (Manhattan / L1) distance between p and q.
 
-    The reference for this implementation are from:
+    Equivalent to :func:`minkowski` with ``d=1``.
 
-    - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
+    Parameters
+    ----------
+    p : list of float
+        First distribution vector.  Must be the same length as *q*.
+    q : list of float
+        Second distribution vector.  Must be the same length as *p*.
 
-    :param p: A list with float numbers, which represents the distribution values,
-                p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values,
-                p and q need to be the same size.
-    :return: A float between [0;+inf], which represent the distance between p and q.
+    Returns
+    -------
+    float
+        City-Block distance in ``[0, +inf)``.
     """
     return sum(abs(p_i - q_j) for p_i, q_j in zip(p, q))
 
 
 def chebyshev(p: list, q: list) -> float:
     """
-    Chebyshev (p, q) divergence. Low values means close, high values means far.
+    Compute the Chebyshev (L-infinity) distance between p and q.
 
-    The reference for this implementation are from:
+    Returns the maximum absolute element-wise difference.
 
-    - CHA, S.-H (2007). "https://www.gly.fsu.edu/∼parker/geostats/Cha.pdf"
+    Parameters
+    ----------
+    p : list of float
+        First distribution vector.  Must be the same length as *q*.
+    q : list of float
+        Second distribution vector.  Must be the same length as *p*.
 
-    :param p: A list with float numbers, which represents the distribution values,
-                p and q need to be the same size.
-    :param q: A list with float numbers, which represents the distribution values,
-                p and q need to be the same size.
-    :return: A float between [0;+inf], which represent the distance between p and q.
+    Returns
+    -------
+    float
+        Chebyshev distance in ``[0, +inf)``.
     """
     return max(abs(p_i - q_j) for p_i, q_j in zip(p, q))

@@ -1,5 +1,16 @@
 """
-This file contains all chi family equations.
+Chi-square family of pairwise distribution divergence measures.
+
+All functions accept two equal-length lists *p* and *q* of non-negative
+floats representing probability distributions and return a non-negative
+float.  Lower values indicate distributions that are closer together
+(divergence convention), except where noted.
+
+Reference
+---------
+Cha, S.-H. (2007). Comprehensive study of distance/similarity measures
+between probability density functions.
+https://www.gly.fsu.edu/~parker/geostats/Cha.pdf
 """
 import math
 

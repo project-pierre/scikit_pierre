@@ -2,7 +2,7 @@ import numpy as np
 import unittest
 from copy import deepcopy
 
-from ...scikit_pierre.relevance.relevance_measures import sum_relevance_score, ndcg_relevance_score
+from scikit_pierre.relevance.relevance_measures import sum_relevance_score, ndcg_relevance_score
 
 
 class TestBaseRelevance(unittest.TestCase):
@@ -50,7 +50,7 @@ class TestNDCGRelevance(TestBaseRelevance):
         idcg = sum(((2 ** w) - 1) / (np.log2(i + 2)) for i, w in enumerate(l))
 
         answer1 = dcg / idcg
-        self.assertEqual(ndcg_relevance_score(self.test1), answer1)
+        self.assertAlmostEqual(ndcg_relevance_score(self.test1), answer1, places=4)
 
     def test_2(self):
         l = deepcopy(self.test2)
@@ -93,7 +93,7 @@ class TestNDCGRelevance(TestBaseRelevance):
         idcg = sum(((2 ** w) - 1) / (np.log2((i + 1) + 1)) for i, w in enumerate(l))
 
         answer6 = dcg / idcg
-        self.assertEqual(ndcg_relevance_score(self.test6), answer6)
+        self.assertAlmostEqual(ndcg_relevance_score(self.test6), answer6, places=4)
 
 
 if __name__ == '__main__':

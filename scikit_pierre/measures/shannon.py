@@ -1,5 +1,15 @@
 """
-This file contains all shanon family equations.
+Shannon's entropy family of pairwise distribution divergence measures.
+
+All functions accept two equal-length lists *p* and *q* of non-negative
+floats.  Zero values are replaced by a small epsilon (1e-5) before applying
+logarithms to avoid undefined results.
+
+Reference
+---------
+Cha, S.-H. (2007). Comprehensive study of distance/similarity measures
+between probability density functions.
+https://www.gly.fsu.edu/~parker/geostats/Cha.pdf
 """
 
 from math import log
@@ -116,18 +126,13 @@ def jensen_shannon(p: list, q: list) -> float:
     :return: A float between [0;+inf], which represent the distance between p and q.
     """
 
-    def compute_left(p_i: float, q_i: float) -> float:
+    def compute(p_i: float, q_i: float) -> float:
         p_a = 0.00001 if p_i == 0 else p_i
         q_b = 0.00001 if q_i == 0 else q_i
-        return p_a * log((2 * p_a) / (p_a + q_b))
+        denom = p_a + q_b
+        return p_a * log((2 * p_a) / denom) + q_b * log((2 * q_b) / denom)
 
-    def compute_right(p_i: float, q_i: float) -> float:
-        p_a = 0.00001 if p_i == 0 else p_i
-        q_b = 0.00001 if q_i == 0 else q_i
-        return q_b * log((2 * q_b) / (p_a + q_b))
-
-    return (1 / 2) * (sum(compute_left(p_i, q_i) for p_i, q_i in zip(p, q)) +
-                      sum(compute_right(p_i, q_i) for p_i, q_i in zip(p, q)))
+    return (1 / 2) * sum(compute(p_i, q_i) for p_i, q_i in zip(p, q))
 
 
 def jensen_difference(p: list, q: list) -> float:
