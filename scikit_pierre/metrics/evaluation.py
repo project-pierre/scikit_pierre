@@ -38,11 +38,12 @@ AverageNumberOfOItemsChanges (ANIC)
 AverageNumberOfGenreChanges (ANGC)
     Mean genre-level changes relative to a baseline list.
 """
+# pylint: disable=too-many-lines
 import itertools
 from collections import Counter
 from typing import List
 
-from numpy import mean, triu_indices, array, log2, sum, linalg
+from numpy import mean, triu_indices, array, log2, sum as np_sum, linalg
 from pandas import DataFrame, notna
 import scipy.sparse as sp
 from sklearn.metrics.pairwise import cosine_similarity
@@ -364,9 +365,9 @@ class Novelty(BaseMetric):
                 v = pop[str(i)]
                 if v == 0:
                     v = 0.00001
-                self_information += sum(-log2(v/u))
+                self_information += np_sum(-log2(v/u))
             mean_self_information.append(self_information/n)
-        novelty = sum(mean_self_information)/k
+        novelty = np_sum(mean_self_information)/k
         return novelty
 
     def compute(self):
@@ -541,6 +542,7 @@ class Miscalibration(BaseCalibrationMetric):
         )
 
     def user_association_miscalibration(self, distri: dict):
+        """Map each user id to their miscalibration score."""
         return {
             ix: self.compute_miscalibration(
                 self.target_dist[ix],
@@ -630,7 +632,7 @@ class NumberOfUserIncreaseAndDecreaseMiscalibration(Miscalibration):
     or decreased (``increase=False``).
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
             self,
             users_profile_df: DataFrame, users_rec_list_df: DataFrame,
             users_baseline_df: DataFrame, items_df: DataFrame,
@@ -709,12 +711,11 @@ class NumberOfUserIncreaseAndDecreaseMiscalibration(Miscalibration):
                 for ix in self.users_ix
                 if rec_miscalib[ix] >= base_miscalib[ix]
             ]
-        else:
-            return [
-                rec_miscalib[ix]
-                for ix in self.users_ix
-                if rec_miscalib[ix] < base_miscalib[ix]
-            ]
+        return [
+            rec_miscalib[ix]
+            for ix in self.users_ix
+            if rec_miscalib[ix] < base_miscalib[ix]
+        ]
 
     def base_dist_compute(self):
         """
@@ -763,10 +764,7 @@ class UserIDMiscalibration(NumberOfUserIncreaseAndDecreaseMiscalibration):
         list of float
             Miscalibration values from :meth:`selecting_users`.
         """
-        return [
-            value
-            for value in self.selecting_users()
-        ]
+        return list(self.selecting_users())
 
     def compute(self) -> float:
         """

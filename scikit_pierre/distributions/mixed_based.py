@@ -85,4 +85,3 @@ def mixed_gleb_twb_with_probability_property(items: dict) -> dict:
     total = sum(distribution.values())
     final_distribution = {g: value / total for g, value in distribution.items()}
     return final_distribution
-

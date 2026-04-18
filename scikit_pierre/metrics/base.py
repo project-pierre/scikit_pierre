@@ -1,3 +1,4 @@
+"""Base classes for evaluation metrics."""
 from numpy import mean
 from pandas import DataFrame
 
@@ -117,7 +118,6 @@ class BaseMetric:
 
         :return: A float with the single computation result.
         """
-        pass
 
     def compute(self) -> float:
         """
@@ -136,7 +136,7 @@ class BaseMetric:
         return mean(users_results)
 
 
-class BaseCalibrationMetric(BaseMetric):
+class BaseCalibrationMetric(BaseMetric):  # pylint: disable=too-many-instance-attributes
     """
     Abstract base class for calibration-based evaluation metrics.
 
@@ -145,7 +145,7 @@ class BaseCalibrationMetric(BaseMetric):
     caching.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
             self,
             users_profile_df: DataFrame, users_rec_list_df: DataFrame, items_set_df: DataFrame,
             distribution_name: str = "CWS", distance_func_name: str = "KL",
@@ -250,10 +250,12 @@ class BaseCalibrationMetric(BaseMetric):
         return dist_dict
 
     def compute_target_dist(self):
+        """Compute and cache the target distribution from df_1."""
         if self.target_dist is None:
             self.target_dist = self.compute_distribution(self.df_1)
 
     def compute_realized_dist(self):
+        """Compute and cache the realized distribution from df_2."""
         if self.realized_dist is None:
             self.realized_dist = self.compute_distribution(self.df_2)
 

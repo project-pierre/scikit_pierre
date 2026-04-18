@@ -161,4 +161,3 @@ def transform_to_vec(target_dist: dict, realized_dist: dict):
     q = [t[1] for t in dist_tuple]
 
     return p, q
-

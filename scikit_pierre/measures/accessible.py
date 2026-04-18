@@ -11,7 +11,8 @@ from . import minkowski, l1, intersection, inner_product, shannon, fidelity, chi
     vicissitude
 
 
-def calibration_measures_funcs(measure: str = "KL"):
+def calibration_measures_funcs(  # pylint: disable=too-many-return-statements,too-many-branches,too-many-statements
+        measure: str = "KL"):
     """
     Return the similarity or divergence function identified by *measure*.
 

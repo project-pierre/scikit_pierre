@@ -133,4 +133,3 @@ def time_genre_with_probability_property(items: dict) -> dict:
     norm = sum(dist.values())
     distribution = {g: value / norm for g, value in dist.items()}
     return distribution
-

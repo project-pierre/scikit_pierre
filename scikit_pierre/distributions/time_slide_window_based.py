@@ -23,7 +23,8 @@ from .mixed_based import mixed_gleb_twb
 from .time_based import time_weighted_based
 
 
-def temporal_slide_window_base_function(items: dict, major: int = 10, using: str = "CWS") -> dict:
+def temporal_slide_window_base_function(  # pylint: disable=too-many-locals
+        items: dict, major: int = 10, using: str = "CWS") -> dict:
     """
     Core implementation of the Temporal Slide Window (TSW) distribution.
 

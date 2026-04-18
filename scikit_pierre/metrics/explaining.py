@@ -33,7 +33,7 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
     0.0 as a sentinel value.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
             self,
             users_profile_df: DataFrame, users_rec_list_df: DataFrame,
             users_baseline_df: DataFrame, items_df: DataFrame,
@@ -134,6 +134,7 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
         )
 
     def user_association_miscalibration(self, distri: dict):
+        """Map each user id to their miscalibration score."""
         return {
             str(ix): self.compute_miscalibration(
                 self.target_dist[ix],
@@ -142,7 +143,7 @@ class ExplainingMiscalibration(BaseCalibrationMetric):
             for ix in self.users_ix
         }
 
-    def compute(self) -> float:
+    def compute(self) -> float:  # pylint: disable=too-many-locals
         """
         Run the explanation pipeline and print results to stdout.
 

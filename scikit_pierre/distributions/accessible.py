@@ -8,7 +8,8 @@ instances and returns a ``dict`` mapping genre/class label to a float value.
 from . import class_based, entropy_based, time_based, mixed_based, time_slide_window_based
 
 
-def distributions_funcs(distribution: str):
+def distributions_funcs(  # pylint: disable=too-many-return-statements,too-many-branches
+        distribution: str):
     """
     Return the distribution function identified by *distribution*.
 

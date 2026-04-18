@@ -54,7 +54,7 @@ class CalibrationBase(BaseTradeOff):
 
     @staticmethod
     def _tradeoff_sim(lmbda: float, relevance_value: float, fairness_value: float,
-                      **kwargs) -> float:
+                      **_kwargs) -> float:
         """
         Compute the trade-off utility for a similarity-based fairness measure.
 
@@ -84,7 +84,7 @@ class CalibrationBase(BaseTradeOff):
 
     @staticmethod
     def _tradeoff_div(lmbda: float, relevance_value: float, fairness_value: float,
-                      **kwargs) -> float:
+                      **_kwargs) -> float:
         """
         Compute the trade-off utility for a divergence-based fairness measure.
 
@@ -153,7 +153,7 @@ class LinearCalibration(CalibrationBase):
     - Steck (2018). https://doi.org/10.1145/3240323.3240372
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
             self,
             users_preferences: DataFrame, candidate_items: DataFrame,
             item_set: DataFrame, users_distribution: DataFrame = None, batch: int = 128
@@ -186,11 +186,12 @@ class LinearCalibration(CalibrationBase):
         self._select_item_component = None
         self._tradeoff_balance_component = None
 
-    def config(self, distribution_component: str = "CWS",
-               fairness_component: str = "CHI_SQUARE", relevance_component: str = "SUM",
-               tradeoff_weight_component: str = "STD",
-               select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01,
-               d: int = 3):
+    def config(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+            self, distribution_component: str = "CWS",
+            fairness_component: str = "CHI_SQUARE", relevance_component: str = "SUM",
+            tradeoff_weight_component: str = "STD",
+            select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01,
+            d: int = 3):
         """
         Configure the trade-off components.  Must be called before :meth:`fit`.
 
@@ -382,7 +383,7 @@ class LinearCalibration(CalibrationBase):
 
             # loop for test each item in each position
             for i_id, item in candidate_items.items():
-                if (i_id not in recommendation_list.keys()) and (i_id is not None):
+                if (i_id not in recommendation_list) and (i_id is not None):
                     temp_rec_items = deepcopy(recommendation_list)
                     temp_item = deepcopy(item)
                     temp_item.time = float(1 / int(order))
@@ -414,7 +415,7 @@ class LinearCalibration(CalibrationBase):
         raise NameError("Select item algorithm not found!")
 
 
-class LogarithmBias(CalibrationBase):
+class LogarithmBias(CalibrationBase):  # pylint: disable=too-many-instance-attributes
     """
     Calibration trade-off with an item-bias correction (LogarithmBias).
 
@@ -436,8 +437,9 @@ class LogarithmBias(CalibrationBase):
     BIAS_ALPHA = 0.001
     BIAS_SIGMA = 0.001
 
-    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame,
-                 item_set: DataFrame, users_distribution: DataFrame = None, batch: int = 128):
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+            self, users_preferences: DataFrame, candidate_items: DataFrame,
+            item_set: DataFrame, users_distribution: DataFrame = None, batch: int = 128):
         """
         Parameters
         ----------
@@ -467,11 +469,12 @@ class LogarithmBias(CalibrationBase):
         self._select_item_component = None
         self._tradeoff_balance_component = None
 
-    def config(self, distribution_component: str = "CWS",
-               fairness_component: str = "CHI_SQUARE", relevance_component: str = "SUM",
-               tradeoff_weight_component: str = "STD",
-               select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01,
-               d: int = 3):
+    def config(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+            self, distribution_component: str = "CWS",
+            fairness_component: str = "CHI_SQUARE", relevance_component: str = "SUM",
+            tradeoff_weight_component: str = "STD",
+            select_item_component: str = "SURROGATE", list_size: int = 10, alpha: float = 0.01,
+            d: int = 3):
         """
         Configure the trade-off components.  Must be called before :meth:`fit`.
 
@@ -679,8 +682,9 @@ class LogarithmBias(CalibrationBase):
         return sum(user_bias_list) / (
                 LogarithmBias.BIAS_SIGMA + len(user_bias_list)), user_bias_list
 
-    def _compute_utility(self, target_distribution: dict, lmbda: float, temp_rec_items: dict,
-                         bias_list: list, i_id: str):
+    def _compute_utility(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+            self, target_distribution: dict, lmbda: float, temp_rec_items: dict,
+            bias_list: list, i_id: str):
         """
         Compute the bias-corrected utility for a candidate list state.
 
@@ -725,7 +729,8 @@ class LogarithmBias(CalibrationBase):
         utility_value = sign(utility_lin) * log(abs(utility_lin) + 1) + user_bias
         return utility_value, new_bias_list
 
-    def _surrogate(self, target_distribution: dict, candidate_items: dict, lmbda: float) -> dict:
+    def _surrogate(  # pylint: disable=too-many-locals
+            self, target_distribution: dict, candidate_items: dict, lmbda: float) -> dict:
         """
         Start with an empty recommendation list,
         loop over the candidate items, during each iteration
@@ -751,7 +756,7 @@ class LogarithmBias(CalibrationBase):
             best_bias_list = []
             # loop for test each item in each position
             for i_id, item in candidate_items.items():
-                if (i_id not in recommendation_list.keys()) and (i_id is not None):
+                if (i_id not in recommendation_list) and (i_id is not None):
                     temp_rec_items = deepcopy(recommendation_list)
                     temp_item = deepcopy(item)
                     bias_list = deepcopy(best_bias_list)
@@ -795,17 +800,7 @@ class PopularityCalibration(LinearCalibration):
     algorithm is otherwise identical to :class:`LinearCalibration`.
     """
 
-    def __init__(
-            self,
-            users_preferences: DataFrame, candidate_items: DataFrame,
-            item_set: DataFrame, users_distribution: DataFrame = None, batch: int = 128
-    ):
-        super().__init__(
-            users_preferences, candidate_items, item_set, users_distribution, batch
-        )
-
-
-class TwoStageCalibration:
+class TwoStageCalibration:  # pylint: disable=too-many-instance-attributes
     """
     Two-stage calibration pipeline (popularity then genre).
 
@@ -820,7 +815,7 @@ class TwoStageCalibration:
     dimensions — popularity and genre diversity.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
             self,
             users_preferences: DataFrame, candidate_items: DataFrame,
             item_set: DataFrame, users_popularity_distribution: DataFrame = None,
@@ -834,8 +829,8 @@ class TwoStageCalibration:
         self.users_genres_distribution = users_genres_distribution
         self.batch = batch
         if "POPULARITY" not in self.item_set.columns and "GENRES" not in self.item_set.columns:
-            raise ("We not found the columns POPULARITY and GENRES in the item_set."
-                   "Please insert these columns.")
+            raise ValueError("We not found the columns POPULARITY and GENRES in the item_set."
+                             "Please insert these columns.")
         self._distribution_component = None
         self._fairness_component = None
         self._relevance_component = None
@@ -847,7 +842,7 @@ class TwoStageCalibration:
         self.pop_calib_instance = None
         self.gen_calib_instance = None
 
-    def config(
+    def config(  # pylint: disable=too-many-arguments,too-many-positional-arguments
             self,
             distribution_component: str = "CWS", fairness_component: str = "CHI",
             relevance_component: str = "SUM", tradeoff_weight_component: str = "STD",
@@ -919,7 +914,8 @@ class TwoStageCalibration:
             self.users_preferences, self.candidate_items,
             self.item_set, self.users_popularity_distribution,
         )
-        first_list_size = int(ceil(len(self.users_preferences)/len(self.users_preferences["USER_ID"].unique().tolist())/2))
+        n_users = len(self.users_preferences["USER_ID"].unique().tolist())
+        first_list_size = int(ceil(len(self.users_preferences) / n_users / 2))
         self.pop_calib_instance.config(
             distribution_component=self._distribution_component,
             fairness_component=self._fairness_component,

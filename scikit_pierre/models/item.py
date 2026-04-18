@@ -7,9 +7,8 @@ lookup dictionary, and exposes helpers used by the distribution and
 calibration modules.
 """
 import itertools
+import sys
 from collections import Counter
-
-from copy import deepcopy
 
 from pandas import DataFrame, merge, concat
 
@@ -170,7 +169,7 @@ class ItemsInMemory:
                     "with the popularity groups of each item.\n"
                     "Please verify the example directory to understand how to produce the groups."
                 )
-                exit(0)
+                sys.exit(0)
 
             splitted = item_genre.split('|')
             genre_ratio = 1.0
@@ -193,26 +192,26 @@ class ItemsInMemory:
         users_transactions : DataFrame
             Must contain at least the column ``ITEM_ID``.
         """
-        def group_by_ratio(value: float) -> str:
+        def group_by_ratio(value: float) -> str:  # pylint: disable=too-many-return-statements
             if 0.0 <= value < 0.1:
                 return 'G10'
-            elif 0.1 <= value < 0.2:
+            if 0.1 <= value < 0.2:
                 return 'G09'
-            elif 0.2 <= value < 0.3:
+            if 0.2 <= value < 0.3:
                 return 'G08'
-            elif 0.3 <= value < 0.4:
+            if 0.3 <= value < 0.4:
                 return 'G07'
-            elif 0.4 <= value < 0.5:
+            if 0.4 <= value < 0.5:
                 return 'G06'
-            elif 0.5 <= value < 0.6:
+            if 0.5 <= value < 0.6:
                 return 'G05'
-            elif 0.6 <= value < 0.7:
+            if 0.6 <= value < 0.7:
                 return 'G04'
-            elif 0.7 <= value < 0.8:
+            if 0.7 <= value < 0.8:
                 return 'G03'
-            elif 0.8 <= value < 0.9:
+            if 0.8 <= value < 0.9:
                 return 'G02'
-            elif 0.9 <= value <= 1:
+            if 0.9 <= value <= 1:
                 return 'G01'
             return 'G00'
 
@@ -324,7 +323,7 @@ class ItemsInMemory:
             item = Item(_id=item_id, classes=item_genre, bias=item_bias)
             self.items[str(item_id)] = item
 
-    def select_user_items(self, data: DataFrame) -> dict:
+    def select_user_items(self, data: DataFrame) -> dict:  # pylint: disable=too-many-locals
         """
         Build a user-specific item dictionary from a user interaction slice.
 
@@ -367,8 +366,8 @@ class ItemsInMemory:
             maximum = timestamps.max()
             divisor = maximum - minimum
 
-        for idx in range(len(item_ids)):
-            item_id = str(item_ids[idx])
+        for idx, raw_id in enumerate(item_ids):
+            item_id = str(raw_id)
             item = self.items[item_id]
             # Share the immutable classes dict — distribution functions never mutate it.
             new_item = Item(_id=item.id, classes=item.classes, bias=item.bias)
@@ -429,7 +428,7 @@ class ItemsInMemory:
         """
         user_results = []
         for _, item in self.items.items():
-            genres = "|".join([g for g in item.classes.keys()])
+            genres = "|".join(list(item.classes.keys()))
             user_results += [DataFrame(data=[[item.id, genres]],
                                        columns=["ITEM_ID", "GENRES"])]
         return concat(user_results, sort=False)

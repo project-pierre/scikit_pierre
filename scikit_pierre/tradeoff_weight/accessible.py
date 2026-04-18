@@ -8,7 +8,7 @@ the corresponding callable from :mod:`weight`.
 from . import weight
 
 
-def tradeoff_weights_funcs(env_lambda: str):
+def tradeoff_weights_funcs(env_lambda: str):  # pylint: disable=too-many-return-statements
     """
     Return the trade-off weight function or constant identified by *env_lambda*.
 

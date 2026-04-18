@@ -1,2 +1,6 @@
 [MASTER]
 init-hook='import sys; sys.path.append("./scikit_pierre")'
+
+[MESSAGES CONTROL]
+# R0801: duplicate-code across modules is intentional (shared algorithm patterns)
+disable=R0801

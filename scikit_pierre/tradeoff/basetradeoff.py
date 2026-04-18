@@ -21,8 +21,9 @@ class BaseTradeOff:
     before invoking :meth:`fit`.
     """
 
-    def __init__(self, users_preferences: DataFrame, candidate_items: DataFrame,
-                 item_set: DataFrame, users_distribution: DataFrame = None, batch: int = 128):
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+            self, users_preferences: DataFrame, candidate_items: DataFrame,
+            item_set: DataFrame, users_distribution: DataFrame = None, batch: int = 128):
         """
         Parameters
         ----------
